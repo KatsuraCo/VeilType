@@ -2,6 +2,7 @@ package com.truelock.enigma.ime
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.inputmethodservice.InputMethodService
 import android.os.Handler
 import android.os.Looper
@@ -28,6 +29,8 @@ import com.truelock.enigma.profiles.ProfileSelectionPolicy
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
+import com.truelock.enigma.ui.AudioCapsuleActivity
+import com.truelock.enigma.ui.VideoCapsuleActivity
 import com.truelock.enigma.ui.localizedProfileStatus
 import com.truelock.enigma.ui.localizedSecretKind
 
@@ -139,6 +142,8 @@ class EnigmaKeyboardService : InputMethodService() {
         val decryptButton = root.findViewById<ImageButton>(R.id.decryptButton)
         val keyButton = root.findViewById<ImageButton>(R.id.keyButton)
         val clearButton = root.findViewById<ImageButton>(R.id.clearButton)
+        val audioCapsuleButton = root.findViewById<ImageButton>(R.id.audioCapsuleButton)
+        val videoCapsuleButton = root.findViewById<ImageButton>(R.id.videoCapsuleButton)
         val languageToggleButton = root.findViewById<EnigmaKeyView>(R.id.languageToggleButton)
         val commaButton = root.findViewById<EnigmaKeyView>(R.id.commaButton)
         val dotButton = root.findViewById<EnigmaKeyView>(R.id.dotButton)
@@ -834,6 +839,26 @@ class EnigmaKeyboardService : InputMethodService() {
             setPreview(getString(R.string.keyboard_clipboard_cleared), PreviewTone.DEFAULT)
             mode = KeyboardMode.IDLE
             render()
+        }
+
+        fun launchCapsuleActivity(target: Class<*>, statusRes: Int) {
+            requestHideSelf(0)
+            startActivity(
+                Intent(this, target).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                },
+            )
+            setPreview(getString(statusRes), PreviewTone.DEFAULT)
+            mode = KeyboardMode.IDLE
+            render()
+        }
+
+        audioCapsuleButton.setOnClickListener {
+            launchCapsuleActivity(AudioCapsuleActivity::class.java, R.string.open_audio_capsule)
+        }
+
+        videoCapsuleButton.setOnClickListener {
+            launchCapsuleActivity(VideoCapsuleActivity::class.java, R.string.open_video_capsule)
         }
 
         updateShiftState()

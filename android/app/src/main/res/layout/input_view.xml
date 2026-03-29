@@ -58,6 +58,28 @@
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:tint="#102030" />
 
+        <ImageButton
+            android:id="@+id/audioCapsuleButton"
+            android:layout_width="34dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_key_utility"
+            android:contentDescription="@string/open_audio_capsule"
+            android:padding="6dp"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:tint="#102030" />
+
+        <ImageButton
+            android:id="@+id/videoCapsuleButton"
+            android:layout_width="34dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_key_utility"
+            android:contentDescription="@string/open_video_capsule"
+            android:padding="6dp"
+            android:src="@android:drawable/ic_menu_camera"
+            android:tint="#102030" />
+
         <TextView
             android:id="@+id/statusText"
             android:layout_width="0dp"
