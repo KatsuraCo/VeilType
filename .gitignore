@@ -1,0 +1,29 @@
+# General
+.DS_Store
+Thumbs.db
+
+# Android / Gradle
+.gradle/
+build/
+local.properties
+*.keystore
+*.jks
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Secrets
+.env
+.env.*
+android/keystore.properties
+
+# Generated vectors or local dumps
+tmp/
+out/
