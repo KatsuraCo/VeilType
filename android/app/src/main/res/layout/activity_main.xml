@@ -154,6 +154,26 @@
             android:textColor="#FFFFFF" />
 
         <Button
+            android:id="@+id/openAudioCapsuleButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_secondary_button"
+            android:text="@string/open_audio_capsule"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/openVideoCapsuleButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_secondary_button"
+            android:text="@string/open_video_capsule"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+
+        <Button
             android:id="@+id/copyDemoMessageButton"
             android:layout_width="match_parent"
             android:layout_height="50dp"

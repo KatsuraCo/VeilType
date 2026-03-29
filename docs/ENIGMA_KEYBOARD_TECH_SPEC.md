@@ -49,6 +49,7 @@ Out of scope for MVP:
 - macOS
 - browser extension
 - sticker-like or image-based encrypted capsules
+- full audio and video capsule parity
 
 ## 4. Main user scenarios
 
@@ -476,6 +477,22 @@ Preferred direction:
 Avoid for early versions:
 - fragile steganography hidden inside ordinary decorative stickers
 - dependence on messenger-native sticker pipelines, compression, or format-specific behavior
+
+## 20.2 Future extension: audio and video capsules
+
+Potential post-MVP extension:
+- `TLA1` audio capsules for voice-note style messages
+- `TLV1` video capsules for short circle-style clips
+- file-based encrypted containers instead of raw text payloads
+
+Preferred interaction:
+- one record button
+- one preview state
+- one send action
+- one explicit decrypt-and-play action on the recipient side
+
+Important constraint:
+- the UI may mimic Telegram or WhatsApp closely, but the implementation stays inside Enigma and does not hook into messenger-native voice/video internals
 
 ## 21. Final product stance
 

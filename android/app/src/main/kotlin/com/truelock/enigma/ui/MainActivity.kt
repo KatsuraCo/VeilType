@@ -40,6 +40,12 @@ class MainActivity : AppCompatActivity() {
         binding.openKeyExchangeButton.setOnClickListener {
             startActivity(Intent(this, KeyExchangeActivity::class.java))
         }
+        binding.openAudioCapsuleButton.setOnClickListener {
+            startActivity(Intent(this, AudioCapsuleActivity::class.java))
+        }
+        binding.openVideoCapsuleButton.setOnClickListener {
+            startActivity(Intent(this, VideoCapsuleActivity::class.java))
+        }
         binding.openInputMethodSettingsButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
         }

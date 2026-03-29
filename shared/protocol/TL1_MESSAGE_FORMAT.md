@@ -214,3 +214,14 @@ MVP compatibility policy:
 - new clients must support `TL1`
 - no backward compatibility guarantees yet beyond version 1
 - future formats must use a different visible prefix if wire layout changes significantly
+
+## 14. Related media capsule families
+
+`TL1` is the text family.
+
+Planned related families:
+- `TLA1` for audio capsules
+- `TLV1` for video capsules
+
+These media families are not copy/paste strings like `TL1`.
+They use file-based container formats and should be specified separately from the text wire format.
