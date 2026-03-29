@@ -170,6 +170,37 @@
     </ScrollView>
 
     <LinearLayout
+        android:id="@+id/audioCapsuleActionPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_premium_card"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/audioCapsuleActionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Голосовая капсула готова к отправке"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/sendAudioCapsuleActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_primary_button"
+            android:text="Отправить голосовую капсулу"
+            android:textAllCaps="false"
+            android:textColor="#102030"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/keyRow1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

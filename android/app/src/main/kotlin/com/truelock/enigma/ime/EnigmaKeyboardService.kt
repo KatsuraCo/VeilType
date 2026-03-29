@@ -23,6 +23,7 @@ import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Button
 import androidx.core.content.FileProvider
 import androidx.core.view.inputmethod.EditorInfoCompat
 import androidx.core.view.inputmethod.InputConnectionCompat
@@ -147,6 +148,9 @@ class EnigmaKeyboardService : InputMethodService() {
         )
         val previewText = root.findViewById<TextView>(R.id.previewText)
         val previewScroll = root.findViewById<ScrollView>(R.id.previewScroll)
+        val audioCapsuleActionPanel = root.findViewById<LinearLayout>(R.id.audioCapsuleActionPanel)
+        val audioCapsuleActionText = root.findViewById<TextView>(R.id.audioCapsuleActionText)
+        val sendAudioCapsuleActionButton = root.findViewById<Button>(R.id.sendAudioCapsuleActionButton)
         val enigmaToggleButton = root.findViewById<ImageButton>(R.id.enigmaToggleButton)
         val decryptButton = root.findViewById<ImageButton>(R.id.decryptButton)
         val keyButton = root.findViewById<ImageButton>(R.id.keyButton)
@@ -177,6 +181,7 @@ class EnigmaKeyboardService : InputMethodService() {
         var inlineAudioRecorder: MediaRecorder? = null
         var inlineAudioSourceFile: java.io.File? = null
         var lastAudioCapsuleFile: java.io.File? = null
+        var lastAudioCapsuleNeedsManualSend = false
         var inlineAudioStartedAt = 0L
 
         val rowButtons = listOf(
@@ -333,6 +338,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 }
                 inlineAudioStartedAt = System.currentTimeMillis()
                 lastAudioCapsuleFile = null
+                lastAudioCapsuleNeedsManualSend = false
                 mode = KeyboardMode.IDLE
                 previewTone = PreviewTone.DEFAULT
                 previewMessage = "Voice capsule recording: 0:00 • ${profile.title}"
@@ -370,8 +376,10 @@ class EnigmaKeyboardService : InputMethodService() {
                 )
                 lastAudioCapsuleFile = capsule
                 if (tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
+                    lastAudioCapsuleNeedsManualSend = false
                     setPreview("Voice capsule inserted into chat.", PreviewTone.SUCCESS)
                 } else {
+                    lastAudioCapsuleNeedsManualSend = true
                     setPreview(
                         "Voice capsule created. This chat does not support direct capsule insert from the keyboard. Hold the mic button to send it manually.",
                         PreviewTone.DEFAULT,
@@ -747,8 +755,14 @@ class EnigmaKeyboardService : InputMethodService() {
             audioCapsuleButton.alpha = 1f
             videoCapsuleButton.alpha = if (inlineAudioRecorder != null) 0.45f else 1f
             sendAudioCapsuleButton.visibility =
-                if (lastAudioCapsuleFile != null && inlineAudioRecorder == null) View.VISIBLE else View.GONE
-            sendAudioCapsuleButton.alpha = if (lastAudioCapsuleFile != null && inlineAudioRecorder == null) 1f else 0.45f
+                if (lastAudioCapsuleNeedsManualSend && lastAudioCapsuleFile != null && inlineAudioRecorder == null) View.VISIBLE else View.GONE
+            sendAudioCapsuleButton.alpha =
+                if (lastAudioCapsuleNeedsManualSend && lastAudioCapsuleFile != null && inlineAudioRecorder == null) 1f else 0.45f
+            audioCapsuleActionPanel.visibility =
+                if (lastAudioCapsuleNeedsManualSend && lastAudioCapsuleFile != null && inlineAudioRecorder == null) View.VISIBLE else View.GONE
+            audioCapsuleActionText.text =
+                if (lastAudioCapsuleNeedsManualSend) "Голосовая капсула готова. Отправь её из этой плашки."
+                else "Голосовая капсула готова к отправке"
             previewScroll.post { previewScroll.scrollTo(0, 0) }
             updateCharacterKeys()
             renderSuggestions()
@@ -1051,6 +1065,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 render()
                 return
             }
+            lastAudioCapsuleNeedsManualSend = false
             setPreview(getString(R.string.media_capsule_share), PreviewTone.DEFAULT)
             render()
         }
@@ -1069,6 +1084,10 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         sendAudioCapsuleButton.setOnClickListener {
+            openLastAudioCapsuleFallback()
+        }
+
+        sendAudioCapsuleActionButton.setOnClickListener {
             openLastAudioCapsuleFallback()
         }
 
