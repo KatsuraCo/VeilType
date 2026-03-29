@@ -153,6 +153,7 @@ class EnigmaKeyboardService : InputMethodService() {
         val clearButton = root.findViewById<ImageButton>(R.id.clearButton)
         val audioCapsuleButton = root.findViewById<ImageButton>(R.id.audioCapsuleButton)
         val videoCapsuleButton = root.findViewById<ImageButton>(R.id.videoCapsuleButton)
+        val sendAudioCapsuleButton = root.findViewById<ImageButton>(R.id.sendAudioCapsuleButton)
         val languageToggleButton = root.findViewById<EnigmaKeyView>(R.id.languageToggleButton)
         val commaButton = root.findViewById<EnigmaKeyView>(R.id.commaButton)
         val dotButton = root.findViewById<EnigmaKeyView>(R.id.dotButton)
@@ -745,6 +746,9 @@ class EnigmaKeyboardService : InputMethodService() {
             )
             audioCapsuleButton.alpha = 1f
             videoCapsuleButton.alpha = if (inlineAudioRecorder != null) 0.45f else 1f
+            sendAudioCapsuleButton.visibility =
+                if (lastAudioCapsuleFile != null && inlineAudioRecorder == null) View.VISIBLE else View.GONE
+            sendAudioCapsuleButton.alpha = if (lastAudioCapsuleFile != null && inlineAudioRecorder == null) 1f else 0.45f
             previewScroll.post { previewScroll.scrollTo(0, 0) }
             updateCharacterKeys()
             renderSuggestions()
@@ -1062,6 +1066,10 @@ class EnigmaKeyboardService : InputMethodService() {
         audioCapsuleButton.setOnLongClickListener {
             openLastAudioCapsuleFallback()
             true
+        }
+
+        sendAudioCapsuleButton.setOnClickListener {
+            openLastAudioCapsuleFallback()
         }
 
         videoCapsuleButton.setOnClickListener {
