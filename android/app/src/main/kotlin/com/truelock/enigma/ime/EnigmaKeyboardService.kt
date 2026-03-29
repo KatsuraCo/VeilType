@@ -1,9 +1,13 @@
 package com.truelock.enigma.ime
 
+import android.Manifest
+import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.inputmethodservice.InputMethodService
+import android.media.MediaRecorder
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -19,17 +23,21 @@ import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.FileProvider
+import androidx.core.view.inputmethod.InputConnectionCompat
+import androidx.core.view.inputmethod.InputContentInfoCompat
 import com.truelock.enigma.R
 import com.truelock.enigma.clipboard.ClipboardDecryptResult
 import com.truelock.enigma.clipboard.ClipboardDecryptService
 import com.truelock.enigma.crypto.Tl1MessageCodec
+import com.truelock.enigma.media.MediaCapsuleService
+import com.truelock.enigma.media.MediaCapsuleType
 import com.truelock.enigma.profiles.KeyProfile
 import com.truelock.enigma.profiles.KeyProfileStatus
 import com.truelock.enigma.profiles.ProfileSelectionPolicy
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
-import com.truelock.enigma.ui.AudioCapsuleActivity
 import com.truelock.enigma.ui.VideoCapsuleActivity
 import com.truelock.enigma.ui.localizedProfileStatus
 import com.truelock.enigma.ui.localizedSecretKind
@@ -163,6 +171,11 @@ class EnigmaKeyboardService : InputMethodService() {
             codec = Tl1MessageCodec(),
         )
         val codec = Tl1MessageCodec()
+        val mediaCapsuleService = MediaCapsuleService(applicationContext, secureProfileStore)
+        var inlineAudioRecorder: MediaRecorder? = null
+        var inlineAudioSourceFile: java.io.File? = null
+        var lastAudioCapsuleFile: java.io.File? = null
+        var inlineAudioStartedAt = 0L
 
         val rowButtons = listOf(
             row1Ids.map { root.findViewById<EnigmaKeyView>(it) },
@@ -179,6 +192,7 @@ class EnigmaKeyboardService : InputMethodService() {
             backspaceButton,
             enterButton,
         )
+        lateinit var render: () -> Unit
 
         fun matchingProfiles(store: SecureProfileStore): List<KeyProfile> {
             val appPackage = currentInputEditorInfo?.packageName
@@ -232,9 +246,140 @@ class EnigmaKeyboardService : InputMethodService() {
             previewTone = tone
         }
 
+        fun formatDurationShort(durationMs: Long): String {
+            val totalSeconds = (durationMs / 1000).toInt().coerceAtLeast(0)
+            return "%d:%02d".format(totalSeconds / 60, totalSeconds % 60)
+        }
+
+        val inlineAudioTicker = object : Runnable {
+            override fun run() {
+                val recorder = inlineAudioRecorder ?: return
+                val selectedProfile = resolveSelectedProfile(secureProfileStore)
+                val elapsed = (System.currentTimeMillis() - inlineAudioStartedAt).coerceAtLeast(0L)
+                setPreview(
+                    "Voice capsule recording: ${formatDurationShort(elapsed)}" +
+                        (selectedProfile?.let { " • ${it.title}" } ?: ""),
+                    PreviewTone.DEFAULT,
+                )
+                if (recorder != null) {
+                    render()
+                    repeatHandler.postDelayed(this, 250L)
+                }
+            }
+        }
+
+        fun releaseInlineAudioRecorder() {
+            repeatHandler.removeCallbacks(inlineAudioTicker)
+            inlineAudioRecorder?.release()
+            inlineAudioRecorder = null
+            inlineAudioSourceFile = null
+        }
+
+        fun tryCommitCapsuleFile(file: java.io.File, mimeType: String): Boolean {
+            val inputConnection = currentInputConnection ?: return false
+            val editorInfo = currentInputEditorInfo ?: return false
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                file,
+            )
+            val description = ClipDescription(
+                file.name,
+                arrayOf(mimeType, "application/octet-stream"),
+            )
+            val contentInfo = InputContentInfoCompat(uri, description, null)
+            return InputConnectionCompat.commitContent(
+                inputConnection,
+                editorInfo,
+                contentInfo,
+                InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION,
+                null,
+            )
+        }
+
+        fun startInlineAudioRecording() {
+            val profile = resolveSelectedProfile(secureProfileStore)
+                ?: run {
+                    setPreview(getString(R.string.keyboard_encrypt_missing_profile), PreviewTone.ERROR)
+                    render()
+                    return
+                }
+            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                setPreview(getString(R.string.media_capsule_error_audio_permission), PreviewTone.ERROR)
+                render()
+                return
+            }
+
+            runCatching {
+                val sourceFile = mediaCapsuleService.createRecordingFile(MediaCapsuleType.AUDIO, "m4a")
+                releaseInlineAudioRecorder()
+                inlineAudioSourceFile = sourceFile
+                inlineAudioRecorder = MediaRecorder().apply {
+                    setAudioSource(MediaRecorder.AudioSource.MIC)
+                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                    setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                    setOutputFile(sourceFile.absolutePath)
+                    prepare()
+                    start()
+                }
+                inlineAudioStartedAt = System.currentTimeMillis()
+                lastAudioCapsuleFile = null
+                mode = KeyboardMode.IDLE
+                previewTone = PreviewTone.DEFAULT
+                previewMessage = "Voice capsule recording: 0:00 • ${profile.title}"
+                repeatHandler.removeCallbacks(inlineAudioTicker)
+                repeatHandler.post(inlineAudioTicker)
+                render()
+            }.onFailure {
+                releaseInlineAudioRecorder()
+                setPreview(getString(R.string.media_capsule_error_encrypt), PreviewTone.ERROR)
+                render()
+            }
+        }
+
+        fun stopInlineAudioRecording() {
+            val recorder = inlineAudioRecorder
+            val sourceFile = inlineAudioSourceFile
+            val profile = resolveSelectedProfile(secureProfileStore)
+            if (recorder == null || sourceFile == null || profile == null) {
+                releaseInlineAudioRecorder()
+                setPreview(getString(R.string.media_capsule_error_no_recording), PreviewTone.ERROR)
+                render()
+                return
+            }
+
+            runCatching {
+                recorder.stop()
+                recorder.reset()
+                val durationMs = (System.currentTimeMillis() - inlineAudioStartedAt).coerceAtLeast(1000L)
+                val capsule = mediaCapsuleService.encryptFile(
+                    sourceFile = sourceFile,
+                    type = MediaCapsuleType.AUDIO,
+                    mimeType = "audio/mp4",
+                    durationMs = durationMs,
+                    profile = profile,
+                )
+                lastAudioCapsuleFile = capsule
+                if (tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
+                    setPreview("Voice capsule inserted into chat.", PreviewTone.SUCCESS)
+                } else {
+                    setPreview(
+                        "Voice capsule created, but this chat does not accept capsules directly from the keyboard.",
+                        PreviewTone.ERROR,
+                    )
+                }
+            }.onFailure {
+                setPreview(getString(R.string.media_capsule_error_encrypt), PreviewTone.ERROR)
+            }
+
+            releaseInlineAudioRecorder()
+            mode = KeyboardMode.IDLE
+            render()
+        }
+
         fun schedulePreviewClear() {
             repeatHandler.removeCallbacksAndMessages(PREVIEW_CLEAR_TOKEN)
-            if (previewTone == PreviewTone.DECRYPTED) return
+            if (previewTone == PreviewTone.DECRYPTED || inlineAudioRecorder != null) return
             repeatHandler.postAtTime(
                 {
                     if (mode != KeyboardMode.DECRYPT) {
@@ -549,7 +694,7 @@ class EnigmaKeyboardService : InputMethodService() {
             }
         }
 
-        fun render() {
+        render = {
             val selectedProfile = resolveSelectedProfile(secureProfileStore)
             profileInfoText.text = selectedProfile?.let {
                 getString(
@@ -586,6 +731,12 @@ class EnigmaKeyboardService : InputMethodService() {
                 TypedValue.COMPLEX_UNIT_SP,
                 if (previewTone == PreviewTone.DECRYPTED) 16f else 14f,
             )
+            audioCapsuleButton.setImageResource(
+                if (inlineAudioRecorder != null) android.R.drawable.ic_media_pause
+                else android.R.drawable.ic_btn_speak_now,
+            )
+            audioCapsuleButton.alpha = 1f
+            videoCapsuleButton.alpha = if (inlineAudioRecorder != null) 0.45f else 1f
             previewScroll.post { previewScroll.scrollTo(0, 0) }
             updateCharacterKeys()
             renderSuggestions()
@@ -841,24 +992,80 @@ class EnigmaKeyboardService : InputMethodService() {
             render()
         }
 
-        fun launchCapsuleActivity(target: Class<*>, statusRes: Int) {
+        fun launchVideoCapsuleActivity() {
             requestHideSelf(0)
-            startActivity(
-                Intent(this, target).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                },
-            )
-            setPreview(getString(statusRes), PreviewTone.DEFAULT)
+            runCatching {
+                startActivity(
+                    Intent(this, VideoCapsuleActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    },
+                )
+                setPreview(getString(R.string.open_video_capsule), PreviewTone.DEFAULT)
+            }.onFailure {
+                setPreview("Video capsule could not be opened from the keyboard.", PreviewTone.ERROR)
+            }
             mode = KeyboardMode.IDLE
             render()
         }
 
+        fun openLastAudioCapsuleFallback() {
+            val capsule = lastAudioCapsuleFile ?: run {
+                setPreview(
+                    "No audio capsule is ready for manual sending yet.",
+                    PreviewTone.ERROR,
+                )
+                render()
+                return
+            }
+            requestHideSelf(0)
+            runCatching {
+                startActivity(
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = MediaCapsuleType.AUDIO.capsuleMimeType
+                        putExtra(
+                            Intent.EXTRA_STREAM,
+                            FileProvider.getUriForFile(
+                                this@EnigmaKeyboardService,
+                                "${applicationContext.packageName}.fileprovider",
+                                capsule,
+                            ),
+                        )
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    },
+                )
+            }.onFailure {
+                setPreview("Manual sending failed for the last voice capsule.", PreviewTone.ERROR)
+                render()
+                return
+            }
+            setPreview(getString(R.string.media_capsule_share), PreviewTone.DEFAULT)
+            render()
+        }
+
         audioCapsuleButton.setOnClickListener {
-            launchCapsuleActivity(AudioCapsuleActivity::class.java, R.string.open_audio_capsule)
+            if (inlineAudioRecorder != null) {
+                stopInlineAudioRecording()
+            } else {
+                startInlineAudioRecording()
+            }
+        }
+
+        audioCapsuleButton.setOnLongClickListener {
+            openLastAudioCapsuleFallback()
+            true
         }
 
         videoCapsuleButton.setOnClickListener {
-            launchCapsuleActivity(VideoCapsuleActivity::class.java, R.string.open_video_capsule)
+            if (inlineAudioRecorder != null) {
+                setPreview(
+                    "Stop voice recording before opening video capsule.",
+                    PreviewTone.ERROR,
+                )
+                render()
+            } else {
+                launchVideoCapsuleActivity()
+            }
         }
 
         updateShiftState()
