@@ -38,34 +38,46 @@
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/recordButton"
+        <TextView
+            android:id="@+id/timerText"
             android:layout_width="match_parent"
-            android:layout_height="68dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
-            android:background="@drawable/bg_primary_button"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="#FFFFFF"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/recordLabelText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
             android:text="@string/audio_capsule_record"
-            android:textAllCaps="false"
-            android:textColor="#102030"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textColor="#B9CBDB"
+            android:textSize="15sp" />
 
         <Button
-            android:id="@+id/stopButton"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_secondary_button"
-            android:text="@string/audio_capsule_stop"
+            android:id="@+id/recordButton"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_capsule_record_button"
+            android:text="●"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            android:visibility="gone" />
+            android:textSize="42sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/openCapsuleButton"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="22dp"
             android:background="@drawable/bg_secondary_button"
             android:text="@string/media_capsule_open"
             android:textAllCaps="false"

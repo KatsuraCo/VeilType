@@ -6,7 +6,6 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -34,6 +33,20 @@ class AudioCapsuleActivity : AppCompatActivity() {
     private var currentDecrypted: DecryptedMediaCapsule? = null
     private var currentPlaybackFile: File? = null
     private var recordingStartedAt = 0L
+    private var lastDurationMs = 0L
+    private val timerRunnable = object : Runnable {
+        override fun run() {
+            val duration = if (recorder != null) {
+                (System.currentTimeMillis() - recordingStartedAt).coerceAtLeast(0L)
+            } else {
+                lastDurationMs
+            }
+            binding.timerText.text = formatDuration(duration)
+            if (recorder != null) {
+                binding.timerText.postDelayed(this, 250L)
+            }
+        }
+    }
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -69,7 +82,6 @@ class AudioCapsuleActivity : AppCompatActivity() {
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
-        binding.stopButton.setOnClickListener { stopRecordingAndEncrypt() }
         binding.openCapsuleButton.setOnClickListener { openCapsuleLauncher.launch(arrayOf("*/*")) }
         binding.playButton.setOnClickListener { playCurrentCapsule() }
         binding.shareButton.setOnClickListener { shareCurrentCapsule() }
@@ -83,6 +95,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
         super.onStop()
         stopPlayback()
         releaseRecorder()
+        binding.timerText.removeCallbacks(timerRunnable)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -104,10 +117,13 @@ class AudioCapsuleActivity : AppCompatActivity() {
             start()
         }
         recordingStartedAt = System.currentTimeMillis()
+        lastDurationMs = 0L
         currentCapsuleFile = null
         currentDecrypted = null
         currentPlaybackFile = null
         renderStatus(getString(R.string.media_capsule_status_recording, profile.title))
+        binding.timerText.removeCallbacks(timerRunnable)
+        binding.timerText.post(timerRunnable)
         syncControls()
     }
 
@@ -130,6 +146,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
                 durationMs = durationMs,
                 profile = profile,
             )
+            lastDurationMs = durationMs
             currentCapsuleFile = capsule
             currentDecrypted = null
             currentPlaybackFile = sourceFile
@@ -138,6 +155,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_encrypt))
         }
 
+        binding.timerText.removeCallbacks(timerRunnable)
         releaseRecorder()
         syncControls()
     }
@@ -152,6 +170,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
             currentCapsuleFile = tempFile
             currentDecrypted = decrypted
             currentPlaybackFile = decrypted.plaintextFile
+            lastDurationMs = decrypted.metadata.durationMs
             renderStatus(
                 getString(
                     R.string.media_capsule_status_decrypted,
@@ -192,7 +211,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
             setDataSource(playbackFile.absolutePath)
             setOnCompletionListener {
                 stopPlayback()
-                renderStatus(getString(R.string.media_capsule_status_ready))
+                renderStatus(getString(R.string.media_capsule_status_saved, currentCapsuleFile?.name ?: playbackFile.name))
                 syncControls()
             }
             prepare()
@@ -252,6 +271,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
     private fun stopPlayback() {
         player?.release()
         player = null
+        syncControls()
     }
 
     private fun releaseRecorder() {
@@ -264,16 +284,32 @@ class AudioCapsuleActivity : AppCompatActivity() {
         val isRecording = recorder != null
         val hasCapsule = currentCapsuleFile != null
         val hasPlayback = currentPlaybackFile != null || currentDecrypted != null
+        val isPlaying = player != null
 
         binding.recordButton.text = if (isRecording) {
+            "■"
+        } else {
+            "●"
+        }
+        binding.recordLabelText.text = if (isRecording) {
             getString(R.string.audio_capsule_stop)
         } else {
             getString(R.string.audio_capsule_record)
         }
-        binding.stopButton.visibility = if (isRecording) View.VISIBLE else View.GONE
         binding.playButton.isEnabled = hasCapsule || hasPlayback
         binding.shareButton.isEnabled = hasCapsule
         binding.openCapsuleButton.isEnabled = !isRecording
+        binding.playButton.alpha = if (hasCapsule || hasPlayback) 1f else 0.55f
+        binding.shareButton.alpha = if (hasCapsule) 1f else 0.55f
+        binding.openCapsuleButton.alpha = if (!isRecording) 1f else 0.55f
+        if (!isRecording) {
+            binding.timerText.text = formatDuration(lastDurationMs)
+        }
+        binding.playButton.text = if (isPlaying) {
+            "■"
+        } else {
+            getString(R.string.audio_capsule_play)
+        }
     }
 
     private fun formatDuration(durationMs: Long): String {

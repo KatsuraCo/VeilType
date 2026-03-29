@@ -5,7 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.MediaController
+import android.view.View
+import android.view.ViewOutlineProvider
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -74,8 +75,16 @@ class VideoCapsuleActivity : AppCompatActivity() {
         binding.openCapsuleButton.setOnClickListener { openCapsuleLauncher.launch(arrayOf("*/*")) }
         binding.playButton.setOnClickListener { playCurrentCapsule() }
         binding.shareButton.setOnClickListener { shareCurrentCapsule() }
+        binding.previewPlayOverlay.setOnClickListener { playCurrentCapsule() }
+        binding.videoView.setOnClickListener { playCurrentCapsule() }
 
-        binding.videoView.setMediaController(MediaController(this))
+        binding.videoPreviewContainer.outlineProvider = ViewOutlineProvider.BACKGROUND
+        binding.videoPreviewContainer.clipToOutline = true
+        binding.videoView.setOnCompletionListener {
+            binding.previewPlayOverlay.visibility = View.VISIBLE
+            renderStatus(getString(R.string.media_capsule_status_saved, currentCapsuleFile?.name ?: currentPlaybackFile?.name ?: "video"))
+            syncControls()
+        }
         renderStatus(getString(R.string.media_capsule_status_ready))
         syncControls()
         handleIncomingIntent(intent)
@@ -85,6 +94,14 @@ class VideoCapsuleActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleIncomingIntent(intent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (binding.videoView.isPlaying) {
+            binding.videoView.stopPlayback()
+        }
+        binding.previewPlayOverlay.visibility = View.VISIBLE
     }
 
     private fun launchVideoCapture() {
@@ -119,6 +136,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             currentDecrypted = null
             currentPlaybackFile = sourceFile
             binding.videoView.setVideoPath(sourceFile.absolutePath)
+            binding.previewPlayOverlay.visibility = View.VISIBLE
             renderStatus(getString(R.string.media_capsule_status_saved, capsule.name))
             syncControls()
         }.onFailure {
@@ -138,6 +156,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             currentDecrypted = decrypted
             currentPlaybackFile = decrypted.plaintextFile
             binding.videoView.setVideoPath(decrypted.plaintextFile.absolutePath)
+            binding.previewPlayOverlay.visibility = View.VISIBLE
             renderStatus(getString(R.string.media_capsule_status_decrypted, decrypted.profile.title, "video"))
             syncControls()
             if (autoPlay) {
@@ -160,7 +179,15 @@ class VideoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_open_first))
             return
         }
+        if (binding.videoView.isPlaying) {
+            binding.videoView.pause()
+            binding.previewPlayOverlay.visibility = View.VISIBLE
+            renderStatus(getString(R.string.media_capsule_status_saved, currentCapsuleFile?.name ?: playbackFile.name))
+            syncControls()
+            return
+        }
         binding.videoView.setVideoPath(playbackFile.absolutePath)
+        binding.previewPlayOverlay.visibility = View.GONE
         binding.videoView.start()
         renderStatus(getString(R.string.video_capsule_status_playing))
         syncControls()
@@ -216,7 +243,16 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private fun syncControls() {
         val hasCapsule = currentCapsuleFile != null
         val hasPlayback = currentPlaybackFile != null || currentDecrypted != null
+        val isPlaying = binding.videoView.isPlaying
         binding.playButton.isEnabled = hasCapsule || hasPlayback
         binding.shareButton.isEnabled = hasCapsule
+        binding.playButton.alpha = if (hasCapsule || hasPlayback) 1f else 0.55f
+        binding.shareButton.alpha = if (hasCapsule) 1f else 0.55f
+        binding.playButton.text = if (isPlaying) {
+            "■"
+        } else {
+            getString(R.string.video_capsule_play)
+        }
+        binding.previewPlayOverlay.visibility = if (hasPlayback && !isPlaying) View.VISIBLE else View.GONE
     }
 }
