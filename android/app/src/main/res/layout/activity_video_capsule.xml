@@ -48,12 +48,13 @@
         <Button
             android:id="@+id/recordButton"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="68dp"
             android:layout_marginTop="18dp"
             android:background="@drawable/bg_primary_button"
             android:text="@string/video_capsule_record"
             android:textAllCaps="false"
             android:textColor="#102030"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <Button

@@ -36,6 +36,21 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.MediaCapsuleRouterActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/x-enigma-audio-capsule" />
+                <data android:mimeType="application/x-enigma-video-capsule" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".ui.AudioCapsuleActivity"
             android:exported="false" />
 

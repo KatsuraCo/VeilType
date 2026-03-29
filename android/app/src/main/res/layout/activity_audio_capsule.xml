@@ -41,12 +41,13 @@
         <Button
             android:id="@+id/recordButton"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="68dp"
             android:layout_marginTop="18dp"
             android:background="@drawable/bg_primary_button"
             android:text="@string/audio_capsule_record"
             android:textAllCaps="false"
             android:textColor="#102030"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <Button
@@ -57,7 +58,8 @@
             android:background="@drawable/bg_secondary_button"
             android:text="@string/audio_capsule_stop"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/openCapsuleButton"

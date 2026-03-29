@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.MediaController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -28,6 +29,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private var currentVideoFile: File? = null
     private var currentCapsuleFile: File? = null
     private var currentDecrypted: DecryptedMediaCapsule? = null
+    private var currentPlaybackFile: File? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -73,7 +75,16 @@ class VideoCapsuleActivity : AppCompatActivity() {
         binding.playButton.setOnClickListener { playCurrentCapsule() }
         binding.shareButton.setOnClickListener { shareCurrentCapsule() }
 
+        binding.videoView.setMediaController(MediaController(this))
         renderStatus(getString(R.string.media_capsule_status_ready))
+        syncControls()
+        handleIncomingIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
     }
 
     private fun launchVideoCapture() {
@@ -106,13 +117,17 @@ class VideoCapsuleActivity : AppCompatActivity() {
             )
             currentCapsuleFile = capsule
             currentDecrypted = null
+            currentPlaybackFile = sourceFile
+            binding.videoView.setVideoPath(sourceFile.absolutePath)
             renderStatus(getString(R.string.media_capsule_status_saved, capsule.name))
+            syncControls()
         }.onFailure {
             renderStatus(getString(R.string.media_capsule_error_encrypt))
+            syncControls()
         }
     }
 
-    private fun importCapsule(uri: Uri) {
+    private fun importCapsule(uri: Uri, autoPlay: Boolean = false) {
         runCatching {
             val tempFile = mediaCapsuleService.createRecordingFile(MediaCapsuleType.VIDEO, MediaCapsuleType.VIDEO.fileExtension)
             contentResolver.openInputStream(uri)?.use { input ->
@@ -121,25 +136,34 @@ class VideoCapsuleActivity : AppCompatActivity() {
             val decrypted = mediaCapsuleService.decryptFile(tempFile)
             currentCapsuleFile = tempFile
             currentDecrypted = decrypted
+            currentPlaybackFile = decrypted.plaintextFile
             binding.videoView.setVideoPath(decrypted.plaintextFile.absolutePath)
             renderStatus(getString(R.string.media_capsule_status_decrypted, decrypted.profile.title, "video"))
+            syncControls()
+            if (autoPlay) {
+                playCurrentCapsule()
+            }
         }.onFailure {
             renderStatus(getString(R.string.media_capsule_error_decrypt))
+            syncControls()
         }
     }
 
     private fun playCurrentCapsule() {
-        val decrypted = currentDecrypted ?: currentCapsuleFile?.let {
-            runCatching { mediaCapsuleService.decryptFile(it) }.getOrNull()
+        val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let {
+            runCatching { mediaCapsuleService.decryptFile(it) }.getOrNull()?.also { decrypted ->
+                currentDecrypted = decrypted
+                currentPlaybackFile = decrypted.plaintextFile
+            }?.plaintextFile
         }
-        if (decrypted == null) {
+        if (playbackFile == null) {
             renderStatus(getString(R.string.media_capsule_error_open_first))
             return
         }
-        currentDecrypted = decrypted
-        binding.videoView.setVideoPath(decrypted.plaintextFile.absolutePath)
+        binding.videoView.setVideoPath(playbackFile.absolutePath)
         binding.videoView.start()
         renderStatus(getString(R.string.video_capsule_status_playing))
+        syncControls()
     }
 
     private fun shareCurrentCapsule() {
@@ -155,13 +179,27 @@ class VideoCapsuleActivity : AppCompatActivity() {
         startActivity(
             Intent.createChooser(
                 Intent(Intent.ACTION_SEND).apply {
-                    type = "application/octet-stream"
+                    type = MediaCapsuleType.VIDEO.capsuleMimeType
                     putExtra(Intent.EXTRA_STREAM, uri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 },
                 getString(R.string.media_capsule_share),
             ),
         )
+    }
+
+    private fun handleIncomingIntent(intent: Intent?) {
+        val uri = resolveIncomingUri(intent) ?: return
+        importCapsule(uri, autoPlay = true)
+    }
+
+    private fun resolveIncomingUri(intent: Intent?): Uri? {
+        if (intent == null) return null
+        return when (intent.action) {
+            Intent.ACTION_VIEW -> intent.data
+            Intent.ACTION_SEND -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            else -> null
+        }
     }
 
     private fun resolveActiveProfile(): KeyProfile? =
@@ -173,5 +211,12 @@ class VideoCapsuleActivity : AppCompatActivity() {
 
     private fun renderStatus(message: String) {
         binding.statusText.text = message
+    }
+
+    private fun syncControls() {
+        val hasCapsule = currentCapsuleFile != null
+        val hasPlayback = currentPlaybackFile != null || currentDecrypted != null
+        binding.playButton.isEnabled = hasCapsule || hasPlayback
+        binding.shareButton.isEnabled = hasCapsule
     }
 }

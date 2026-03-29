@@ -3,9 +3,10 @@ package com.truelock.enigma.media
 enum class MediaCapsuleType(
     val magic: String,
     val fileExtension: String,
+    val capsuleMimeType: String,
 ) {
-    AUDIO("TLA1", "tla1"),
-    VIDEO("TLV1", "tlv1"),
+    AUDIO("TLA1", "tla1", "application/x-enigma-audio-capsule"),
+    VIDEO("TLV1", "tlv1", "application/x-enigma-video-capsule"),
     ;
 
     fun magicBytes(): ByteArray = magic.toByteArray(Charsets.US_ASCII)

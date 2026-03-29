@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -31,6 +32,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
     private var recordingFile: File? = null
     private var currentCapsuleFile: File? = null
     private var currentDecrypted: DecryptedMediaCapsule? = null
+    private var currentPlaybackFile: File? = null
     private var recordingStartedAt = 0L
 
     private val permissionLauncher = registerForActivityResult(
@@ -60,19 +62,33 @@ class AudioCapsuleActivity : AppCompatActivity() {
         )
         mediaCapsuleService = MediaCapsuleService(applicationContext, secureProfileStore)
 
-        binding.recordButton.setOnClickListener { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) }
+        binding.recordButton.setOnClickListener {
+            if (recorder != null) {
+                stopRecordingAndEncrypt()
+            } else {
+                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
         binding.stopButton.setOnClickListener { stopRecordingAndEncrypt() }
         binding.openCapsuleButton.setOnClickListener { openCapsuleLauncher.launch(arrayOf("*/*")) }
         binding.playButton.setOnClickListener { playCurrentCapsule() }
         binding.shareButton.setOnClickListener { shareCurrentCapsule() }
 
         renderStatus(getString(R.string.media_capsule_status_ready))
+        syncControls()
+        handleIncomingIntent(intent)
     }
 
     override fun onStop() {
         super.onStop()
         stopPlayback()
         releaseRecorder()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
     }
 
     private fun startRecording() {
@@ -90,7 +106,9 @@ class AudioCapsuleActivity : AppCompatActivity() {
         recordingStartedAt = System.currentTimeMillis()
         currentCapsuleFile = null
         currentDecrypted = null
+        currentPlaybackFile = null
         renderStatus(getString(R.string.media_capsule_status_recording, profile.title))
+        syncControls()
     }
 
     private fun stopRecordingAndEncrypt() {
@@ -114,15 +132,17 @@ class AudioCapsuleActivity : AppCompatActivity() {
             )
             currentCapsuleFile = capsule
             currentDecrypted = null
+            currentPlaybackFile = sourceFile
             renderStatus(getString(R.string.media_capsule_status_saved, capsule.name))
         }.onFailure {
             renderStatus(getString(R.string.media_capsule_error_encrypt))
         }
 
         releaseRecorder()
+        syncControls()
     }
 
-    private fun importCapsule(uri: Uri) {
+    private fun importCapsule(uri: Uri, autoPlay: Boolean = false) {
         runCatching {
             val tempFile = mediaCapsuleService.createRecordingFile(MediaCapsuleType.AUDIO, MediaCapsuleType.AUDIO.fileExtension)
             contentResolver.openInputStream(uri)?.use { input ->
@@ -131,6 +151,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
             val decrypted = mediaCapsuleService.decryptFile(tempFile)
             currentCapsuleFile = tempFile
             currentDecrypted = decrypted
+            currentPlaybackFile = decrypted.plaintextFile
             renderStatus(
                 getString(
                     R.string.media_capsule_status_decrypted,
@@ -138,27 +159,47 @@ class AudioCapsuleActivity : AppCompatActivity() {
                     formatDuration(decrypted.metadata.durationMs),
                 ),
             )
+            syncControls()
+            if (autoPlay) {
+                playCurrentCapsule()
+            }
         }.onFailure {
             renderStatus(getString(R.string.media_capsule_error_decrypt))
+            syncControls()
         }
     }
 
     private fun playCurrentCapsule() {
-        val decrypted = currentDecrypted ?: currentCapsuleFile?.let {
-            runCatching { mediaCapsuleService.decryptFile(it) }.getOrNull()
+        if (player != null) {
+            stopPlayback()
+            renderStatus(getString(R.string.media_capsule_status_ready))
+            syncControls()
+            return
         }
-        if (decrypted == null) {
+
+        val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let {
+            runCatching { mediaCapsuleService.decryptFile(it) }.getOrNull()?.also { decrypted ->
+                currentDecrypted = decrypted
+                currentPlaybackFile = decrypted.plaintextFile
+            }?.plaintextFile
+        }
+        if (playbackFile == null) {
             renderStatus(getString(R.string.media_capsule_error_open_first))
             return
         }
-        currentDecrypted = decrypted
         stopPlayback()
         player = MediaPlayer().apply {
-            setDataSource(decrypted.plaintextFile.absolutePath)
+            setDataSource(playbackFile.absolutePath)
+            setOnCompletionListener {
+                stopPlayback()
+                renderStatus(getString(R.string.media_capsule_status_ready))
+                syncControls()
+            }
             prepare()
             start()
         }
         renderStatus(getString(R.string.audio_capsule_status_playing))
+        syncControls()
     }
 
     private fun shareCurrentCapsule() {
@@ -174,13 +215,27 @@ class AudioCapsuleActivity : AppCompatActivity() {
         startActivity(
             Intent.createChooser(
                 Intent(Intent.ACTION_SEND).apply {
-                    type = "application/octet-stream"
+                    type = MediaCapsuleType.AUDIO.capsuleMimeType
                     putExtra(Intent.EXTRA_STREAM, uri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 },
                 getString(R.string.media_capsule_share),
             ),
         )
+    }
+
+    private fun handleIncomingIntent(intent: Intent?) {
+        val uri = resolveIncomingUri(intent) ?: return
+        importCapsule(uri, autoPlay = true)
+    }
+
+    private fun resolveIncomingUri(intent: Intent?): Uri? {
+        if (intent == null) return null
+        return when (intent.action) {
+            Intent.ACTION_VIEW -> intent.data
+            Intent.ACTION_SEND -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            else -> null
+        }
     }
 
     private fun resolveActiveProfile(): KeyProfile? =
@@ -202,6 +257,23 @@ class AudioCapsuleActivity : AppCompatActivity() {
     private fun releaseRecorder() {
         recorder?.release()
         recorder = null
+        recordingFile = null
+    }
+
+    private fun syncControls() {
+        val isRecording = recorder != null
+        val hasCapsule = currentCapsuleFile != null
+        val hasPlayback = currentPlaybackFile != null || currentDecrypted != null
+
+        binding.recordButton.text = if (isRecording) {
+            getString(R.string.audio_capsule_stop)
+        } else {
+            getString(R.string.audio_capsule_record)
+        }
+        binding.stopButton.visibility = if (isRecording) View.VISIBLE else View.GONE
+        binding.playButton.isEnabled = hasCapsule || hasPlayback
+        binding.shareButton.isEnabled = hasCapsule
+        binding.openCapsuleButton.isEnabled = !isRecording
     }
 
     private fun formatDuration(durationMs: Long): String {
