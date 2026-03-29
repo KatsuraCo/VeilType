@@ -24,6 +24,7 @@ import android.widget.ScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.FileProvider
+import androidx.core.view.inputmethod.EditorInfoCompat
 import androidx.core.view.inputmethod.InputConnectionCompat
 import androidx.core.view.inputmethod.InputContentInfoCompat
 import com.truelock.enigma.R
@@ -278,6 +279,13 @@ class EnigmaKeyboardService : InputMethodService() {
         fun tryCommitCapsuleFile(file: java.io.File, mimeType: String): Boolean {
             val inputConnection = currentInputConnection ?: return false
             val editorInfo = currentInputEditorInfo ?: return false
+            val supportedMimeTypes = EditorInfoCompat.getContentMimeTypes(editorInfo)
+            val canCommit = supportedMimeTypes.any { supportedType ->
+                ClipDescription.compareMimeTypes(mimeType, supportedType) ||
+                    ClipDescription.compareMimeTypes("application/octet-stream", supportedType)
+            }
+            if (!canCommit) return false
+
             val uri = FileProvider.getUriForFile(
                 this,
                 "${applicationContext.packageName}.fileprovider",
@@ -364,8 +372,8 @@ class EnigmaKeyboardService : InputMethodService() {
                     setPreview("Voice capsule inserted into chat.", PreviewTone.SUCCESS)
                 } else {
                     setPreview(
-                        "Voice capsule created, but this chat does not accept capsules directly from the keyboard.",
-                        PreviewTone.ERROR,
+                        "Voice capsule created. This chat does not support direct capsule insert from the keyboard. Hold the mic button to send it manually.",
+                        PreviewTone.DEFAULT,
                     )
                 }
             }.onFailure {
