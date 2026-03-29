@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         val profiles = secureProfileStore.listProfiles()
         binding.profileCountText.text = getString(R.string.profile_count_format, profiles.size)
         binding.debugStatusText.text = status
-        binding.languageButton.text = "🌐 ${resolveCurrentLanguageLabel()}"
+        binding.languageButton.text = "\uD83C\uDF10 ${resolveCurrentLanguageLabel()}"
         binding.keyboardStateText.text = getString(
             R.string.main_keyboard_state_format,
             resolveKeyboardStateLabel(),
@@ -103,15 +103,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLanguagePicker() {
-        val items = supportedLanguages.map { it.label }.toTypedArray()
-        val currentIndex = supportedLanguages.indexOfFirst { it.tag == resolveCurrentLanguageTag() }
+        val items = supportedLanguageTags.map(::languageLabel).toTypedArray()
+        val currentIndex = supportedLanguageTags.indexOf(resolveCurrentLanguageTag())
             .takeIf { it >= 0 }
             ?: 0
 
         AlertDialog.Builder(this)
             .setSingleChoiceItems(items, currentIndex) { dialog, which ->
-                val selected = supportedLanguages[which]
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(selected.tag))
+                val selectedTag = supportedLanguageTags[which]
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(selectedTag))
                 dialog.dismiss()
             }
             .show()
@@ -128,33 +128,30 @@ class MainActivity : AppCompatActivity() {
 
     private fun resolveCurrentLanguageLabel(): String {
         val tag = resolveCurrentLanguageTag()
-        return supportedLanguages.firstOrNull { it.tag == tag }?.label ?: run {
-            val locale = Locale.forLanguageTag(tag.ifBlank { "en" })
-            locale.getDisplayLanguage(locale).replaceFirstChar { character ->
-                if (character.isLowerCase()) {
-                    character.titlecase(locale)
-                } else {
-                    character.toString()
-                }
+        return languageLabel(tag)
+    }
+
+    private fun languageLabel(tag: String): String {
+        val locale = Locale.forLanguageTag(tag.ifBlank { "en" })
+        return locale.getDisplayLanguage(locale).replaceFirstChar { character ->
+            if (character.isLowerCase()) {
+                character.titlecase(locale)
+            } else {
+                character.toString()
             }
         }
     }
 
-    private data class SupportedLanguage(
-        val tag: String,
-        val label: String,
-    )
-
     private companion object {
-        val supportedLanguages = listOf(
-            SupportedLanguage("ru", "Русский"),
-            SupportedLanguage("en", "English"),
-            SupportedLanguage("de", "Deutsch"),
-            SupportedLanguage("es", "Español"),
-            SupportedLanguage("fr", "Français"),
-            SupportedLanguage("it", "Italiano"),
-            SupportedLanguage("pt", "Português"),
-            SupportedLanguage("tr", "Türkçe"),
+        val supportedLanguageTags = listOf(
+            "ru",
+            "en",
+            "de",
+            "es",
+            "fr",
+            "it",
+            "pt",
+            "tr",
         )
     }
 
