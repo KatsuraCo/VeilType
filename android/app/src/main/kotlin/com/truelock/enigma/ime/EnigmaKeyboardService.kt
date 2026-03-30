@@ -40,6 +40,7 @@ import com.truelock.enigma.profiles.ProfileSelectionPolicy
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
+import com.truelock.enigma.ui.AudioPermissionRequestActivity
 import com.truelock.enigma.ui.VideoCapsuleActivity
 import com.truelock.enigma.ui.localizedProfileStatus
 import com.truelock.enigma.ui.localizedSecretKind
@@ -319,7 +320,13 @@ class EnigmaKeyboardService : InputMethodService() {
                     return
                 }
             if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                setPreview(getString(R.string.media_capsule_error_audio_permission), PreviewTone.ERROR)
+                requestHideSelf(0)
+                startActivity(
+                    Intent(this, AudioPermissionRequestActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    },
+                )
+                setPreview(getString(R.string.media_capsule_error_audio_permission), PreviewTone.DEFAULT)
                 render()
                 return
             }

@@ -36,6 +36,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.AudioPermissionRequestActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.MediaCapsuleRouterActivity"
             android:exported="true">
             <intent-filter>
