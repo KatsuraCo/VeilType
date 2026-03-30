@@ -312,6 +312,16 @@ class EnigmaKeyboardService : InputMethodService() {
             )
         }
 
+        fun supportsDirectCapsuleInsert(editorInfo: EditorInfo?, mimeType: String): Boolean {
+            if (editorInfo == null) return false
+            val supportedMimeTypes = EditorInfoCompat.getContentMimeTypes(editorInfo)
+            if (supportedMimeTypes.isEmpty()) return false
+            return supportedMimeTypes.any { supportedType ->
+                ClipDescription.compareMimeTypes(mimeType, supportedType) ||
+                    ClipDescription.compareMimeTypes("application/octet-stream", supportedType)
+            }
+        }
+
         fun startInlineAudioRecording() {
             val profile = resolveSelectedProfile(secureProfileStore)
                 ?: run {
@@ -363,6 +373,10 @@ class EnigmaKeyboardService : InputMethodService() {
             val recorder = inlineAudioRecorder
             val sourceFile = inlineAudioSourceFile
             val profile = resolveSelectedProfile(secureProfileStore)
+            val directInsertSupported = supportsDirectCapsuleInsert(
+                currentInputEditorInfo,
+                MediaCapsuleType.AUDIO.capsuleMimeType,
+            )
             if (recorder == null || sourceFile == null || profile == null) {
                 releaseInlineAudioRecorder()
                 setPreview(getString(R.string.media_capsule_error_no_recording), PreviewTone.ERROR)
@@ -382,13 +396,19 @@ class EnigmaKeyboardService : InputMethodService() {
                     profile = profile,
                 )
                 lastAudioCapsuleFile = capsule
-                if (tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
+                if (directInsertSupported && tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
                     lastAudioCapsuleNeedsManualSend = false
-                    setPreview("Voice capsule inserted into chat.", PreviewTone.SUCCESS)
+                    setPreview("Этот чат принял голосовую капсулу прямо из клавиатуры.", PreviewTone.SUCCESS)
+                } else if (directInsertSupported) {
+                    lastAudioCapsuleNeedsManualSend = true
+                    setPreview(
+                        "Чат заявил поддержку капсул, но вставка не сработала. Отправь капсулу через кнопку ниже.",
+                        PreviewTone.DEFAULT,
+                    )
                 } else {
                     lastAudioCapsuleNeedsManualSend = true
                     setPreview(
-                        "Voice capsule created. This chat does not support direct capsule insert from the keyboard. Hold the mic button to send it manually.",
+                        "Этот чат не поддерживает прямую вставку голосовой капсулы из клавиатуры. Отправь её через кнопку ниже.",
                         PreviewTone.DEFAULT,
                     )
                 }
@@ -769,7 +789,11 @@ class EnigmaKeyboardService : InputMethodService() {
                 if (lastAudioCapsuleNeedsManualSend && lastAudioCapsuleFile != null && inlineAudioRecorder == null) View.VISIBLE else View.GONE
             audioCapsuleActionText.text =
                 if (lastAudioCapsuleNeedsManualSend) "Голосовая капсула готова. Отправь её из этой плашки."
-                else "Голосовая капсула готова к отправке"
+                else if (supportsDirectCapsuleInsert(currentInputEditorInfo, MediaCapsuleType.AUDIO.capsuleMimeType)) {
+                    "Этот чат поддерживает прямую вставку капсулы."
+                } else {
+                    "Этот чат не поддерживает прямую вставку капсулы."
+                }
             previewScroll.post { previewScroll.scrollTo(0, 0) }
             updateCharacterKeys()
             renderSuggestions()
