@@ -1934,8 +1934,8 @@ class EnigmaKeyboardService : InputMethodService() {
             val originalWord = match.value
             val normalized = lowercaseForCurrentLanguage(originalWord)
             val replacementBase = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_AUTOCORRECT[normalized]
-                KeyboardLanguage.EN -> EN_AUTOCORRECT[normalized]
+                KeyboardLanguage.RU -> RU_AUTOCORRECT_V2[normalized]
+                KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
                 KeyboardLanguage.TR -> TR_AUTOCORRECT[normalized]
                 KeyboardLanguage.ES -> ES_AUTOCORRECT[normalized]
                 KeyboardLanguage.PT -> PT_AUTOCORRECT[normalized]
@@ -1967,15 +1967,18 @@ class EnigmaKeyboardService : InputMethodService() {
             if (word.length < 2 || characterMode != CharacterMode.LETTERS) return emptyList()
             val normalized = lowercaseForCurrentLanguage(word)
             val lexicon = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_SUGGESTIONS
-                KeyboardLanguage.EN -> EN_SUGGESTIONS
+                KeyboardLanguage.RU -> RU_SUGGESTIONS_V2
+                KeyboardLanguage.EN -> EN_SUGGESTIONS_V2
                 else -> return emptyList()
             }
             val correction = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_AUTOCORRECT[normalized]
-                KeyboardLanguage.EN -> EN_AUTOCORRECT[normalized]
+                KeyboardLanguage.RU -> RU_AUTOCORRECT_V2[normalized]
+                KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
                 else -> null
             }
+            val recentMatches = recentWords
+                .filter { it.startsWith(normalized) && it != normalized }
+                .take(3)
 
             val prefixMatches = lexicon
                 .filter { it.startsWith(normalized) && it != normalized }
@@ -1993,9 +1996,9 @@ class EnigmaKeyboardService : InputMethodService() {
 
             return buildList {
                 if (!correction.isNullOrBlank()) add(correction)
+                addAll(recentMatches)
                 addAll(prefixMatches)
                 addAll(fuzzyMatches)
-                addAll(recentWords.filter { it.startsWith(normalized) && it != normalized })
             }
                 .distinct()
                 .take(3)
@@ -3209,8 +3212,8 @@ class EnigmaKeyboardService : InputMethodService() {
                 val originalWord = match.value
                 val normalized = originalWord.lowercase(keyLanguageLocale())
                 val replacementBase = when (currentLanguage) {
-                    KeyboardLanguage.RU -> RU_AUTOCORRECT[normalized]
-                    KeyboardLanguage.EN -> EN_AUTOCORRECT[normalized]
+                    KeyboardLanguage.RU -> RU_AUTOCORRECT_V2[normalized]
+                    KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
                     KeyboardLanguage.TR -> TR_AUTOCORRECT[normalized]
                     KeyboardLanguage.ES -> ES_AUTOCORRECT[normalized]
                     KeyboardLanguage.PT -> PT_AUTOCORRECT[normalized]
@@ -3500,6 +3503,153 @@ class EnigmaKeyboardService : InputMethodService() {
             "hello", "thanks", "please", "today", "tomorrow", "message",
             "keyboard", "project", "encrypt", "decrypt", "normal", "great",
             "check", "update", "continue", "camera", "screen", "working",
+        )
+        val RU_AUTOCORRECT_V2 = mapOf(
+            "\u043f\u0440\u0435\u0432\u0435\u0442" to "\u043f\u0440\u0438\u0432\u0435\u0442",
+            "\u043f\u0438\u0432\u0435\u0442" to "\u043f\u0440\u0438\u0432\u0435\u0442",
+            "\u0441\u043f\u043e\u0441\u0438\u0431\u043e" to "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u0441\u043f\u0430\u0441\u0438\u0431\u0430" to "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u043f\u043e\u0436\u0430\u043b\u0443\u0441\u0442\u0430" to "\u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430",
+            "\u0449\u0430\u0441" to "\u0441\u0435\u0439\u0447\u0430\u0441",
+            "\u0441\u0435\u0447\u0430\u0441" to "\u0441\u0435\u0439\u0447\u0430\u0441",
+            "\u043d\u0435\u0437\u043d\u0430\u044e" to "\u043d\u0435 \u0437\u043d\u0430\u044e",
+            "\u043d\u0438\u0437\u043d\u0430\u044e" to "\u043d\u0435 \u0437\u043d\u0430\u044e",
+            "\u0432\u043e\u043e\u0431\u0449\u0435\u043c" to "\u0432 \u043e\u0431\u0449\u0435\u043c",
+            "\u0432\u0430\u0430\u0431\u0449\u0435" to "\u0432\u043e\u043e\u0431\u0449\u0435",
+            "\u0447\u0442\u043e\u0431" to "\u0447\u0442\u043e\u0431\u044b",
+            "\u043d\u043e\u0440\u043c" to "\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e",
+            "\u0441\u043f\u0441" to "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u043f\u0436" to "\u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430",
+        )
+        val EN_AUTOCORRECT_V2 = mapOf(
+            "teh" to "the",
+            "adn" to "and",
+            "wierd" to "weird",
+            "recieve" to "receive",
+            "recieved" to "received",
+            "seperate" to "separate",
+            "definately" to "definitely",
+            "acommodate" to "accommodate",
+            "becuase" to "because",
+            "thier" to "their",
+            "freind" to "friend",
+            "enviroment" to "environment",
+            "langauge" to "language",
+            "messsage" to "message",
+            "keybaord" to "keyboard",
+            "dont" to "don't",
+            "cant" to "can't",
+            "wont" to "won't",
+            "im" to "I'm",
+            "ive" to "I've",
+            "ill" to "I'll",
+            "id" to "I'd",
+            "doesnt" to "doesn't",
+            "isnt" to "isn't",
+            "arent" to "aren't",
+            "didnt" to "didn't",
+            "wasnt" to "wasn't",
+            "werent" to "weren't",
+            "couldnt" to "couldn't",
+            "shouldnt" to "shouldn't",
+            "wouldnt" to "wouldn't",
+        )
+        val RU_SUGGESTIONS_V2 = listOf(
+            "\u043f\u0440\u0438\u0432\u0435\u0442",
+            "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430",
+            "\u0441\u0435\u0439\u0447\u0430\u0441",
+            "\u0441\u0435\u0433\u043e\u0434\u043d\u044f",
+            "\u0437\u0430\u0432\u0442\u0440\u0430",
+            "\u0443\u0442\u0440\u043e\u043c",
+            "\u0432\u0435\u0447\u0435\u0440\u043e\u043c",
+            "\u0445\u043e\u0440\u043e\u0448\u043e",
+            "\u043e\u0442\u043b\u0438\u0447\u043d\u043e",
+            "\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e",
+            "\u043f\u043e\u043d\u044f\u0442\u043d\u043e",
+            "\u043b\u0430\u0434\u043d\u043e",
+            "\u0434\u0430\u0432\u0430\u0439",
+            "\u043a\u043e\u043d\u0435\u0447\u043d\u043e",
+            "\u0432\u043e\u043e\u0431\u0449\u0435",
+            "\u043f\u0440\u043e\u0441\u0442\u043e",
+            "\u043f\u043e\u0442\u043e\u043c\u0443",
+            "\u043f\u043e\u0442\u043e\u043c",
+            "\u043c\u043e\u0436\u043d\u043e",
+            "\u043d\u0443\u0436\u043d\u043e",
+            "\u0431\u0443\u0434\u0435\u0442",
+            "\u0441\u0434\u0435\u043b\u0430\u0442\u044c",
+            "\u043f\u043e\u043f\u0440\u0430\u0432\u0438\u0442\u044c",
+            "\u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c",
+            "\u043f\u043e\u043f\u0440\u043e\u0431\u043e\u0432\u0430\u0442\u044c",
+            "\u043a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u0430",
+            "\u043a\u043b\u0430\u0432\u0438\u0448\u0430",
+            "\u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435",
+            "\u043a\u0430\u043f\u0441\u0443\u043b\u0430",
+            "\u0433\u043e\u043b\u043e\u0441\u043e\u0432\u0430\u044f",
+            "\u0432\u0438\u0434\u0435\u043e",
+            "\u0444\u043e\u0442\u043e",
+            "\u043a\u043b\u044e\u0447",
+            "\u0448\u0438\u0444\u0440",
+            "\u0448\u0438\u0444\u0440\u043e\u0432\u0430\u043d\u0438\u0435",
+            "\u0440\u0430\u0441\u0448\u0438\u0444\u0440\u043e\u0432\u043a\u0430",
+            "\u043f\u0440\u043e\u0435\u043a\u0442",
+            "\u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435",
+            "\u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438",
+            "\u044f\u0437\u044b\u043a",
+            "\u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442",
+            "\u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u043e",
+            "\u0431\u044b\u0441\u0442\u0440\u043e",
+            "\u0443\u0434\u043e\u0431\u043d\u043e",
+        )
+        val EN_SUGGESTIONS_V2 = listOf(
+            "hello",
+            "thanks",
+            "thank",
+            "please",
+            "today",
+            "tomorrow",
+            "morning",
+            "evening",
+            "message",
+            "messages",
+            "keyboard",
+            "keyboards",
+            "project",
+            "application",
+            "settings",
+            "language",
+            "english",
+            "russian",
+            "encrypt",
+            "encrypted",
+            "encryption",
+            "decrypt",
+            "decryption",
+            "capsule",
+            "voice",
+            "video",
+            "photo",
+            "camera",
+            "screen",
+            "button",
+            "buttons",
+            "layout",
+            "preview",
+            "stable",
+            "working",
+            "normal",
+            "great",
+            "check",
+            "update",
+            "continue",
+            "improve",
+            "feature",
+            "features",
+            "security",
+            "private",
+            "release",
+            "build",
+            "branch",
         )
         val TR_SUGGESTIONS = listOf(
             "merhaba", "selam", "teşekkürler", "lütfen", "bugün", "yarın",
