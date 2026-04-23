@@ -1927,23 +1927,34 @@ class EnigmaKeyboardService : InputMethodService() {
             else -> replacement
         }
 
-        fun autocorrectBeforeSeparator() {
+        fun softAutocorrectCandidate(normalized: String): String? = when (currentLanguage) {
+            KeyboardLanguage.RU -> RU_SOFT_AUTOCORRECT_V2[normalized]
+            KeyboardLanguage.EN -> EN_SOFT_AUTOCORRECT_V2[normalized]
+            else -> null
+        }
+
+        fun autocorrectBeforeSeparator(softOnly: Boolean = false) {
             if (characterMode != CharacterMode.LETTERS) return
 
             val source = textBeforeCursor(32)
             val match = WORD_AT_END.find(source) ?: return
             val originalWord = match.value
             val normalized = lowercaseForCurrentLanguage(originalWord)
-            val replacementBase = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_AUTOCORRECT_V2[normalized]
-                KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
-                KeyboardLanguage.TR -> TR_AUTOCORRECT[normalized]
-                KeyboardLanguage.ES -> ES_AUTOCORRECT[normalized]
-                KeyboardLanguage.PT -> PT_AUTOCORRECT[normalized]
-                KeyboardLanguage.DE -> DE_AUTOCORRECT[normalized]
-                KeyboardLanguage.FR -> FR_AUTOCORRECT[normalized]
-                KeyboardLanguage.IT -> IT_AUTOCORRECT[normalized]
-            } ?: return
+            val replacementBase =
+                if (softOnly) {
+                    softAutocorrectCandidate(normalized)
+                } else {
+                    when (currentLanguage) {
+                        KeyboardLanguage.RU -> RU_AUTOCORRECT_V2[normalized]
+                        KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
+                        KeyboardLanguage.TR -> TR_AUTOCORRECT[normalized]
+                        KeyboardLanguage.ES -> ES_AUTOCORRECT[normalized]
+                        KeyboardLanguage.PT -> PT_AUTOCORRECT[normalized]
+                        KeyboardLanguage.DE -> DE_AUTOCORRECT[normalized]
+                        KeyboardLanguage.FR -> FR_AUTOCORRECT[normalized]
+                        KeyboardLanguage.IT -> IT_AUTOCORRECT[normalized]
+                    }
+                } ?: return
 
             val replacement = applyReplacementCase(originalWord, replacementBase)
             currentInputConnection?.deleteSurroundingText(originalWord.length, 0)
@@ -2001,31 +2012,69 @@ class EnigmaKeyboardService : InputMethodService() {
                 KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
                 else -> null
             }
-            val recentMatches = recentWords
-                .filter { it.startsWith(normalized) && it != normalized }
-                .take(3)
+            val recentRanks = recentWords.withIndex().associate { it.value to it.index }
+            val frequencyWords = when (currentLanguage) {
+                KeyboardLanguage.RU -> RU_PRIORITY_SUGGESTIONS_V2
+                KeyboardLanguage.EN -> EN_PRIORITY_SUGGESTIONS_V2
+                else -> emptySet()
+            }
 
             val prefixMatches = lexicon
+                .asSequence()
                 .filter { it.startsWith(normalized) && it != normalized }
-                .take(3)
+                .take(20)
+                .toList()
 
             val fuzzyMatches = lexicon
                 .asSequence()
                 .filter { it != normalized }
                 .map { candidate -> candidate to levenshtein(normalized, candidate) }
                 .filter { (_, distance) -> distance in 1..2 }
-                .sortedBy { it.second }
                 .map { it.first }
-                .take(3)
+                .take(20)
                 .toList()
 
-            return buildList {
+            fun candidateScore(candidate: String): Int {
+                var score = 0
+                val recentRank = recentRanks[candidate]
+                if (recentRank != null) {
+                    score += 140 - (recentRank * 6)
+                }
+                if (candidate.startsWith(normalized)) {
+                    score += 110
+                    score += normalized.length * 9
+                    score -= (candidate.length - normalized.length).coerceAtLeast(0)
+                } else if (candidate.contains(normalized)) {
+                    score += 24
+                }
+                val distance = levenshtein(normalized, candidate)
+                if (distance in 1..2) {
+                    score += 24 - (distance * 7)
+                }
+                if (candidate in frequencyWords) {
+                    score += 26
+                }
+                if (candidate == correction) {
+                    score += 44
+                }
+                if (candidate.length <= normalized.length + 2) {
+                    score += 8
+                }
+                return score
+            }
+
+            return buildSet {
                 if (!correction.isNullOrBlank()) add(correction)
-                addAll(recentMatches)
+                addAll(recentWords)
                 addAll(prefixMatches)
                 addAll(fuzzyMatches)
             }
-                .distinct()
+                .filter { it != normalized }
+                .sortedWith(
+                    compareByDescending<String> { candidateScore(it) }
+                        .thenBy { it.length }
+                        .thenBy { it },
+                )
                 .take(3)
                 .map { applyReplacementCase(word, it) }
         }
@@ -2054,7 +2103,7 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         fun commitSmartSpace() {
-            autocorrectBeforeSeparator()
+            autocorrectBeforeSeparator(softOnly = true)
             currentWordBeforeCursor()?.let { word ->
                 val normalized = lowercaseForCurrentLanguage(word)
                 rememberRecentWord(normalized)
@@ -3675,6 +3724,81 @@ class EnigmaKeyboardService : InputMethodService() {
             "release",
             "build",
             "branch",
+        )
+        val RU_SOFT_AUTOCORRECT_V2 = mapOf(
+            "\u043f\u0440\u0435\u0432\u0435\u0442" to "\u043f\u0440\u0438\u0432\u0435\u0442",
+            "\u043f\u0438\u0432\u0435\u0442" to "\u043f\u0440\u0438\u0432\u0435\u0442",
+            "\u0441\u043f\u043e\u0441\u0438\u0431\u043e" to "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u0441\u043f\u0430\u0441\u0438\u0431\u0430" to "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u043f\u043e\u0436\u0430\u043b\u0443\u0441\u0442\u0430" to "\u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430",
+            "\u0449\u0430\u0441" to "\u0441\u0435\u0439\u0447\u0430\u0441",
+            "\u0441\u0435\u0447\u0430\u0441" to "\u0441\u0435\u0439\u0447\u0430\u0441",
+            "\u0447\u0442\u043e\u0431" to "\u0447\u0442\u043e\u0431\u044b",
+            "\u043d\u043e\u0440\u043c" to "\u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e",
+            "\u0441\u043f\u0441" to "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+        )
+        val EN_SOFT_AUTOCORRECT_V2 = mapOf(
+            "teh" to "the",
+            "adn" to "and",
+            "wierd" to "weird",
+            "recieve" to "receive",
+            "recieved" to "received",
+            "seperate" to "separate",
+            "definately" to "definitely",
+            "becuase" to "because",
+            "thier" to "their",
+            "freind" to "friend",
+            "langauge" to "language",
+            "messsage" to "message",
+            "keybaord" to "keyboard",
+        )
+        val RU_PRIORITY_SUGGESTIONS_V2 = setOf(
+            "\u043f\u0440\u0438\u0432\u0435\u0442",
+            "\u0441\u043f\u0430\u0441\u0438\u0431\u043e",
+            "\u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430",
+            "\u0434\u0430",
+            "\u043d\u0435\u0442",
+            "\u043b\u0430\u0434\u043d\u043e",
+            "\u0445\u043e\u0440\u043e\u0448\u043e",
+            "\u0441\u0435\u0439\u0447\u0430\u0441",
+            "\u0441\u0435\u0433\u043e\u0434\u043d\u044f",
+            "\u0437\u0430\u0432\u0442\u0440\u0430",
+            "\u043c\u043e\u0436\u043d\u043e",
+            "\u043d\u0443\u0436\u043d\u043e",
+            "\u0431\u0443\u0434\u0435\u0442",
+            "\u0441\u0434\u0435\u043b\u0430\u0442\u044c",
+            "\u043f\u0440\u043e\u0441\u0442\u043e",
+            "\u043f\u043e\u0442\u043e\u043c",
+            "\u0442\u043e\u043b\u044c\u043a\u043e",
+            "\u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0430",
+            "\u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442",
+            "\u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c",
+        )
+        val EN_PRIORITY_SUGGESTIONS_V2 = setOf(
+            "hello",
+            "thanks",
+            "please",
+            "yes",
+            "no",
+            "okay",
+            "today",
+            "tomorrow",
+            "message",
+            "messages",
+            "keyboard",
+            "project",
+            "settings",
+            "language",
+            "security",
+            "private",
+            "working",
+            "stable",
+            "problem",
+            "check",
+            "update",
+            "continue",
+            "feature",
+            "support",
         )
         val TR_SUGGESTIONS = listOf(
             "merhaba", "selam", "teşekkürler", "lütfen", "bugün", "yarın",
