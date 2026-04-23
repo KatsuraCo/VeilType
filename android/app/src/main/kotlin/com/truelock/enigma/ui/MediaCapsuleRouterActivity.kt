@@ -3,6 +3,7 @@ package com.truelock.enigma.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.truelock.enigma.media.MediaCapsuleType
 
@@ -21,12 +22,22 @@ class MediaCapsuleRouterActivity : AppCompatActivity() {
     }
 
     private fun routeIncomingIntent(intent: Intent?) {
-        val uri = resolveIncomingUri(intent) ?: return
-        val target = when (detectType(uri)) {
+        val uri = resolveIncomingUri(intent)
+        if (uri == null) {
+            Log.w(TAG, "routeIncomingIntent: uri missing action=${intent?.action} type=${intent?.type}")
+            return
+        }
+        val detectedType = detectType(uri)
+        val target = when (detectedType) {
             MediaCapsuleType.AUDIO -> AudioCapsuleActivity::class.java
             MediaCapsuleType.VIDEO -> VideoCapsuleActivity::class.java
+            MediaCapsuleType.PHOTO -> PhotoCapsuleActivity::class.java
             null -> MainActivity::class.java
         }
+        Log.d(
+            TAG,
+            "routeIncomingIntent action=${intent?.action} type=${intent?.type} uri=$uri detected=$detectedType target=${target.simpleName}",
+        )
 
         startActivity(
             Intent(this, target).apply {
@@ -41,7 +52,7 @@ class MediaCapsuleRouterActivity : AppCompatActivity() {
         if (intent == null) return null
         return when (intent.action) {
             Intent.ACTION_VIEW -> intent.data
-            Intent.ACTION_SEND -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            Intent.ACTION_SEND -> intent.uriExtraCompat(Intent.EXTRA_STREAM)
             else -> null
         }
     }
@@ -53,6 +64,12 @@ class MediaCapsuleRouterActivity : AppCompatActivity() {
                 val read = input.read(magic)
                 if (read == 4) MediaCapsuleType.fromMagic(magic) else null
             }
+        }.onFailure {
+            Log.w(TAG, "detectType failed for uri=$uri", it)
         }.getOrNull()
+    }
+
+    private companion object {
+        const val TAG = "MediaCapsuleRouter"
     }
 }

@@ -1,309 +1,160 @@
-# Enigma Keyboard: Serverless Key Exchange Specification
+# VeilType: Shared Key Setup Specification
 
-Version: 0.1
-Date: 2026-03-28
-Status: Draft
-Owner: TrueLock / internal
+Version: 0.2  
+Date: 2026-04-04  
+Status: Draft  
+Owner: internal
 
 ## 1. Goal
 
-Make contact setup simple enough for ordinary users without introducing a server into the trust model.
+Make first-run key setup simple enough for ordinary users without introducing:
+- a server
+- an account system
+- cloud sync
+- recovery paths
 
-The system must allow two users to establish a shared chat profile using:
-- QR code when they are nearby
-- message bundle / text bundle through any chat as fallback
-- manual secret entry only as a reserve path
-
-The server must not participate in:
-- key generation
-- key storage
-- shared secret derivation
-- message decryption
-- password recovery
+The system must let two people end up with the same 8-emoji shared key on both devices.
 
 Core rule:
-- private keys never leave the device
+- the shared key exists only on the users' devices and in the explicit handoff they choose
 
 ## 2. Product decision
 
 Chosen direction:
-- **Option 1: fully serverless contact exchange**
+- one shared-key setup flow
 
 This means:
-- each device creates a local asymmetric key pair
-- users exchange only public contact bundles
-- both devices derive the same shared secret locally
-- both users compare a short safety fingerprint out-of-band
+- one person can generate an 8-emoji shared key locally
+- the same key can be copied or shared through a separate trusted channel
+- the other person imports and saves that exact key locally
+- both sides then use it for `TL1`, `TLA1`, and `TLV1`
 
-## 3. Cryptographic model
+## 3. Security model
 
-### 3.1 Local identity keys
+The setup flow must preserve the same trust model as the messaging flow:
+- no server
+- no account
+- no cloud
+- no recovery
+- no hidden escrow
 
-Each installation generates:
-- `identity_private_key`
-- `identity_public_key`
+Private rules:
+- the app must not silently transmit keys anywhere
+- the app must not generate a cloud identity
+- the app must not pretend lost keys can be restored later
 
-Recommended algorithm:
-- `X25519` for key agreement
+## 4. Shared key representation
 
-Optional future expansion:
-- `Ed25519` for signatures if we later want signed bundles
+MVP representations:
+- human-friendly ordered 8-emoji sequence
+- machine-friendly encoded key package for copy/paste
 
-### 3.2 Shared secret
-
-For contact A and B:
-- A computes `DH(A_private, B_public)`
-- B computes `DH(B_private, A_public)`
-
-Both sides derive the same secret and then run it through a KDF.
-
-Recommended derivation:
-- `HKDF-SHA256`
-
-Derived outputs:
-- profile encryption key
-- profile fingerprint seed
-- contact profile id seed
-
-### 3.3 Fingerprint
-
-After exchange the app shows a short human-verifiable fingerprint:
-- 6 emoji
-- or 12 hex chars
-- or 4 short words
-
-Recommended MVP:
-- 6 emoji fingerprint
-
-Users compare it:
-- in person
-- by phone call
-- by another trusted channel
-
-If fingerprints do not match:
-- user must discard the contact setup
-
-## 4. Contact bundle
-
-### 4.1 Bundle contents
-
-Minimum fields:
-- protocol version
-- app marker
-- device id
-- public identity key
-- display name
-- creation timestamp
-
-Optional:
-- short device label
-
-### 4.2 Example logical payload
-
-```json
-{
-  "v": 1,
-  "app": "enigma_keyboard",
-  "device_id": "dev_8f2a1b",
-  "display_name": "Daniil",
-  "created_at": "2026-03-28T12:00:00Z",
-  "identity_public_key": "base64url..."
-}
-```
-
-### 4.3 Encoding
-
-Bundle transport format:
-- compact JSON
-- compressed later if needed
-- encoded as `base64url`
-- wrapped with prefix:
-
-```text
-EKC1:eyJ2IjoxLCJhcHAiOiJl...
-```
-
-Where:
-- `EKC1` = Enigma Key Contact format v1
+Requirements:
+- deterministic import result
+- safe local storage after import
+- no accidental mutation of the underlying key material
 
 ## 5. UX flows
 
-### 5.1 Nearby flow: QR
+### 5.1 Generate and share
 
 Sender:
-1. Opens `Contacts`
-2. Taps `Show my QR`
-3. App displays QR with contact bundle
-
-Receiver:
-1. Opens `Contacts`
-2. Taps `Scan QR`
-3. Scans sender QR
-4. App imports sender public bundle
-5. App derives shared contact secret locally
-6. App shows contact preview
-7. App displays safety fingerprint
-8. User compares fingerprint with sender
-9. User taps `Trust contact`
+1. Opens key setup.
+2. Generates a new 8-emoji shared key.
+3. Saves it locally.
+4. Shares it with the other person through a deliberate side channel.
 
 Result:
-- chat profile created automatically
+- sender has a local saved key
+- recipient receives the same secret outside the app's trust boundary
 
-### 5.2 Remote flow: text bundle
-
-Sender:
-1. Opens `Contacts`
-2. Taps `Share contact`
-3. App copies or shares `EKC1:...`
+### 5.2 Import and save
 
 Receiver:
-1. Receives text bundle in any messenger
-2. Copies it
-3. In app taps `Import contact`
-4. App reads bundle from clipboard
-5. App derives shared contact secret locally
-6. App shows safety fingerprint
-7. Users compare fingerprint by another channel
-8. Receiver trusts contact
+1. Opens key setup.
+2. Pastes or imports the 8-emoji shared key.
+3. Reviews the key label or chat label.
+4. Saves it locally.
 
-### 5.3 Manual reserve flow
+Result:
+- both users now have the same local key
 
-Only fallback:
-- user creates shared profile from emoji sequence manually
+### 5.3 Daily usage
 
-This is not the primary UX after contact exchange is implemented.
+After setup:
+1. User opens any chat.
+2. User selects VeilType Keyboard.
+3. User encrypts with the saved shared key.
+4. Recipient decrypts locally from the clipboard.
 
 ## 6. Data model
 
-### 6.1 Local identity
+### 6.1 Local shared key record
 
 Fields:
-- `device_id`
-- `display_name`
-- `identity_public_key`
-- encrypted private key material in Android Keystore-backed storage
+- `profile_id`
+- `title`
+- `app_package`
+- `peer_hint`
+- `secret_sequence_kind`
+- `profile_salt`
+- protected key material
 - `created_at`
-
-### 6.2 Contact
-
-Fields:
-- `contact_id`
-- `display_name`
-- `device_label`
-- `remote_public_key`
-- `local_profile_id`
-- `fingerprint`
-- `verified_at`
-- `created_at`
+- `expires_at`
 - `last_used_at`
 - `status`
 
+### 6.2 Status rules
+
 Statuses:
-- `pending`
-- `verified`
-- `blocked`
+- `active`
+- `expiring`
+- `expired`
 - `archived`
 
-### 6.3 Generated profile
+Rules:
+- expired profiles cannot encrypt new messages
+- archived profiles are not used by default
+- old profiles may still decrypt if retained locally
 
-After handshake the app creates a regular chat profile:
-- title
-- optional app package binding
-- peer hint
-- secret kind = `CONTACT_HANDSHAKE`
-- derived profile key
+## 7. Import/export requirements
 
-This means the existing profile system remains the runtime layer.
-The contact exchange only improves how profiles are created.
+The flow must support:
+- explicit export by user action
+- explicit import by user action
+- clipboard-friendly transport
 
-## 7. Security rules
+The flow must not support:
+- silent background exchange
+- remote server lookup
+- account-based device syncing
 
-### 7.1 Must
+## 8. Android implementation guidance
 
-- private key generated locally only
-- private key never exported in plaintext
-- shared secret derived locally only
-- no cloud recovery
-- no server lookup as a trust source
-- fingerprint must be shown before trust is finalized
+Phase A:
+- local shared-key generation
+- local save
+- copy/share action
+- import from clipboard
 
-### 7.2 Must not
+Phase B:
+- clearer receive-state UX
+- stronger success/failure messaging
+- better labeling of the active key in chat
 
-- no sending the actual symmetric chat key directly
-- no single global key reused for all contacts
-- no hidden recovery key
-- no automatic silent trust of imported contact bundles
+Phase C:
+- smoother first-run onboarding
+- fewer chances to create the wrong key for the wrong chat
 
-## 8. Recommended Android implementation
+## 9. Product stance
 
-### Phase A
+This setup model is intentionally simple:
+- one 8-emoji shared key
+- both sides save it locally
+- no third party in the trust path
 
-- generate local identity pair on first launch
-- create `Contacts` screen
-- add `Show my QR`
-- add `Import bundle from clipboard`
-- derive shared secret and create profile
-
-### Phase B
-
-- add QR scan
-- add safety fingerprint confirmation UI
-- add contact list
-- allow contact -> profile binding for app packages
-
-### Phase C
-
-- export/import signed contact card
-- optional device rename
-- contact revoke/archive flow
-
-## 9. Required UI screens
-
-MVP screens:
-- `Contacts`
-- `My Contact QR`
-- `Import Contact`
-- `Verify Fingerprint`
-- `Contact Details`
-
-## 10. Integration with current project
-
-Current architecture already has:
-- local profile storage
-- per-app profile memory
-- crypto pipeline for messages
-
-This new feature should plug in as:
-
-1. create local identity
-2. exchange public contact bundles
-3. derive shared profile secret
-4. save normal profile to secure storage
-5. use it from keyboard exactly like any other profile
-
-So:
-- keyboard logic changes only slightly
-- most work is in setup UX and local contact storage
-
-## 11. Why this is the right path
-
-Compared to manual emoji secret exchange:
-- fewer user mistakes
-- no need to send the same secret directly
-- much better onboarding
-- still no server
-- still strong trust model
-
-Compared to a server-based directory:
-- better privacy
-- no central compromise point
-- simpler security story
-
-## 12. Immediate next step
-
-Implement `Phase A`:
-- local identity generation
-- bundle export
-- bundle import
-- derived profile creation
-- fingerprint confirmation
+It is stricter than mainstream messaging products, and that strictness is part of the product promise:
+- no server
+- no account
+- no cloud
+- no recovery

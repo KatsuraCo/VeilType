@@ -7,17 +7,14 @@ import java.time.Instant
 
 class ProfileSelectionPolicyTest {
     @Test
-    fun selectDefaultForApp_prefersMatchingPackageAndRecentUse() {
+    fun selectDefault_prefersRecentUsableKey() {
         val profiles = listOf(
             profile("a", "org.telegram.messenger", KeyProfileStatus.ACTIVE, "2026-03-27T12:00:00Z"),
             profile("b", "com.whatsapp", KeyProfileStatus.ACTIVE, "2026-03-27T13:00:00Z"),
             profile("c", "org.telegram.messenger", KeyProfileStatus.EXPIRING, "2026-03-27T14:00:00Z"),
         )
 
-        val selected = ProfileSelectionPolicy.selectDefaultForApp(
-            profiles = profiles,
-            appPackage = "org.telegram.messenger",
-        )
+        val selected = ProfileSelectionPolicy.selectDefault(profiles)
 
         assertEquals("c", selected?.id)
     }
@@ -36,13 +33,13 @@ class ProfileSelectionPolicyTest {
     }
 
     @Test
-    fun selectDefaultForApp_returnsNullWhenNoUsableProfiles() {
+    fun selectDefault_returnsNullWhenNoUsableKeys() {
         val profiles = listOf(
             profile("a", "org.telegram.messenger", KeyProfileStatus.ARCHIVED, "2026-03-27T12:00:00Z"),
             profile("b", "org.telegram.messenger", KeyProfileStatus.EXPIRED, "2026-03-27T13:00:00Z"),
         )
 
-        val selected = ProfileSelectionPolicy.selectDefaultForApp(profiles, "org.telegram.messenger")
+        val selected = ProfileSelectionPolicy.selectDefault(profiles)
         assertNull(selected)
     }
 

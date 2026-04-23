@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#D7E3EC" />
-            <corners android:radius="14dp" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="#F4F6F8" />
-            <corners android:radius="14dp" />
-        </shape>
-    </item>
+    <item android:state_pressed="true" android:drawable="@drawable/bg_key_pressed" />
+    <item android:state_selected="true" android:drawable="@drawable/bg_key_pressed" />
+    <item android:state_focused="true" android:drawable="@drawable/bg_key_pressed" />
+    <item android:drawable="@drawable/bg_key_default_shape" />
 </selector>

@@ -16,6 +16,9 @@ class KeyProfileFactory(
         peerHint: String? = null,
         now: Instant = Instant.now(),
         rotationHours: Int = 48,
+        oneTimeRead: Boolean = false,
+        requireBiometricForDecrypt: Boolean = false,
+        exportAllowed: Boolean = true,
     ): KeyProfileCreationResult {
         require(title.isNotBlank()) { "title must not be blank" }
         require(rotationHours > 0) { "rotationHours must be positive" }
@@ -29,6 +32,9 @@ class KeyProfileFactory(
             peerHint = peerHint,
             now = now,
             rotationHours = rotationHours,
+            oneTimeRead = oneTimeRead,
+            requireBiometricForDecrypt = requireBiometricForDecrypt,
+            exportAllowed = exportAllowed,
         )
     }
 
@@ -39,6 +45,9 @@ class KeyProfileFactory(
         peerHint: String? = null,
         now: Instant = Instant.now(),
         rotationHours: Int = 48,
+        oneTimeRead: Boolean = false,
+        requireBiometricForDecrypt: Boolean = false,
+        exportAllowed: Boolean = true,
     ): KeyProfileCreationResult {
         require(title.isNotBlank()) { "title must not be blank" }
         require(rotationHours > 0) { "rotationHours must be positive" }
@@ -47,11 +56,64 @@ class KeyProfileFactory(
         return createInternal(
             title = title,
             canonicalSequence = sequence,
+            sequenceDisplay = emojis.joinToString(" "),
             secretSequenceKind = SecretSequenceKind.EMOJI_SEQUENCE,
             appPackage = appPackage,
             peerHint = peerHint,
             now = now,
             rotationHours = rotationHours,
+            oneTimeRead = oneTimeRead,
+            requireBiometricForDecrypt = requireBiometricForDecrypt,
+            exportAllowed = exportAllowed,
+        )
+    }
+
+    fun createFromEmojiSequenceWithSalt(
+        title: String,
+        emojis: List<String>,
+        profileSalt: ByteArray,
+        appPackage: String? = null,
+        peerHint: String? = null,
+        now: Instant = Instant.now(),
+        rotationHours: Int = 48,
+        oneTimeRead: Boolean = false,
+        requireBiometricForDecrypt: Boolean = false,
+        exportAllowed: Boolean = true,
+    ): KeyProfileCreationResult {
+        require(title.isNotBlank()) { "title must not be blank" }
+        require(rotationHours > 0) { "rotationHours must be positive" }
+        require(profileSalt.size == 16) { "profileSalt must be 16 bytes" }
+
+        val sequence = ProfileKeyDeriver.canonicalEmojiSequence(emojis)
+        val profileKey = ProfileKeyDeriver.deriveProfileKey(sequence, profileSalt)
+        val hint = ProfileKeyDeriver.deriveProfileHint(profileKey)
+
+        val profile = KeyProfile(
+            id = UUID.randomUUID().toString(),
+            title = title.trim(),
+            appPackage = appPackage?.trim()?.ifBlank { null },
+            peerHint = peerHint?.trim()?.ifBlank { null },
+            secretSequenceDisplay = emojis.joinToString(" "),
+            secretSequenceKind = SecretSequenceKind.EMOJI_SEQUENCE,
+            profileVersion = 1,
+            profileSalt = profileSalt.copyOf(),
+            wrappedProfileKey = profileKey.copyOf(),
+            profileHint = hint,
+            createdAt = now,
+            expiresAt = now.plus(Duration.ofHours(rotationHours.toLong())),
+            lastUsedAt = null,
+            status = KeyProfileStatus.ACTIVE,
+            allowDecryptAfterExpiry = true,
+            rotationPeriodHours = rotationHours,
+            oneTimeRead = oneTimeRead,
+            requireBiometricForDecrypt = requireBiometricForDecrypt,
+            exportAllowed = exportAllowed,
+        )
+
+        return KeyProfileCreationResult(
+            profile = profile,
+            profileKey = profileKey,
+            canonicalSequence = sequence,
         )
     }
 
@@ -62,6 +124,9 @@ class KeyProfileFactory(
         peerHint: String? = null,
         now: Instant = Instant.now(),
         rotationHours: Int = 48,
+        oneTimeRead: Boolean = false,
+        requireBiometricForDecrypt: Boolean = false,
+        exportAllowed: Boolean = true,
     ): KeyProfileCreationResult {
         require(title.isNotBlank()) { "title must not be blank" }
         require(rotationHours > 0) { "rotationHours must be positive" }
@@ -87,6 +152,9 @@ class KeyProfileFactory(
             status = KeyProfileStatus.ACTIVE,
             allowDecryptAfterExpiry = true,
             rotationPeriodHours = rotationHours,
+            oneTimeRead = oneTimeRead,
+            requireBiometricForDecrypt = requireBiometricForDecrypt,
+            exportAllowed = exportAllowed,
         )
 
         return KeyProfileCreationResult(
@@ -99,11 +167,15 @@ class KeyProfileFactory(
     private fun createInternal(
         title: String,
         canonicalSequence: String,
+        sequenceDisplay: String? = null,
         secretSequenceKind: SecretSequenceKind,
         appPackage: String? = null,
         peerHint: String? = null,
         now: Instant = Instant.now(),
         rotationHours: Int = 48,
+        oneTimeRead: Boolean = false,
+        requireBiometricForDecrypt: Boolean = false,
+        exportAllowed: Boolean = true,
     ): KeyProfileCreationResult {
         val salt = ByteArray(16).also(secureRandom::nextBytes)
         val profileKey = ProfileKeyDeriver.deriveProfileKey(canonicalSequence, salt)
@@ -114,6 +186,7 @@ class KeyProfileFactory(
             title = title.trim(),
             appPackage = appPackage?.trim()?.ifBlank { null },
             peerHint = peerHint?.trim()?.ifBlank { null },
+            secretSequenceDisplay = sequenceDisplay,
             secretSequenceKind = secretSequenceKind,
             profileVersion = 1,
             profileSalt = salt,
@@ -125,6 +198,9 @@ class KeyProfileFactory(
             status = KeyProfileStatus.ACTIVE,
             allowDecryptAfterExpiry = true,
             rotationPeriodHours = rotationHours,
+            oneTimeRead = oneTimeRead,
+            requireBiometricForDecrypt = requireBiometricForDecrypt,
+            exportAllowed = exportAllowed,
         )
 
         return KeyProfileCreationResult(

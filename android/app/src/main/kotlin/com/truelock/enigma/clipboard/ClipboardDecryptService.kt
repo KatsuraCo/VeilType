@@ -2,10 +2,13 @@ package com.truelock.enigma.clipboard
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import com.truelock.enigma.R
 import com.truelock.enigma.crypto.Tl1MessageCodec
+import com.truelock.enigma.crypto.Tl1ShareEnvelope
 import com.truelock.enigma.profiles.KeyProfileStatus
 import com.truelock.enigma.profiles.ProfileSelectionPolicy
+import com.truelock.enigma.security.DecryptUsageStore
 import com.truelock.enigma.storage.SecureProfileStore
 
 class ClipboardDecryptService(
@@ -14,6 +17,8 @@ class ClipboardDecryptService(
     private val secureProfileStore: SecureProfileStore,
     private val codec: Tl1MessageCodec,
 ) {
+    private val usageStore = DecryptUsageStore(context)
+
     fun decryptPrimaryClip(): ClipboardDecryptResult {
         if (!clipboardManager.hasPrimaryClip()) {
             return ClipboardDecryptResult.ClipboardEmpty
@@ -22,11 +27,11 @@ class ClipboardDecryptService(
         val clip = clipboardManager.primaryClip ?: return ClipboardDecryptResult.ClipboardEmpty
         if (clip.itemCount == 0) return ClipboardDecryptResult.ClipboardEmpty
 
-        val text = clip.getItemAt(0).coerceToText(context)?.toString()?.trim().orEmpty()
-        if (text.isEmpty()) return ClipboardDecryptResult.ClipboardEmpty
-        if (!text.startsWith(Tl1MessageCodec.PREFIX)) {
-            return ClipboardDecryptResult.MessageNotRecognized
-        }
+        val rawText = clip.getItemAt(0).coerceToText(context)?.toString()?.trim().orEmpty()
+        if (rawText.isEmpty()) return ClipboardDecryptResult.ClipboardEmpty
+        val text = Tl1ShareEnvelope.extractTl1Message(rawText)
+            ?: rawText.takeIf { it.startsWith(Tl1MessageCodec.PREFIX) }
+            ?: return ClipboardDecryptResult.MessageNotRecognized
 
         val hint = try {
             codec.extractProfileHint(text)
@@ -42,18 +47,61 @@ class ClipboardDecryptService(
 
         if (candidates.isEmpty()) return ClipboardDecryptResult.WrongKeyOrInvalidMessage
 
-        val candidateKeys = candidates.map { secureProfileStore.loadProfileKey(it) }
-        return try {
-            val plaintext = codec.decrypt(text, candidateKeys)
-            val matchedTitle = candidates.firstOrNull()?.title ?: context.getString(R.string.clipboard_unknown_profile)
-            ClipboardDecryptResult.Success(plaintext = plaintext, profileTitle = matchedTitle)
-        } catch (_: Exception) {
-            ClipboardDecryptResult.WrongKeyOrInvalidMessage
+        val fingerprint = usageStore.messageFingerprint(text)
+        var biometricCandidate: com.truelock.enigma.profiles.KeyProfile? = null
+
+        candidates.forEach { candidate ->
+            if (candidate.requireBiometricForDecrypt) {
+                if (biometricCandidate == null) biometricCandidate = candidate
+                return@forEach
+            }
+            if (candidate.oneTimeRead && usageStore.isConsumed(candidate.id, fingerprint)) {
+                return ClipboardDecryptResult.AlreadyConsumed(candidate.title)
+            }
+            val plaintext = runCatching {
+                codec.decrypt(text, listOf(secureProfileStore.loadProfileKey(candidate)))
+            }.getOrNull() ?: return@forEach
+            if (candidate.oneTimeRead) {
+                usageStore.markConsumed(candidate.id, fingerprint)
+            }
+            return ClipboardDecryptResult.Success(
+                plaintext = plaintext,
+                profileTitle = candidate.title.ifBlank { context.getString(R.string.clipboard_unknown_profile) },
+            )
         }
+
+        if (biometricCandidate != null) {
+            return ClipboardDecryptResult.RequiresBiometric(
+                encodedMessage = text,
+                profileId = biometricCandidate!!.id,
+                profileTitle = biometricCandidate!!.title,
+            )
+        }
+
+        return ClipboardDecryptResult.WrongKeyOrInvalidMessage
+    }
+
+    fun decryptWithProfile(encodedMessage: String, profileId: String): ClipboardDecryptResult {
+        val profile = secureProfileStore.findProfile(profileId) ?: return ClipboardDecryptResult.WrongKeyOrInvalidMessage
+        val fingerprint = usageStore.messageFingerprint(encodedMessage)
+        if (profile.oneTimeRead && usageStore.isConsumed(profile.id, fingerprint)) {
+            return ClipboardDecryptResult.AlreadyConsumed(profile.title)
+        }
+        val plaintext = runCatching {
+            codec.decrypt(encodedMessage, listOf(secureProfileStore.loadProfileKey(profile)))
+        }.getOrNull() ?: return ClipboardDecryptResult.WrongKeyOrInvalidMessage
+        if (profile.oneTimeRead) {
+            usageStore.markConsumed(profile.id, fingerprint)
+        }
+        return ClipboardDecryptResult.Success(plaintext = plaintext, profileTitle = profile.title)
     }
 
     fun clearPrimaryClip() {
-        val clip = android.content.ClipData.newPlainText("", "")
-        clipboardManager.setPrimaryClip(clip)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            clipboardManager.clearPrimaryClip()
+        } else {
+            val clip = android.content.ClipData.newPlainText("", "")
+            clipboardManager.setPrimaryClip(clip)
+        }
     }
 }

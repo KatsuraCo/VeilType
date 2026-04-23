@@ -1,22 +1,46 @@
 package com.truelock.enigma.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.truelock.enigma.R
+import com.truelock.enigma.crypto.ProfileKeyDeriver
 import com.truelock.enigma.databinding.ActivityProfileManagerBinding
+import com.truelock.enigma.profiles.EmojiKeyBundle
+import com.truelock.enigma.profiles.EmojiKeyBundleCodec
 import com.truelock.enigma.profiles.KeyProfile
 import com.truelock.enigma.profiles.KeyProfileFactory
 import com.truelock.enigma.profiles.ProfileLifecycleService
+import com.truelock.enigma.profiles.ProfileSelectionPolicy
+import com.truelock.enigma.security.BiometricDecryptHelper
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
 
 class ProfileManagerActivity : AppCompatActivity() {
+    private companion object {
+        const val EXTRA_FOCUS_IMPORT = "focus_import"
+        val EXPIRY_OPTIONS_HOURS = listOf(24, 48, 24 * 7, 24 * 30)
+    }
+
     private lateinit var binding: ActivityProfileManagerBinding
     private lateinit var secureProfileStore: SecureProfileStore
+    private lateinit var clipboardManager: ClipboardManager
+    private lateinit var biometricHelper: BiometricDecryptHelper
+    private var focusImportMode: Boolean = false
+
     private val profileFactory = KeyProfileFactory()
+    private val keyBundleCodec = EmojiKeyBundleCodec()
     private var renderedProfiles: List<KeyProfile> = emptyList()
+    private var currentKeyBundle: EmojiKeyBundle? = null
+    private var selectedRotationHours: Int = 48
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +51,30 @@ class ProfileManagerActivity : AppCompatActivity() {
             repository = FileKeyProfileRepository(applicationContext),
             keyVault = ProfileKeyVault(),
         )
+        clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        biometricHelper = BiometricDecryptHelper(this)
 
+        binding.generateKeyButton.setOnClickListener {
+            generateRandomKey()
+        }
+        binding.copyKeyButton.setOnClickListener {
+            copyKeyBundle()
+        }
+        binding.shareKeyButton.setOnClickListener {
+            shareKeyBundle()
+        }
+        binding.saveGeneratedKeyButton.setOnClickListener {
+            upsertProfileFromInputs(forceCreate = true)
+        }
+        binding.importKeyButton.setOnClickListener {
+            importKeyBundle()
+        }
+        binding.saveImportedKeyButton.setOnClickListener {
+            upsertProfileFromInputs(forceCreate = true)
+        }
+        binding.keyExpiryButton.setOnClickListener {
+            showExpiryPicker()
+        }
         binding.createProfileButton.setOnClickListener {
             upsertProfileFromInputs()
         }
@@ -47,95 +94,294 @@ class ProfileManagerActivity : AppCompatActivity() {
         binding.deleteProfileButton.setOnClickListener {
             deleteSelectedProfile()
         }
-        binding.profileListView.setOnItemClickListener { _, _, position, _ ->
-            val profile = renderedProfiles.getOrNull(position) ?: return@setOnItemClickListener
-            bindSelectedProfile(profile)
-            binding.statusText.text = getString(R.string.profile_status_selected, profile.title)
+        binding.deleteOldKeysButton.setOnClickListener {
+            deleteOldKeys()
         }
 
         seedDefaults()
+        focusImportMode = intent.getBooleanExtra(EXTRA_FOCUS_IMPORT, false)
+        binding.createKeyCard.visibility = if (focusImportMode) android.view.View.GONE else android.view.View.VISIBLE
+        binding.importKeyCard.visibility = if (focusImportMode) android.view.View.VISIBLE else android.view.View.GONE
+        if (focusImportMode) {
+            prepareImportMode()
+        } else {
+            generateRandomKey()
+        }
         renderProfiles(getString(R.string.profile_status_ready))
+
+        if (focusImportMode) {
+            binding.importKeyInput.requestFocus()
+            binding.statusText.text = getString(R.string.profile_status_key_missing)
+        }
     }
 
     private fun seedDefaults() {
         if (binding.titleInput.text.isNullOrBlank()) {
             binding.titleInput.setText(getString(R.string.profile_default_title))
         }
-        if (binding.appPackageInput.text.isNullOrBlank()) {
-            binding.appPackageInput.setText(getString(R.string.profile_default_package))
+        binding.appPackageInput.setText("")
+        binding.peerHintInput.setText("")
+        binding.oneTimeReadCheckBox.isChecked = false
+        binding.biometricDecryptCheckBox.isChecked = false
+        binding.exportAllowedCheckBox.isChecked = true
+        updateExpiryButton()
+    }
+
+    private fun clearSelectedProfileForNewKey() {
+        binding.selectedProfileIdInput.setText("")
+        binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
+        binding.createProfileButton.setText(R.string.save_profile)
+        binding.saveGeneratedKeyButton.setText(R.string.save_profile)
+        binding.saveImportedKeyButton.setText(R.string.save_profile)
+        binding.oneTimeReadCheckBox.isChecked = false
+        binding.biometricDecryptCheckBox.isChecked = false
+        binding.exportAllowedCheckBox.isChecked = true
+    }
+
+    private fun generateRandomKey() {
+        clearSelectedProfileForNewKey()
+        currentKeyBundle = keyBundleCodec.createRandomBundle(
+            title = binding.titleInput.text?.toString(),
+            appPackage = null,
+            peerHint = null,
+        )
+        applyBundleToInputs(
+            bundle = currentKeyBundle ?: return,
+            keepImportField = false,
+        )
+        renderProfiles(getString(R.string.profile_status_key_generated))
+    }
+
+    private fun copyKeyBundle() {
+        val existing = findSelectedProfileOrNull()
+        if (existing?.exportAllowed == false) {
+            renderProfiles(getString(R.string.profile_export_blocked))
+            return
         }
-        if (binding.peerHintInput.text.isNullOrBlank()) {
-            binding.peerHintInput.setText(getString(R.string.profile_default_peer))
+        val bundle = resolveExportBundle() ?: run {
+            renderProfiles(getString(R.string.profile_error_exactly_five_emoji))
+            return
         }
-        if (binding.emojiSequenceInput.text.isNullOrBlank()) {
-            binding.emojiSequenceInput.setText(getString(R.string.profile_default_emoji_sequence))
+        val doCopy = {
+            val encoded = keyBundleCodec.encode(bundle)
+            clipboardManager.setPrimaryClip(
+                ClipData.newPlainText(getString(R.string.profile_key_clipboard_label), encoded),
+            )
+            binding.importKeyInput.setText(encoded)
+            renderProfiles(getString(R.string.profile_status_key_copied))
+        }
+        protectExport(doCopy)
+    }
+
+    private fun shareKeyBundle() {
+        val existing = findSelectedProfileOrNull()
+        if (existing?.exportAllowed == false) {
+            renderProfiles(getString(R.string.profile_export_blocked))
+            return
+        }
+        val bundle = resolveExportBundle() ?: run {
+            renderProfiles(getString(R.string.profile_error_exactly_five_emoji))
+            return
+        }
+        val doShare = {
+            val encoded = keyBundleCodec.encode(bundle)
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, encoded)
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.profile_key_clipboard_label))
+            }
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.profile_share_key_chooser)))
+            renderProfiles(getString(R.string.profile_status_key_shared))
+        }
+        protectExport(doShare)
+    }
+
+    private fun importKeyBundle() {
+        val raw = binding.importKeyInput.text?.toString()?.trim().orEmpty()
+            .ifBlank {
+                clipboardManager.primaryClip
+                    ?.getItemAt(0)
+                    ?.coerceToText(this)
+                    ?.toString()
+                    ?.trim()
+                    .orEmpty()
+            }
+        if (raw.isBlank()) {
+            renderProfiles(getString(R.string.profile_status_key_missing))
+            return
+        }
+        val bundle = runCatching { keyBundleCodec.decode(raw) }.getOrElse {
+            renderProfiles(getString(R.string.profile_status_key_invalid))
+            return
+        }
+        clearSelectedProfileForNewKey()
+        currentKeyBundle = bundle
+        applyBundleToInputs(bundle, keepImportField = true)
+        renderProfiles(getString(R.string.profile_status_key_imported))
+    }
+
+    private fun applyBundleToInputs(bundle: EmojiKeyBundle, keepImportField: Boolean) {
+        val display = bundle.emojis.joinToString(" ")
+        if (!bundle.title.isNullOrBlank()) {
+            binding.titleInput.setText(bundle.title)
+        }
+        binding.appPackageInput.setText("")
+        binding.peerHintInput.setText("")
+        binding.emojiSequenceInput.setText(display)
+        binding.generatedEmojiText.text = display
+        if (!keepImportField) {
+            binding.importKeyInput.setText("")
         }
     }
 
-    private fun upsertProfileFromInputs() {
-        val title = binding.titleInput.text?.toString()?.trim().orEmpty()
-        val appPackage = binding.appPackageInput.text?.toString()?.trim().orEmpty()
-        val peerHint = binding.peerHintInput.text?.toString()?.trim().orEmpty()
+    private fun prepareImportMode() {
+        currentKeyBundle = null
+        binding.selectedProfileIdInput.setText("")
+        binding.importKeyInput.setText("")
+        binding.emojiSequenceInput.setText("")
+        binding.generatedEmojiText.text = ""
+        binding.emojiSequenceInput.hint = getString(R.string.profile_import_key_hint)
+        binding.createProfileButton.setText(R.string.save_profile)
+        binding.saveImportedKeyButton.setText(R.string.save_profile)
+        binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
+    }
+
+    private fun resolveExportBundle(): EmojiKeyBundle? {
+        val selected = findSelectedProfileOrNull()
+        if (selected?.secretSequenceDisplay != null) {
+            return EmojiKeyBundle(
+                title = binding.titleInput.text?.toString()?.trim().orEmpty().ifBlank { selected.title },
+                emojis = selected.secretSequenceDisplay.split(Regex("\\s+")).filter { it.isNotBlank() },
+                profileSalt = selected.profileSalt,
+                appPackage = null,
+                peerHint = null,
+            )
+        }
+
         val emojiRaw = binding.emojiSequenceInput.text?.toString()?.trim().orEmpty()
-        val emojis = emojiRaw
-            .split(Regex("\\s+"))
-            .filter { it.isNotBlank() }
-
-        if (title.isBlank()) {
-            renderProfiles(getString(R.string.profile_error_title_required))
-            return
-        }
-        val existing = findSelectedProfileOrNull()
-        if (existing == null && emojis.size != 5) {
-            renderProfiles(getString(R.string.profile_error_exactly_five_emoji))
-            return
-        }
-        if (existing != null && emojiRaw.isNotBlank() && emojis.size != 5) {
-            renderProfiles(getString(R.string.profile_error_exactly_five_emoji))
-            return
+        val emojis = emojiRaw.split(Regex("\\s+")).filter { it.isNotBlank() }
+        if (emojis.size != ProfileKeyDeriver.EMOJI_SEQUENCE_LENGTH) {
+            return null
         }
 
-        val profileToSave = if (existing != null && emojiRaw.isBlank()) {
-            existing.copy(
-                title = title,
-                appPackage = appPackage.ifBlank { null },
-                peerHint = peerHint.ifBlank { null },
+        val bundle = currentKeyBundle
+        return if (bundle != null && bundle.emojis == emojis) {
+            bundle.copy(
+                title = binding.titleInput.text?.toString()?.trim().orEmpty().ifBlank { bundle.title ?: "" },
+                appPackage = null,
+                peerHint = null,
             )
         } else {
-            val result = profileFactory.createFromEmojiSequence(
-                title = title,
-                emojis = emojis,
-                appPackage = appPackage.ifBlank { null },
-                peerHint = peerHint.ifBlank { null },
-            )
+            keyBundleCodec.createRandomBundle(
+                title = binding.titleInput.text?.toString(),
+                appPackage = null,
+                peerHint = null,
+            ).copy(emojis = emojis)
+        }
+    }
 
-            if (existing != null) {
-                secureProfileStore.saveProfile(
-                    result.profile.copy(
-                        id = existing.id,
-                        profileVersion = existing.profileVersion + 1,
-                        createdAt = existing.createdAt,
-                        lastUsedAt = existing.lastUsedAt,
-                    ),
-                    result.profileKey,
-                )
-                binding.selectedProfileIdInput.setText(existing.id)
-                binding.createProfileButton.setText(R.string.save_profile)
-                renderProfiles(getString(R.string.profile_status_updated, title))
-                return
+    private fun upsertProfileFromInputs(forceCreate: Boolean = false) {
+        val title = binding.titleInput.text?.toString()?.trim().orEmpty()
+            .ifBlank {
+                currentKeyBundle?.title?.takeIf { it.isNotBlank() }
+                    ?: getString(R.string.profile_default_title)
             }
+        val emojiRaw = binding.emojiSequenceInput.text?.toString()?.trim().orEmpty()
+        val emojis = emojiRaw.split(Regex("\\s+")).filter { it.isNotBlank() }
 
-            secureProfileStore.saveProfile(result.profile, result.profileKey)
-            binding.selectedProfileIdInput.setText(result.profile.id)
-            binding.createProfileButton.setText(R.string.save_profile)
-            renderProfiles(getString(R.string.profile_status_created, result.profile.title))
+        val existing = if (forceCreate) null else findSelectedProfileOrNull()
+        if (existing == null && emojis.size != ProfileKeyDeriver.EMOJI_SEQUENCE_LENGTH) {
+            renderProfiles(getString(R.string.profile_error_exactly_five_emoji))
+            return
+        }
+        if (existing != null && emojiRaw.isBlank()) {
+            val updated = existing.copy(
+                title = title,
+                appPackage = null,
+                peerHint = null,
+                oneTimeRead = binding.oneTimeReadCheckBox.isChecked,
+                requireBiometricForDecrypt = binding.biometricDecryptCheckBox.isChecked,
+                exportAllowed = binding.exportAllowedCheckBox.isChecked,
+            )
+            secureProfileStore.saveProfile(updated)
+            renderProfiles(getString(R.string.profile_status_updated, updated.title))
+            return
+        }
+        if (emojis.size != ProfileKeyDeriver.EMOJI_SEQUENCE_LENGTH) {
+            renderProfiles(getString(R.string.profile_error_exactly_five_emoji))
             return
         }
 
-        secureProfileStore.saveProfile(profileToSave)
-        binding.selectedProfileIdInput.setText(profileToSave.id)
+        val matchingBundle = when {
+            existing?.secretSequenceDisplay != null &&
+                existing.secretSequenceDisplay.split(Regex("\\s+")).filter { it.isNotBlank() } == emojis ->
+                EmojiKeyBundle(existing.title, emojis, existing.profileSalt, null, null)
+            currentKeyBundle?.emojis == emojis -> currentKeyBundle
+            else -> null
+        }
+
+        val result = if (matchingBundle != null) {
+            runCatching {
+                profileFactory.createFromEmojiSequenceWithSalt(
+                    title = title,
+                    emojis = emojis,
+                    profileSalt = matchingBundle.profileSalt,
+                    appPackage = null,
+                    peerHint = null,
+                    rotationHours = selectedRotationHours,
+                    oneTimeRead = binding.oneTimeReadCheckBox.isChecked,
+                    requireBiometricForDecrypt = binding.biometricDecryptCheckBox.isChecked,
+                    exportAllowed = binding.exportAllowedCheckBox.isChecked,
+                )
+            }.getOrElse {
+                renderProfiles(getString(R.string.profile_status_key_invalid))
+                return
+            }
+        } else {
+            runCatching {
+                profileFactory.createFromEmojiSequence(
+                    title = title,
+                    emojis = emojis,
+                    appPackage = null,
+                    peerHint = null,
+                    rotationHours = selectedRotationHours,
+                    oneTimeRead = binding.oneTimeReadCheckBox.isChecked,
+                    requireBiometricForDecrypt = binding.biometricDecryptCheckBox.isChecked,
+                    exportAllowed = binding.exportAllowedCheckBox.isChecked,
+                )
+            }.getOrElse {
+                renderProfiles(getString(R.string.profile_status_key_invalid))
+                return
+            }
+        }
+
+        if (existing != null) {
+            secureProfileStore.saveProfile(
+                result.profile.copy(
+                    id = existing.id,
+                    profileVersion = existing.profileVersion + 1,
+                    createdAt = existing.createdAt,
+                    lastUsedAt = existing.lastUsedAt,
+                    oneTimeRead = binding.oneTimeReadCheckBox.isChecked,
+                    requireBiometricForDecrypt = binding.biometricDecryptCheckBox.isChecked,
+                    exportAllowed = binding.exportAllowedCheckBox.isChecked,
+                ),
+                result.profileKey,
+            )
+            binding.selectedProfileIdInput.setText(existing.id)
+            binding.createProfileButton.setText(R.string.save_profile)
+            currentKeyBundle = matchingBundle
+                ?: EmojiKeyBundle(title, emojis, result.profile.profileSalt, null, null)
+            renderProfiles(getString(R.string.profile_status_updated, title))
+            return
+        }
+
+        secureProfileStore.saveProfile(result.profile, result.profileKey)
+        binding.selectedProfileIdInput.setText(result.profile.id)
         binding.createProfileButton.setText(R.string.save_profile)
-        renderProfiles(getString(R.string.profile_status_updated, profileToSave.title))
+        currentKeyBundle = matchingBundle
+            ?: EmojiKeyBundle(title, emojis, result.profile.profileSalt, null, null)
+        renderProfiles(getString(R.string.profile_status_created, result.profile.title))
     }
 
     private fun renewSelectedProfile() {
@@ -158,26 +404,75 @@ class ProfileManagerActivity : AppCompatActivity() {
         resetForm(getString(R.string.profile_status_deleted, profile.title))
     }
 
+    private fun deleteOldKeys() {
+        val profiles = secureProfileStore.listProfiles()
+        val currentProfile = ProfileSelectionPolicy.selectDefault(profiles) ?: profiles.firstOrNull()
+        val oldProfiles = profiles.filter { it.id != currentProfile?.id }
+        if (oldProfiles.isEmpty()) {
+            renderProfiles(getString(R.string.profile_status_no_old_keys))
+            return
+        }
+
+        AlertDialog.Builder(this)
+            .setMessage(getString(R.string.profile_delete_old_keys_confirm))
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.profile_delete_old_keys) { _, _ ->
+                oldProfiles.forEach { secureProfileStore.deleteProfile(it.id) }
+                renderProfiles(getString(R.string.profile_status_old_keys_deleted))
+            }
+            .show()
+    }
+
     private fun bindSelectedProfile(profile: KeyProfile) {
         binding.selectedProfileIdInput.setText(profile.id)
         binding.titleInput.setText(profile.title)
-        binding.appPackageInput.setText(profile.appPackage.orEmpty())
-        binding.peerHintInput.setText(profile.peerHint.orEmpty())
-        binding.emojiSequenceInput.setText("")
+        binding.appPackageInput.setText("")
+        binding.peerHintInput.setText("")
+        binding.emojiSequenceInput.setText(profile.secretSequenceDisplay.orEmpty())
+        binding.generatedEmojiText.text = profile.secretSequenceDisplay.orEmpty()
+        binding.importKeyInput.setText("")
         binding.emojiSequenceInput.hint = getString(R.string.profile_emoji_sequence_edit_hint)
         binding.createProfileButton.setText(R.string.save_profile)
+        binding.saveGeneratedKeyButton.setText(R.string.save_profile)
+        binding.saveImportedKeyButton.setText(R.string.save_profile)
         binding.selectedProfileLabel.text = getString(R.string.profile_manager_selected_format, profile.title)
+        selectedRotationHours = profile.rotationPeriodHours
+        binding.oneTimeReadCheckBox.isChecked = profile.oneTimeRead
+        binding.biometricDecryptCheckBox.isChecked = profile.requireBiometricForDecrypt
+        binding.exportAllowedCheckBox.isChecked = profile.exportAllowed
+        updateExpiryButton()
+        currentKeyBundle = profile.secretSequenceDisplay
+            ?.split(Regex("\\s+"))
+            ?.filter { it.isNotBlank() }
+            ?.takeIf { it.size == ProfileKeyDeriver.EMOJI_SEQUENCE_LENGTH }
+            ?.let { emojis ->
+                EmojiKeyBundle(
+                    title = profile.title,
+                    emojis = emojis,
+                    profileSalt = profile.profileSalt,
+                    appPackage = null,
+                    peerHint = null,
+                )
+            }
     }
 
     private fun resetForm(status: String) {
         binding.selectedProfileIdInput.setText("")
         binding.titleInput.setText(getString(R.string.profile_default_title))
-        binding.appPackageInput.setText(getString(R.string.profile_default_package))
-        binding.peerHintInput.setText(getString(R.string.profile_default_peer))
-        binding.emojiSequenceInput.setText(getString(R.string.profile_default_emoji_sequence))
+        binding.appPackageInput.setText("")
+        binding.peerHintInput.setText("")
+        binding.importKeyInput.setText("")
         binding.emojiSequenceInput.hint = getString(R.string.profile_emoji_sequence_hint)
-        binding.createProfileButton.setText(R.string.create_profile)
+        binding.createProfileButton.setText(R.string.save_profile)
+        binding.saveGeneratedKeyButton.setText(R.string.save_profile)
+        binding.saveImportedKeyButton.setText(R.string.save_profile)
         binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
+        selectedRotationHours = 48
+        binding.oneTimeReadCheckBox.isChecked = false
+        binding.biometricDecryptCheckBox.isChecked = false
+        binding.exportAllowedCheckBox.isChecked = true
+        updateExpiryButton()
+        generateRandomKey()
         renderProfiles(status)
     }
 
@@ -201,35 +496,170 @@ class ProfileManagerActivity : AppCompatActivity() {
         return secureProfileStore.listProfiles().firstOrNull { it.id == id }
     }
 
+    private fun formatProfileMeta(profile: KeyProfile): String =
+        buildString {
+            append(localizedSecretKind(profile.secretSequenceKind))
+            append(" • ")
+            append(localizedProfileStatus(profile.status))
+            if (profile.oneTimeRead) {
+                append(" • ")
+                append(getString(R.string.profile_one_time_short))
+            }
+            if (profile.requireBiometricForDecrypt) {
+                append(" • ")
+                append(getString(R.string.profile_biometric_short))
+            }
+            if (!profile.exportAllowed) {
+                append(" • ")
+                append(getString(R.string.profile_no_export_short))
+            }
+            append("\n")
+            append(profile.expiresAt.toString())
+        }
+
+    private fun localizedSecretKind(kind: com.truelock.enigma.profiles.SecretSequenceKind): String = when (kind) {
+        com.truelock.enigma.profiles.SecretSequenceKind.EMOJI_SEQUENCE -> getString(R.string.profile_kind_emoji_sequence)
+        com.truelock.enigma.profiles.SecretSequenceKind.VISUAL_SEQUENCE -> getString(R.string.profile_kind_visual_sequence)
+        com.truelock.enigma.profiles.SecretSequenceKind.CONTACT_HANDSHAKE -> getString(R.string.profile_kind_contact_handshake)
+    }
+
+    private fun localizedProfileStatus(status: com.truelock.enigma.profiles.KeyProfileStatus): String = when (status) {
+        com.truelock.enigma.profiles.KeyProfileStatus.ACTIVE -> getString(R.string.profile_status_active)
+        com.truelock.enigma.profiles.KeyProfileStatus.EXPIRING -> getString(R.string.profile_status_expiring)
+        com.truelock.enigma.profiles.KeyProfileStatus.EXPIRED -> getString(R.string.profile_status_expired)
+        com.truelock.enigma.profiles.KeyProfileStatus.ARCHIVED -> getString(R.string.profile_status_archived)
+    }
+
     private fun renderProfiles(status: String) {
         val profiles = secureProfileStore.listProfiles()
+        val currentProfile = ProfileSelectionPolicy.selectDefault(profiles) ?: profiles.firstOrNull()
         renderedProfiles = profiles
         binding.statusText.text = status
-        binding.profileCountText.text = getString(R.string.profile_count_format, profiles.size)
-
-        val listItems = if (profiles.isEmpty()) {
-            listOf(getString(R.string.profile_list_placeholder))
-        } else {
-            profiles.map { profile -> formatProfileListItem(profile) }
-        }
-
-        binding.profileListView.adapter = ArrayAdapter(
-            this,
-            R.layout.item_profile_list,
-            listItems,
-        )
+        binding.statusText.visibility =
+            if (status == getString(R.string.profile_status_ready)) android.view.View.GONE else android.view.View.VISIBLE
+        binding.profileCountText.setText(R.string.profile_current_key_title)
+        val hasProfiles = profiles.isNotEmpty()
+        binding.createKeyCard.visibility =
+            if (!focusImportMode) android.view.View.VISIBLE else android.view.View.GONE
+        binding.selectedProfileLabel.text = currentProfile?.title ?: getString(R.string.profile_current_key_none)
+        val showSavedKeys = hasProfiles && !focusImportMode
+        binding.profileSummaryCard.visibility =
+            if (!focusImportMode) android.view.View.VISIBLE else android.view.View.GONE
+        binding.savedKeysTitleText.visibility = if (showSavedKeys) android.view.View.VISIBLE else android.view.View.GONE
+        binding.savedKeysSubtitleText.visibility = if (showSavedKeys) android.view.View.VISIBLE else android.view.View.GONE
+        binding.profileListSurface.visibility = if (showSavedKeys) android.view.View.VISIBLE else android.view.View.GONE
+        binding.deleteOldKeysButton.visibility = android.view.View.GONE
+        binding.clearProfilesButton.visibility = if (hasProfiles) android.view.View.VISIBLE else android.view.View.GONE
 
         val selectedId = binding.selectedProfileIdInput.text?.toString()?.trim().orEmpty()
-        val selectedIndex = profiles.indexOfFirst { it.id == selectedId }
-        if (selectedIndex >= 0) {
-            binding.profileListView.setItemChecked(selectedIndex, true)
-            binding.selectedProfileLabel.text = getString(
-                R.string.profile_manager_selected_format,
-                profiles[selectedIndex].title,
-            )
-        } else {
-            binding.profileListView.clearChoices()
-            binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
+        renderProfilesList(profiles, selectedId, currentProfile?.id)
+    }
+
+    private fun renderProfilesList(
+        profiles: List<KeyProfile>,
+        selectedId: String,
+        currentProfileId: String?,
+    ) {
+        binding.profileListContainer.removeAllViews()
+        val inflater = LayoutInflater.from(this)
+
+        if (profiles.isEmpty()) {
+            return
         }
+
+        profiles.forEach { profile ->
+            val itemView = inflater.inflate(R.layout.item_profile_list, binding.profileListContainer, false)
+            itemView.findViewById<TextView>(R.id.profileTitleText).text =
+                if (profile.id == currentProfileId) "• ${profile.title}" else profile.title
+            itemView.findViewById<TextView>(R.id.profileEmojiText).text =
+                profile.secretSequenceDisplay.orEmpty()
+            itemView.findViewById<TextView>(R.id.profileMetaText).text = formatProfileMeta(profile)
+            itemView.isActivated = profile.id == selectedId
+            itemView.alpha = if (itemView.isActivated) 1f else 0.92f
+            itemView.setOnClickListener {
+                secureProfileStore.touchProfile(profile.id)
+                bindSelectedProfile(profile)
+                renderProfiles(getString(R.string.profile_status_selected, profile.title))
+            }
+            itemView.findViewById<View>(R.id.copyProfileItemButton).setOnClickListener {
+                copyProfileItem(profile)
+            }
+            itemView.findViewById<View>(R.id.editProfileItemButton).setOnClickListener {
+                bindSelectedProfile(profile)
+                renderProfiles(getString(R.string.profile_status_selected, profile.title))
+            }
+            itemView.findViewById<View>(R.id.deleteProfileItemButton).setOnClickListener {
+                secureProfileStore.deleteProfile(profile.id)
+                val statusMessage = getString(R.string.profile_status_deleted, profile.title)
+                if (binding.selectedProfileIdInput.text?.toString()?.trim() == profile.id) {
+                    resetForm(statusMessage)
+                } else {
+                    renderProfiles(statusMessage)
+                }
+            }
+            binding.profileListContainer.addView(itemView)
+        }
+    }
+
+    private fun copyProfileItem(profile: KeyProfile) {
+        if (!profile.exportAllowed) {
+            renderProfiles(getString(R.string.profile_export_blocked))
+            return
+        }
+        val emojis = profile.secretSequenceDisplay
+            ?.split(Regex("\\s+"))
+            ?.filter { it.isNotBlank() }
+            ?.takeIf { it.size == ProfileKeyDeriver.EMOJI_SEQUENCE_LENGTH }
+            ?: return
+        val bundle = EmojiKeyBundle(
+            title = profile.title,
+            emojis = emojis,
+            profileSalt = profile.profileSalt,
+            appPackage = null,
+            peerHint = null,
+        )
+        protectExport {
+            val encoded = keyBundleCodec.encode(bundle)
+            clipboardManager.setPrimaryClip(
+                ClipData.newPlainText(getString(R.string.profile_key_clipboard_label), encoded),
+            )
+            renderProfiles(getString(R.string.profile_status_key_copied_item, profile.title))
+        }
+    }
+
+    private fun protectExport(action: () -> Unit) {
+        if (!biometricHelper.canUseBiometric()) {
+            action()
+            return
+        }
+        biometricHelper.authenticate(
+            onSuccess = action,
+            onError = { renderProfiles(it) },
+        )
+    }
+
+    private fun showExpiryPicker() {
+        val labels = EXPIRY_OPTIONS_HOURS.map(::expiryLabelForHours).toTypedArray()
+        val currentIndex = EXPIRY_OPTIONS_HOURS.indexOf(selectedRotationHours).takeIf { it >= 0 } ?: 1
+        AlertDialog.Builder(this)
+            .setTitle(R.string.profile_expiry_picker_title)
+            .setSingleChoiceItems(labels, currentIndex) { dialog, which ->
+                selectedRotationHours = EXPIRY_OPTIONS_HOURS[which]
+                updateExpiryButton()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun updateExpiryButton() {
+        binding.keyExpiryButton.text = expiryLabelForHours(selectedRotationHours)
+    }
+
+    private fun expiryLabelForHours(hours: Int): String = when (hours) {
+        24 -> getString(R.string.profile_expiry_24h)
+        48 -> getString(R.string.profile_expiry_48h)
+        24 * 7 -> getString(R.string.profile_expiry_7d)
+        24 * 30 -> getString(R.string.profile_expiry_30d)
+        else -> getString(R.string.profile_expiry_default)
     }
 }

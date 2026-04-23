@@ -1,331 +1,606 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#0F1822"
+    android:background="#0B1020"
     android:orientation="vertical"
-    android:paddingStart="6dp"
-    android:paddingTop="6dp"
-    android:paddingEnd="6dp"
-    android:paddingBottom="8dp">
+    android:paddingStart="3dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="3dp"
+    android:paddingBottom="0dp">
 
     <LinearLayout
+        android:id="@+id/keyboardSurface"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:background="#0B1020"
+        android:orientation="vertical"
+        android:paddingBottom="2dp">
 
-        <ImageButton
-            android:id="@+id/enigmaToggleButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/keyboard_action_encrypt_desc"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_lock_lock"
-            android:tint="#102030" />
+        <ScrollView
+            android:id="@+id/previewScroll"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:fadeScrollbars="false"
+            android:fillViewport="true"
+            android:scrollbars="vertical"
+            android:visibility="gone">
 
-        <ImageButton
-            android:id="@+id/decryptButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/keyboard_action_decrypt_desc"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_menu_view"
-            android:tint="#102030" />
+            <TextView
+                android:id="@+id/previewText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:paddingStart="10dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="8dp"
+                android:text="@string/keyboard_preview_placeholder"
+                android:textColor="#EAF4FF"
+                android:textIsSelectable="true"
+                android:textSize="13sp" />
+        </ScrollView>
 
-        <ImageButton
-            android:id="@+id/keyButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/keyboard_action_key_desc"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_menu_manage"
-            android:tint="#102030" />
+        <LinearLayout
+            android:id="@+id/audioRecordingPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:visibility="gone">
 
-        <ImageButton
-            android:id="@+id/clearButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/keyboard_action_clear_desc"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="#102030" />
+            <TextView
+                android:id="@+id/audioRecordingText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/audio_capsule_status_recording"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/audioCapsuleButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/open_audio_capsule"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_btn_speak_now"
-            android:tint="#102030" />
+            <Button
+                android:id="@+id/audioRecordingPauseButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="6dp"
+                android:minWidth="68dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/video_capsule_pause"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/videoCapsuleButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/open_video_capsule"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_menu_camera"
-            android:tint="#102030" />
+            <Button
+                android:id="@+id/audioRecordingStopButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="6dp"
+                android:minWidth="60dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/audio_capsule_stop_short"
+                android:textAllCaps="false"
+                android:textColor="#102030"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/sendAudioCapsuleButton"
-            android:layout_width="34dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="4dp"
-            android:background="@drawable/bg_key_utility"
-            android:contentDescription="@string/media_capsule_share"
-            android:padding="6dp"
-            android:src="@android:drawable/ic_menu_send"
-            android:tint="#102030"
-            android:visibility="gone" />
+        <LinearLayout
+            android:id="@+id/audioCapsuleActionPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="vertical"
+            android:padding="4dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/audioCapsuleActionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:text="@string/audio_capsule_action_ready_text"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/playAudioCapsuleActionButton"
+                    android:layout_width="42dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/audio_capsule_play"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_media_play"
+                    app:tint="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/deleteCapsuleActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="@string/keyboard_action_close"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/sendAudioCapsuleActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1.2"
+                    android:text="@string/audio_capsule_send_button"
+                    android:textAllCaps="false"
+                    android:textColor="#102030"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/actionBarContainer"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp">
+
+            <LinearLayout
+                android:id="@+id/mainActionRow"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/enigmaToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/keyboard_action_encrypt_desc"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_lock_lock"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/decryptButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/keyboard_action_decrypt_desc"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_view"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/clearButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/keyboard_action_clear_desc"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/attachToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                    android:contentDescription="@string/keyboard_action_attach_desc"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_add"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/audioCapsuleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/open_audio_capsule"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_btn_speak_now"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/photoCapsuleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/open_photo_message"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_camera"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/videoCapsuleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/open_video_capsule"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_slideshow"
+                    app:tint="#FFFFFF" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/attachActionRow"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageButton
+                    android:id="@+id/attachBackButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                    android:contentDescription="@string/keyboard_action_attach_desc"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_media_previous"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/audioCapsuleButtonHidden"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/open_audio_capsule"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_btn_speak_now"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/photoCapsuleButtonHidden"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/open_photo_message"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_camera"
+                    app:tint="#FFFFFF" />
+
+                <ImageButton
+                    android:id="@+id/videoCapsuleButtonHidden"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/open_video_capsule"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_slideshow"
+                    app:tint="#FFFFFF" />
+            </LinearLayout>
+        </FrameLayout>
 
         <TextView
             android:id="@+id/statusText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:text="@string/keyboard_status_idle"
-            android:textColor="#E7EEF7"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/profileInfoText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#8CA4B8"
-        android:textSize="10sp" />
-
-    <LinearLayout
-        android:id="@+id/suggestionRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/suggestionButton1"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_weight="1" />
-
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/suggestionButton2"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1" />
-
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/suggestionButton3"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <ScrollView
-        android:id="@+id/previewScroll"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_marginTop="4dp"
-        android:background="#13202B"
-        android:fadeScrollbars="false"
-        android:fillViewport="true"
-        android:scrollbars="vertical"
-        android:visibility="gone">
+            android:visibility="gone" />
 
         <TextView
-            android:id="@+id/previewText"
+            android:id="@+id/profileInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/keyNumberRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="72dp"
-            android:padding="8dp"
-            android:text="@string/keyboard_preview_placeholder"
-            android:textColor="#EAF4FF"
-            android:textIsSelectable="true"
-            android:textSize="13sp" />
-    </ScrollView>
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/audioCapsuleActionPanel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/bg_premium_card"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone">
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN1"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:text="1" />
 
-        <TextView
-            android:id="@+id/audioCapsuleActionText"
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN2"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="2" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN3"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="3" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN4"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="4" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN5"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="5" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN6"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="6" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN7"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="7" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN8"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="8" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN9"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="9" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/keyN0"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/numericPadContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Голосовая капсула готова к отправке"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="4dp"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <Button
-            android:id="@+id/sendAudioCapsuleActionButton"
+            <LinearLayout
+                android:id="@+id/numericPadRow1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey1" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="1" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="2" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="3" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericDeleteButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="@string/keyboard_action_backspace" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/numericPadRow2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey4" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="4" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="5" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="6" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericEnterButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="@string/keyboard_action_enter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/numericPadRow3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey7" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="7" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="8" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="9" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericMinusButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="-" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/numericPadRow4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:orientation="horizontal">
+
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericLettersButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1.1" android:text="@string/keyboard_action_letters" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericCommaButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="," />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey0" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="0" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericDotButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="." />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/keyRow1"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_primary_button"
-            android:text="Отправить голосовую капсулу"
-            android:textAllCaps="false"
-            android:textColor="#102030"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/keyRow1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:orientation="horizontal">
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C1" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C4" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C7" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C10" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C11" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C12" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+        </LinearLayout>
 
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C1" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C4" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C7" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C10" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C11" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR1C12" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/keyRow2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/keyRow2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:orientation="horizontal">
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C1" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C4" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C7" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C10" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C11" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+        </LinearLayout>
 
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C1" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C4" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C7" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C10" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR2C11" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/keyRow3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/keyRow3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:orientation="horizontal">
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/shiftButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_weight="1.18"
+                android:text="@string/keyboard_action_shift" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/shiftButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_weight="1.3"
-            android:text="@string/keyboard_action_shift" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C2" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C3" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C4" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C5" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C6" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C7" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C8" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C9" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C10" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C4" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C7" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
-        <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C10" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" />
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/backspaceButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1.18"
+                android:text="@string/keyboard_action_backspace" />
+        </LinearLayout>
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/backspaceButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="1.35"
-            android:text="@string/keyboard_action_backspace" />
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/keyRow4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/keyRow4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:orientation="horizontal">
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/symbolsToggleButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_weight="1"
+                android:text="@string/keyboard_action_symbols" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/symbolsToggleButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:text="@string/keyboard_action_symbols" />
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/languageToggleButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="@string/keyboard_action_language_ru" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/languageToggleButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="1"
-            android:text="@string/keyboard_action_language_ru" />
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/commaButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="0.82"
+                android:text="@string/keyboard_action_comma" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/commaButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="0.82"
-            android:text="@string/keyboard_action_comma" />
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/spaceButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="3.2"
+                android:text="@string/keyboard_action_space" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/spaceButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="3.2"
-            android:text="@string/keyboard_action_space" />
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/dotButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="0.82"
+                android:text="@string/keyboard_action_dot" />
 
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/dotButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="0.82"
-            android:text="@string/keyboard_action_dot" />
-
-        <com.truelock.enigma.ime.EnigmaKeyView
-            android:id="@+id/enterButton"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="2dp"
-            android:layout_weight="1.25"
-            android:text="@string/keyboard_action_enter" />
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/enterButton"
+                android:layout_width="0dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1.25"
+                android:text="@string/keyboard_action_enter" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

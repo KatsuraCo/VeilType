@@ -20,15 +20,13 @@ fun Context.localizedProfileStatus(status: KeyProfileStatus): String = when (sta
 }
 
 fun Context.formatProfileListItem(profile: KeyProfile): String {
-    val anyValue = getString(R.string.profile_value_any)
-    return getString(
-        R.string.profile_list_item_format,
-        profile.title,
-        profile.id,
-        profile.appPackage ?: anyValue,
-        profile.peerHint ?: anyValue,
-        localizedSecretKind(profile.secretSequenceKind),
-        localizedProfileStatus(profile.status),
-        profile.expiresAt.toString(),
-    )
+    return buildString {
+        append(profile.title)
+        append("\n\n")
+        append(localizedSecretKind(profile.secretSequenceKind))
+        append(" - ")
+        append(localizedProfileStatus(profile.status))
+        append("\n")
+        append(profile.expiresAt.toString())
+    }
 }

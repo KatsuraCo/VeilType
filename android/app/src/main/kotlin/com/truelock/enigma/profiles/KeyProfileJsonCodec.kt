@@ -10,6 +10,7 @@ object KeyProfileJsonCodec {
             .put("title", profile.title)
             .put("app_package", profile.appPackage)
             .put("peer_hint", profile.peerHint)
+            .put("secret_sequence_display", profile.secretSequenceDisplay)
             .put("secret_sequence_kind", profile.secretSequenceKind.name.lowercase())
             .put("profile_version", profile.profileVersion)
             .put("profile_salt_b64", profile.profileSalt.toBase64())
@@ -21,6 +22,9 @@ object KeyProfileJsonCodec {
             .put("status", profile.status.name.lowercase())
             .put("allow_decrypt_after_expiry", profile.allowDecryptAfterExpiry)
             .put("rotation_period_hours", profile.rotationPeriodHours)
+            .put("one_time_read", profile.oneTimeRead)
+            .put("require_biometric_for_decrypt", profile.requireBiometricForDecrypt)
+            .put("export_allowed", profile.exportAllowed)
 
         return json.toString()
     }
@@ -32,6 +36,7 @@ object KeyProfileJsonCodec {
             title = json.getString("title"),
             appPackage = json.nullableString("app_package"),
             peerHint = json.nullableString("peer_hint"),
+            secretSequenceDisplay = json.nullableString("secret_sequence_display"),
             secretSequenceKind = SecretSequenceKind.valueOf(
                 json.getString("secret_sequence_kind").uppercase(),
             ),
@@ -45,6 +50,9 @@ object KeyProfileJsonCodec {
             status = KeyProfileStatus.valueOf(json.getString("status").uppercase()),
             allowDecryptAfterExpiry = json.getBoolean("allow_decrypt_after_expiry"),
             rotationPeriodHours = json.getInt("rotation_period_hours"),
+            oneTimeRead = json.optBoolean("one_time_read", false),
+            requireBiometricForDecrypt = json.optBoolean("require_biometric_for_decrypt", false),
+            exportAllowed = json.optBoolean("export_allowed", true),
         )
     }
 

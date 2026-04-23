@@ -1,62 +1,60 @@
-# Implementation Plan
+# VeilType Implementation Plan
 
 ## Immediate next steps
 
-1. Freeze protocol decisions.
-2. Prepare crypto test vectors.
-3. Define Android project structure.
-4. Build profile storage and key derivation first.
-5. Build keyboard UI only after crypto core is stable.
+1. Freeze the local-only product narrative around one 8-emoji shared key.
+2. Finalize crypto test vectors and `TL1` behavior.
+3. Keep Android implementation aligned with the public trust model.
+4. Treat text encryption as the primary launch flow.
+5. Keep media capsules as a secondary layer on the same local-only model.
 
 ## Phase 0 outputs
 
-- `shared/protocol/format.md`
-- `shared/test_vectors/`
-- final algorithm choice
-- final profile schema
+- final message format
+- crypto test vectors
+- final key profile schema
+- explicit product language for no server / no account / no cloud / no recovery
 
 ## Phase 1 outputs
 
-- Android module skeleton
+- Android crypto core
 - local storage abstraction
-- profile manager
+- key manager
 - encrypt/decrypt service
-- unit tests for known vectors
+- unit tests
 
 ## Phase 2 outputs
 
 - working Android keyboard
-- `Enigma` mode
-- `Decrypt clipboard`
-- profile switcher
+- encrypt action
+- decrypt from clipboard
+- active-key switcher
 - expiry warnings
 
 ## Phase 3 outputs
 
 - security review checklist
-- polish and bug fixing
-- user-facing warnings and onboarding
+- onboarding polish
+- consistent microcopy across launch surfaces
+- first-run setup validation on fresh devices
 
 ## Phase 4 outputs
 
-- local identity key pair
-- contact bundle export format (`EKC1`)
-- import from clipboard / QR-ready bundle parser
-- shared-secret derivation via public keys
-- automatic profile creation from contact handshake
-- safety fingerprint confirmation screen
+- simple 8-emoji shared-key creation flow
+- simple 8-emoji shared-key import flow
+- cleaner share and receive UX
+- better active-key clarity per app
 
 ## Phase 5 outputs
 
 - audio capsule recording and playback
 - video capsule recording and playback
-- file-based capsule container for `TLA1` and `TLV1`
-- explicit share/import flow through attachments or exported files
-- preview UI that mimics voice note and video note interactions
+- file-based containers for `TLA1` and `TLV1`
+- explicit share/import flow through files or attachments
 
 ## Future improvements
 
-- `image capsule` mode: render encrypted payload as an image or sticker-like visual container instead of a raw `TL1:` string
-- import/decrypt flow for image capsules via local image recognition or QR-style scanning
-- avoid fragile steganography inside ordinary stickers for MVP; prefer explicit machine-readable visual payloads
-- `TLA1` / `TLV1` can later be extended with richer previews, transcode options, and sticker-like visual wrappers without changing the encrypted file container
+- image-style capsule mode for visual transport instead of raw `TL1` text
+- richer previews for `TLA1` / `TLV1`
+- better desktop compatibility with Android key material
+- faster fresh-device onboarding with the same honest trust model

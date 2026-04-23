@@ -5,18 +5,23 @@ import org.bouncycastle.crypto.params.Argon2Parameters
 import java.security.MessageDigest
 
 object ProfileKeyDeriver {
+    const val EMOJI_SEQUENCE_LENGTH = 8
     private const val ARGON2_MEMORY_KIB = 19_456
     private const val ARGON2_ITERATIONS = 2
     private const val ARGON2_PARALLELISM = 1
     private const val KEY_LENGTH_BYTES = 32
 
     fun canonicalVisualSequence(cardIds: List<Int>): String {
-        require(cardIds.size == 5) { "Exactly 5 card ids are required" }
+        require(cardIds.size == EMOJI_SEQUENCE_LENGTH) {
+            "Exactly $EMOJI_SEQUENCE_LENGTH card ids are required"
+        }
         return cardIds.joinToString("-") { it.toString().padStart(2, '0') }
     }
 
     fun canonicalEmojiSequence(emojis: List<String>): String {
-        require(emojis.size == 5) { "Exactly 5 emoji tokens are required" }
+        require(emojis.size == EMOJI_SEQUENCE_LENGTH) {
+            "Exactly $EMOJI_SEQUENCE_LENGTH emoji tokens are required"
+        }
         return emojis.joinToString("-") { token ->
             require(token.isNotBlank()) { "Emoji token must not be blank" }
             token.codePointsHex()

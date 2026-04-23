@@ -1,21 +1,16 @@
 package com.truelock.enigma.profiles
 
 object ProfileSelectionPolicy {
-    fun selectDefaultForApp(
-        profiles: List<KeyProfile>,
-        appPackage: String?,
-    ): KeyProfile? {
-        val candidates = profiles
+    fun selectDefault(profiles: List<KeyProfile>): KeyProfile? {
+        return profiles
             .asSequence()
             .filter { it.status == KeyProfileStatus.ACTIVE || it.status == KeyProfileStatus.EXPIRING }
-            .filter { appPackage == null || it.appPackage == null || it.appPackage == appPackage }
             .sortedWith(
-                compareByDescending<KeyProfile> { it.appPackage == appPackage }
-                    .thenByDescending { it.lastUsedAt ?: it.createdAt }
+                compareByDescending<KeyProfile> { it.lastUsedAt ?: it.createdAt }
+                    .thenBy { it.title.lowercase() }
             )
             .toList()
-
-        return candidates.firstOrNull()
+            .firstOrNull()
     }
 
     fun shortlistByProfileHint(

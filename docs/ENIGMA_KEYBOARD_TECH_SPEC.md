@@ -1,40 +1,46 @@
-# Enigma Keyboard: Technical Specification
+# VeilType: Technical Specification
 
-Version: 0.1
-Date: 2026-03-27
-Status: Draft for MVP implementation
-Owner: TrueLock / internal
+Version: 0.2  
+Date: 2026-04-04  
+Status: Draft for MVP alignment  
+Owner: internal
 
 ## 1. Product concept
 
-Enigma Keyboard is a local-only encryption layer for ordinary chats.
+VeilType is a local-only encryption layer for ordinary chats.
 
-The user types a message in any messenger, enables Enigma mode on the keyboard, and sends an unreadable encrypted string instead of plain text.
+The user types a message in any messenger, switches to the VeilType keyboard, and replaces plaintext with unreadable encrypted text before sending.
 
-The recipient uses the same keyboard and the same secret sequence to decrypt the message locally. The decrypted text is shown in a preview panel above the keyboard after the user copies the encrypted string from the chat and taps the decrypt action.
+The recipient uses VeilType and the same 8-emoji shared key to decrypt locally. Decrypted text is shown only after the recipient explicitly copies the encrypted string from chat and taps the decrypt action.
 
-The system must not depend on a server for encryption, decryption, key recovery, or message delivery.
+The system must not depend on a server for:
+- encryption
+- decryption
+- key storage
+- account state
+- cloud sync
+- recovery
 
 Core rule:
-- loss of key = loss of access to messages
+- loss of key = loss of access
 
 ## 2. Product goals
 
 Goals:
 - work on top of existing messengers
 - require no proprietary chat backend
-- encrypt and decrypt locally only
-- use an ordered secret sequence instead of a typed password
-- support fast daily usage with remembered per-profile keys
-- minimize friction for sender and recipient
+- keep encryption and decryption fully local
+- support one 8-emoji shared key per conversation
+- minimize setup friction without weakening the trust model
+- make the first successful encrypted message possible in under one minute
 
 Non-goals:
 - building a new messenger
 - cloud sync
 - password recovery
 - server-side key escrow
-- AI-based text transformation
-- hiding meaning in ordinary-looking text
+- AI transformation of message text
+- hiding ciphertext inside ordinary-looking text
 
 ## 3. Target platforms
 
@@ -42,86 +48,67 @@ MVP:
 - Android custom keyboard using `InputMethodService`
 
 Phase 2:
-- Windows desktop helper with hotkey, clipboard decrypt, and encrypted paste
+- Windows desktop helper with local encrypt/decrypt and clipboard support
 
 Out of scope for MVP:
-- iOS custom keyboard parity
+- iOS feature parity
 - macOS
-- browser extension
-- sticker-like or image-based encrypted capsules
-- full audio and video capsule parity
+- browser extensions
+- server-backed identity or discovery
 
 ## 4. Main user scenarios
 
 ### 4.1 Encrypt and send
 1. User opens any chat app.
-2. User opens Enigma Keyboard.
-3. User enables `Enigma` mode.
-4. User selects an active key profile.
-5. User types plain text.
-6. Keyboard shows plaintext preview and encrypted output preview.
-7. User taps `Encrypt & Paste`.
-8. Plain text is replaced in the input field by an encrypted string.
-9. User sends the message through the host app normally.
+2. User switches to VeilType Keyboard.
+3. User selects the active shared key.
+4. User types plain text.
+5. User taps the encrypt action.
+6. Plain text is replaced in the input field by a `TL1` encrypted string.
+7. User sends the message through the host app normally.
 
 ### 4.2 Decrypt from clipboard
-1. User sees an encrypted string in chat.
-2. User copies the string to clipboard.
-3. User opens Enigma Keyboard.
-4. User taps `Decrypt`.
-5. Keyboard reads clipboard.
-6. If the message format is valid and key matches, keyboard shows decrypted text in the preview panel.
-7. User may copy plaintext to clipboard if needed.
+1. User sees a `TL1` string in chat.
+2. User copies it to the clipboard.
+3. User opens VeilType Keyboard.
+4. User taps the decrypt action.
+5. Keyboard reads the clipboard.
+6. If the message is valid and the key matches, keyboard shows decrypted text in the preview panel.
 
-### 4.3 Create key profile
-1. User taps `Key`.
-2. User creates a new profile.
-3. User enters profile label, for example `Yasha TG`.
-4. User selects an ordered secret sequence.
-5. Keyboard derives a local master key from the sequence.
-6. Profile is stored locally in protected storage.
+### 4.3 Create shared key
+1. User opens the key setup screen.
+2. User generates a new 8-emoji shared key.
+3. User saves it locally.
+4. User shares the same key with the other person through a separate trusted channel.
 
-### 4.4 Rotate key profile
-1. Existing profile approaches 48-hour expiry.
-2. Keyboard warns user in advance.
-3. User chooses one of:
-- confirm same secret sequence and renew profile
-- create a new sequence
-- archive profile and stop encrypting with it
-4. Old profile remains available for decrypting older messages unless user deletes it.
+### 4.4 Import shared key
+1. User receives the 8-emoji shared key from the other person.
+2. User pastes or imports it.
+3. User saves it locally under a readable label.
+4. Keyboard can now encrypt and decrypt for that chat.
 
 ## 5. UX requirements
 
-### 5.1 Keyboard modes
+### 5.1 Keyboard states
 
-The keyboard must support 3 modes:
+The keyboard must support three clear states:
 - Normal
-- Enigma
+- Encrypt
 - Decrypt
 
-### Normal mode
+### Normal state
 - standard text input
-- quick buttons: `E`, `Decrypt`, `Key`
+- clear utility actions for encrypt, decrypt, and key switch
 
-### Enigma mode
-- visible badge: `Enigma ON`
-- active profile label visible at all times
-- expiry timer visible
-- preview panel shows:
-  - current plaintext
-  - resulting encrypted string preview
-- actions:
-  - `Encrypt & Paste`
-  - `Cancel`
-  - `Switch Key`
+### Encrypt state
+- active shared key visible at all times
+- preview panel shows the encrypted result
+- one clear action to replace plaintext with ciphertext
 
-### Decrypt mode
-- button `Decrypt clipboard`
+### Decrypt state
+- one explicit action to read the clipboard
 - preview panel for decrypted plaintext
-- actions:
-  - `Copy`
-  - `Clear`
-  - `Try another key`
+- no silent auto-decrypt behavior
 
 ### 5.2 Error UX
 
@@ -129,24 +116,22 @@ Errors must be short and explicit:
 - `Clipboard is empty`
 - `Message format not recognized`
 - `Wrong key`
-- `Profile expired`
+- `No active key`
 - `Encryption failed`
 - `Message too large`
 
-### 5.3 Chat detection UX
-
-The keyboard may reliably detect the host application package on Android, but must not claim universal automatic chat detection.
+### 5.3 Key-selection UX
 
 Rules:
-- default profile selection may be per app package
-- specific contact mapping is manual only
-- if multiple profiles exist for one app, user must choose one explicitly
+- user must always know which shared key is active
+- app-level default key selection is allowed
+- if multiple keys exist for one app, the user must be able to switch intentionally
 
 ## 6. Security model
 
 Security requirements:
 - all encryption and decryption is local
-- no plaintext leaves device through Enigma service
+- no plaintext leaves the device through a VeilType-controlled service
 - no server stores or processes keys
 - no recovery path exists
 - no global master key exists
@@ -155,61 +140,37 @@ Security requirements:
 
 Security assumptions:
 - device OS is not fully compromised
-- keyboard app storage is protected by OS secure storage where available
-- clipboard exposure is a known risk and must be documented
+- app storage is protected by OS facilities where available
+- clipboard exposure remains a known risk and must be documented
 
-Explicit warning in product:
-- if a user loses the key profile, encrypted messages cannot be recovered
+Explicit product warning:
+- if the user loses the shared key, encrypted messages cannot be recovered
 
-## 7. Key system
+## 7. Shared key system
 
-### 7.1 Secret sequence modes
+### 7.1 Shared key modes
 
-MVP supports two secret sequence modes:
-- `emoji sequence`
-- `visual sequence`
+MVP supports:
+- generated shared key package
+- ordered 8-emoji sequence as the default human-friendly secret representation
 
-Primary MVP mode:
-- `emoji sequence`
-
-Fallback/extended mode:
-- `visual sequence`
-
-Both modes rely on strict ordering.
-
-### 7.1.1 Emoji sequence
-
-User selects:
-- exactly 5 emoji tokens
-- exact order matters
-
-Reason:
-- faster than card picking
-- easier to remember
-- fits keyboard UX better
-
-### 7.1.2 Visual sequence
-
-User selects:
-- exactly 5 visual cards
-- exact order matters
-
-The app must not depend on arbitrary personal photos for key derivation in MVP.
+The product story should lead with:
+- one 8-emoji shared key
+- both people save the same key locally
 
 ### 7.2 Key derivation
 
 Input:
-- canonical string for an ordered secret sequence
+- canonical representation of the shared secret
 - optional app-scoped salt
 - profile-specific random salt
 
 Derivation:
-- normalize secret sequence into canonical byte string
-- derive profile master key using `Argon2id`
+- normalize the secret into a canonical byte string
+- derive a local key using `Argon2id`
 
-Recommended parameters for MVP:
-- memory cost tuned for mobile performance
-- target derivation time: 150-400 ms on mid-range Android device
+Recommended MVP target:
+- 150-400 ms derivation time on a mid-range Android device
 
 ### 7.3 Key profiles
 
@@ -238,13 +199,12 @@ Statuses:
 Rules:
 - profile lifetime for encryption: 48 hours
 - warning threshold: 6 hours before expiry
-- expired profile cannot encrypt new messages
-- expired profile may decrypt old messages if not deleted
-- rotation creates a new profile version or renews existing one
+- expired profiles cannot encrypt new messages
+- expired profiles may decrypt old messages if not deleted
 
 ## 8. Message format
 
-Encrypted message must be copy/paste-safe for chat apps.
+Encrypted messages must remain copy/paste-safe for chat apps.
 
 Required properties:
 - ASCII-safe
@@ -264,11 +224,6 @@ Payload structure before encoding:
 - ciphertext
 - authentication tag
 
-Notes:
-- `profile hint hash` must not reveal key directly
-- it may help narrow down candidate profiles
-- all fields must be authenticated
-
 ## 9. Cryptography
 
 Recommended algorithm:
@@ -284,64 +239,59 @@ Requirements:
 - no custom crypto primitives
 
 Plaintext input:
-- UTF-8 encoded text
+- UTF-8 text
 
 Ciphertext output:
 - binary payload encoded with `base64url`
 
 ## 10. Length and message limits
 
-The encrypted output will be longer than plaintext.
-
 MVP constraints:
 - soft limit: 500 UTF-8 bytes of plaintext
 - hard limit: 1500 UTF-8 bytes of plaintext
 
-If message exceeds hard limit:
-- keyboard must block encryption and show a clear error
+If the message exceeds the hard limit:
+- keyboard must block encryption
+- keyboard must show a clear error
 
 ## 11. Android architecture
 
 Main modules:
-- `ime/` keyboard service
-- `crypto/` encryption and key derivation
-- `profiles/` profile management
-- `clipboard/` decrypt flow
-- `storage/` local secure persistence
-- `ui/` keyboard panel states
-- `settings/`
-- `diagnostics/`
+- `ime/`
+- `crypto/`
+- `profiles/`
+- `clipboard/`
+- `storage/`
+- `ui/`
 
 Main Android components:
 - `InputMethodService`
-- settings activity
-- profile manager activity
+- main activity
+- key/profile manager activity
 - optional onboarding activity
 
-## 12. Windows phase 2 architecture
+## 12. Windows phase 2
 
-Windows version is not a true keyboard in MVP.
+Windows is not a true keyboard for MVP.
 
-It is a desktop helper:
+It is a local helper with:
 - global hotkey
-- small floating panel
-- encrypt typed or pasted text
-- paste encrypted string into active window
-- decrypt clipboard into local preview panel
+- floating panel
+- local encrypt/decrypt
+- encrypted paste into the active window
 
 ## 13. Local storage
 
-Data to store locally:
+Data stored locally:
 - key profiles
 - profile metadata
 - app-package bindings
-- user settings
-- local audit counters
+- settings
+- local counters
 
 Storage requirements:
 - use OS-protected storage where available
 - encrypt sensitive records at rest
-- never store raw visual sequence in plaintext
 - never store decrypted message history by default
 
 ## 14. Clipboard rules
@@ -352,43 +302,40 @@ Rules:
 - decrypt only on explicit user action
 - never auto-read and auto-decrypt silently
 - recognize valid encrypted format by prefix `TL1:`
-- provide `clear clipboard` option after successful decrypt
+- provide `clear clipboard` after successful decrypt
 
 ## 15. Screen/state specification
 
 ### 15.1 Onboarding
 - welcome
-- security warning
-- no recovery statement
-- create first profile
+- local-only trust statement
+- no account
+- no cloud
+- no recovery
+- create first shared key
 - enable keyboard in Android settings
 
 ### 15.2 Keyboard idle state
 - normal keyboard layout
-- top buttons: `E`, `Decrypt`, `Key`
+- top utility actions
 
-### 15.3 Keyboard enigma state
-- active profile chip
-- expiry chip
-- plaintext preview
-- encrypted preview
-- `Encrypt & Paste`
-- `Cancel`
+### 15.3 Keyboard encrypt state
+- active key chip
+- preview panel
+- explicit encrypt action
 
 ### 15.4 Keyboard decrypt state
 - clipboard status
-- `Decrypt clipboard`
+- decrypt action
 - result panel
-- `Copy`
-- `Clear`
 
-### 15.5 Profile management screen
-- list profiles
-- active / expired markers
-- renew profile
-- archive profile
-- delete profile
-- bind profile to app package
+### 15.5 Key management screen
+- create key
+- import key
+- list saved keys
+- renew
+- archive
+- delete
 
 ## 16. Telemetry and privacy
 
@@ -397,110 +344,85 @@ By default:
 - no key telemetry
 - no clipboard content telemetry
 
-Allowed anonymous telemetry only if user opts in:
-- app crashes
-- encryption success/failure counts
-- performance timing buckets
+Allowed only with opt-in:
+- crash reports
+- anonymous success/failure counts
+- coarse performance timing buckets
 
 ## 17. Threats and limitations
 
 Known limitations:
-- if attacker controls unlocked device, security is reduced
-- clipboard may leak if other software reads it
-- host chat apps still see encrypted string metadata, not plaintext
+- if an attacker controls an unlocked device, security is reduced
+- clipboard may leak to other software
+- host chat apps still see ciphertext metadata, not plaintext
 - screenshots can expose decrypted preview
-- Android app-package detection is reliable, exact-contact detection is not
 
 Out-of-scope attacks for MVP:
 - fully compromised OS
-- hardware keylogger
+- hardware keyloggers
 - malicious accessibility malware
 
 ## 18. Acceptance criteria for MVP
 
 MVP is accepted when:
-- user can create a visual key profile
-- user can encrypt text from keyboard in any normal text field
-- encrypted string is inserted into chat input
-- recipient can decrypt from clipboard locally
-- profile expiry and renewal work
+- user can create or import a shared key
+- user can encrypt text from the keyboard in a normal text field
+- encrypted text is inserted into chat input
+- recipient can decrypt from the clipboard locally
+- key expiry and renewal work
 - no server is required for normal operation
 - no plaintext is stored persistently by default
 
 ## 19. Implementation phases
 
-### Phase 0: protocol and crypto validation
+### Phase 0
 - finalize message format
-- finalize key derivation parameters
+- finalize derivation parameters
 - create test vectors
 
-### Phase 1: Android crypto core
-- profile storage
+### Phase 1
+- Android crypto core
+- local profile storage
 - encryption/decryption library
 - unit tests
 
-### Phase 2: Android keyboard MVP
-- keyboard UI
-- enigma mode
+### Phase 2
+- Android keyboard MVP
+- encrypt state
 - decrypt from clipboard
-- profile switcher
+- key switcher
 
-### Phase 3: hardening
-- secure storage review
-- clipboard policy
+### Phase 3
+- storage review
+- clipboard policy hardening
 - error handling
 - UX polish
 
-### Phase 4: Windows helper
-- desktop encrypt/decrypt panel
-- hotkey paste
-- profile compatibility with Android
+### Phase 4
+- Windows helper
+- compatibility with Android key material
 
-## 20. Open questions
+## 20. Future extension: media capsules
 
-- final choice between `XChaCha20-Poly1305` and `AES-GCM` based on library maturity
-- exact number of visual cards in bundled set
-- whether to support multiple active profiles per app package in MVP or only one
-- whether to allow manual plaintext copy after decrypt by default
-- whether expiry should be fixed at 48 hours or configurable
+Post-MVP extension:
+- `TLA1` audio capsules
+- `TLV1` video capsules
+- file-based encrypted containers
 
-## 20.1 Future extension: image capsule / sticker mode
-
-Potential post-MVP extension:
-- convert encrypted payload into a machine-readable image capsule instead of sending raw `TL1:` text
-- support sticker-like visual containers that can be shared through ordinary messengers as images
-- recipient flow: import image locally and decode payload inside Enigma
-
-Preferred direction:
-- explicit image capsule with QR-like or structured visual payload
-
-Avoid for early versions:
-- fragile steganography hidden inside ordinary decorative stickers
-- dependence on messenger-native sticker pipelines, compression, or format-specific behavior
-
-## 20.2 Future extension: audio and video capsules
-
-Potential post-MVP extension:
-- `TLA1` audio capsules for voice-note style messages
-- `TLV1` video capsules for short circle-style clips
-- file-based encrypted containers instead of raw text payloads
-
-Preferred interaction:
+Interaction goal:
 - one record button
 - one preview state
-- one send action
-- one explicit decrypt-and-play action on the recipient side
-
-Important constraint:
-- the UI may mimic Telegram or WhatsApp closely, but the implementation stays inside Enigma and does not hook into messenger-native voice/video internals
+- one explicit send action
+- one explicit decrypt-and-play action
 
 ## 21. Final product stance
 
-Enigma Keyboard is not a convenience chat utility.
+VeilType is not a convenience messaging platform.
 
-It is a strict local encryption tool with the following immutable principles:
+It is a strict local encryption tool with immutable principles:
 - no server
-- no recovery
+- no account
 - no cloud
-- no plaintext processing outside device
+- no recovery
+- no plaintext processing outside the device
 - lost key means lost access

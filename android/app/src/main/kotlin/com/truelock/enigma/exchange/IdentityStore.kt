@@ -101,6 +101,6 @@ class IdentityStore(
 
     private fun defaultDisplayName(): String =
         Build.MODEL?.trim().orEmpty().ifBlank {
-            appContext.getString(R.string.key_exchange_identity_default_name)
+            appContext.getString(R.string.app_name)
         }
 }

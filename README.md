@@ -1,38 +1,71 @@
-# Enigma Keyboard
+# VeilType
 
-Android-first encrypted keyboard for ordinary chats.
+VeilType is an Android-first keyboard that encrypts messages locally before they leave your chat app.
 
-## Scope
+It lets a user:
+- create or receive one 8-emoji shared key,
+- type inside a custom keyboard,
+- replace plaintext with `TL1` ciphertext in Telegram, WhatsApp, or another chat,
+- decrypt copied `TL1` messages locally from the clipboard,
+- send encrypted audio and video capsules as `TLA1` and `TLV1` files.
 
-This project is separate from `encryptor77777` / TrueLock.
+## Core trust model
 
-Purpose:
-- build a dedicated Enigma-style keyboard product
-- keep experiments isolated from the main TrueLock codebase
-- support Android keyboard MVP first
-- add Windows desktop helper later
-
-Core principles:
-- local-only encryption
+- local-only encryption and decryption
 - no server
+- no account
+- no cloud backup
 - no recovery
-- visual key profiles
-- copied ciphertext can be decrypted from clipboard
+- no master key
+- losing the 8-emoji shared key means losing access
 
-## Project layout
+## Current product shape
 
-- `docs/` product and technical documentation
-- `android/` Android keyboard implementation
-- `windows/` Windows helper implementation
-- `shared/` protocol, crypto notes, test vectors, shared artifacts
-- `scripts/` local tooling and generators
+This repo contains an Android app with:
+- a custom IME keyboard,
+- local shared-key storage,
+- text encryption and clipboard decryption,
+- audio capsules,
+- video capsules,
+- release APK output.
 
-## Current status
+## Product story
 
-Current phase:
-- documentation and architecture definition
+The strongest story is still the simplest one:
 
-Next phase:
-- finalize wire format
-- define crypto test vectors
-- prepare Android module structure
+1. Enable VeilType Keyboard.
+2. Create or receive one 8-emoji shared key.
+3. Open any chat and encrypt a message locally.
+
+Audio and video capsules matter, but they are secondary to the text flow.
+
+## Repository layout
+
+- `android/` Android application and keyboard implementation
+- `docs/` product, launch, and technical documentation
+- `shared/` protocol notes and test vectors
+- `veiltype-core/` public open-core package with specs, vectors, and Python reference implementation
+- `scripts/` local tooling
+- `windows/` future desktop helper work
+
+## Launch materials
+
+Product Hunt and launch docs live in:
+- `docs/PRODUCT_HUNT_PACKAGE.md`
+- `docs/PRODUCT_HUNT_LAUNCH_PACKAGE_FINAL.md`
+- `docs/PRODUCT_HUNT_READINESS.md`
+
+## Open-core materials
+
+Prepared public open-core package:
+- `veiltype-core/README.md`
+- `veiltype-core/LICENSE`
+- `veiltype-core/PUBLISH_PUBLIC_REPO.md`
+- `veiltype-core/docs/`
+- `veiltype-core/vectors/`
+- `veiltype-core/src/veiltype_core/`
+
+## Release artifact
+
+Latest release APK output:
+- `android/app/build/outputs/apk/release/app-release.apk`

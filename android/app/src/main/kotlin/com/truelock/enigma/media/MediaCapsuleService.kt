@@ -1,7 +1,9 @@
 package com.truelock.enigma.media
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import com.truelock.enigma.profiles.KeyProfile
+import com.truelock.enigma.security.DecryptUsageStore
 import com.truelock.enigma.storage.SecureProfileStore
 import java.io.File
 
@@ -10,12 +12,36 @@ class MediaCapsuleService(
     private val secureProfileStore: SecureProfileStore,
     private val codec: MediaCapsuleFileCodec = MediaCapsuleFileCodec(),
 ) {
+    companion object {
+        const val MAX_MEDIA_BYTES = 32L * 1024L * 1024L
+    }
+
     private val capsuleStore = MediaCapsuleFileStore(File(context.filesDir, "media_capsules"))
     private val decryptedStore = File(context.cacheDir, "media_plain").apply { mkdirs() }
     private val recordingStore = File(context.cacheDir, "media_recordings").apply { mkdirs() }
+    private val usageStore = DecryptUsageStore(context)
 
     fun createRecordingFile(type: MediaCapsuleType, extension: String): File =
         File(recordingStore, "${type.magic.lowercase()}_${System.currentTimeMillis()}.$extension")
+
+    fun describeMediaFile(file: File): String {
+        if (!file.exists()) {
+            return "missing(${file.name})"
+        }
+
+        val prefix = "name=${file.name} size=${file.length()}"
+        return runCatching {
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(file.absolutePath)
+            val mime = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            val bitrate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
+            retriever.release()
+            "$prefix mime=${mime ?: "unknown"} durationMs=${duration ?: "unknown"} bitrate=${bitrate ?: "unknown"}"
+        }.getOrElse { error ->
+            "$prefix metadataError=${error.javaClass.simpleName}:${error.message.orEmpty()}"
+        }
+    }
 
     fun encryptFile(
         sourceFile: File,
@@ -26,6 +52,7 @@ class MediaCapsuleService(
         width: Int? = null,
         height: Int? = null,
     ): File {
+        requireMediaSize(sourceFile)
         val rawKey = secureProfileStore.loadProfileKey(profile)
         val metadata = MediaCapsuleMetadata(
             mimeType = mimeType,
@@ -46,16 +73,26 @@ class MediaCapsuleService(
     }
 
     fun decryptFile(capsuleFile: File, profiles: List<KeyProfile> = secureProfileStore.listProfiles()): DecryptedMediaCapsule {
+        requireMediaSize(capsuleFile)
         val bytes = capsuleStore.readCapsule(capsuleFile)
         val hint = codec.extractProfileHint(bytes)
         val candidates = profiles.filter { it.profileHint.contentEquals(hint) }.ifEmpty { profiles }
         require(candidates.isNotEmpty()) { "No profiles available for media capsule" }
 
+        val profile = candidates.firstOrNull() ?: error("No matching profile")
+        val fingerprint = usageStore.mediaFingerprint(bytes)
+        require(!profile.oneTimeRead || !usageStore.isConsumed(profile.id, fingerprint)) {
+            "Capsule already opened"
+        }
+
         val keys = candidates.map(secureProfileStore::loadProfileKey)
         val decoded = codec.decrypt(bytes, keys)
-        val profile = candidates.firstOrNull { it.profileHint.contentEquals(decoded.profileHint) }
+        val decodedProfile = candidates.firstOrNull { it.profileHint.contentEquals(decoded.profileHint) }
             ?: candidates.first()
-        secureProfileStore.touchProfile(profile.id)
+        secureProfileStore.touchProfile(decodedProfile.id)
+        if (decodedProfile.oneTimeRead) {
+            usageStore.markConsumed(decodedProfile.id, fingerprint)
+        }
 
         val extension = decoded.metadata.originalFileName
             ?.substringAfterLast('.', "")
@@ -71,17 +108,35 @@ class MediaCapsuleService(
         return DecryptedMediaCapsule(
             capsuleFile = capsuleFile,
             plaintextFile = plaintextFile,
-            profile = profile,
+            profile = decodedProfile,
             metadata = decoded.metadata,
             type = decoded.type,
         )
+    }
+
+    fun resolveProfileForCapsule(
+        capsuleFile: File,
+        profiles: List<KeyProfile> = secureProfileStore.listProfiles(),
+    ): KeyProfile? {
+        requireMediaSize(capsuleFile)
+        val bytes = capsuleStore.readCapsule(capsuleFile)
+        val hint = codec.extractProfileHint(bytes)
+        return profiles.firstOrNull { it.profileHint.contentEquals(hint) } ?: profiles.firstOrNull()
     }
 
     private fun defaultPlaintextExtension(type: MediaCapsuleType): String =
         when (type) {
             MediaCapsuleType.AUDIO -> "m4a"
             MediaCapsuleType.VIDEO -> "mp4"
+            MediaCapsuleType.PHOTO -> "jpg"
         }
+
+    private fun requireMediaSize(file: File) {
+        require(file.exists()) { "Media file missing" }
+        require(file.length() in 1..MAX_MEDIA_BYTES) {
+            "Media file exceeds supported size"
+        }
+    }
 }
 
 data class DecryptedMediaCapsule(

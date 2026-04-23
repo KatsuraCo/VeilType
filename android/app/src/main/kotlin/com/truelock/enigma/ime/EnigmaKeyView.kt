@@ -2,10 +2,12 @@ package com.truelock.enigma.ime
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatTextView
 import com.truelock.enigma.R
 
@@ -21,31 +23,40 @@ class EnigmaKeyView @JvmOverloads constructor(
         isFocusable = false
         isAllCaps = false
         includeFontPadding = false
-        ellipsize = TextUtils.TruncateAt.END
+        ellipsize = null
         maxLines = 1
         minWidth = 0
         minimumWidth = 0
         minHeight = 0
         minimumHeight = 0
         setPadding(dp(4), dp(2), dp(4), dp(2))
-        setTextColor(Color.parseColor("#102030"))
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        background = context.getDrawable(R.drawable.bg_key)
+        setTextColor(Color.parseColor("#F6F8FC"))
+        typeface = Typeface.DEFAULT_BOLD
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_key)
     }
 
     fun applyUtilityStyle() {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 10.5f)
-        background = context.getDrawable(R.drawable.bg_key_utility)
+        ellipsize = TextUtils.TruncateAt.END
+        setTextColor(Color.parseColor("#F2F8FF"))
+        typeface = Typeface.DEFAULT_BOLD
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_key_utility)
     }
 
     fun applyCharacterStyle() {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-        background = context.getDrawable(R.drawable.bg_key)
+        ellipsize = null
+        setTextColor(Color.parseColor("#F6F8FC"))
+        typeface = Typeface.DEFAULT_BOLD
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_key)
     }
 
     fun applySuggestionStyle() {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-        background = context.getDrawable(R.drawable.bg_key_utility)
+        setTextColor(Color.parseColor("#F2F8FF"))
+        typeface = Typeface.DEFAULT_BOLD
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f)
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_key_utility)
     }
 
     private fun dp(value: Int): Int =
