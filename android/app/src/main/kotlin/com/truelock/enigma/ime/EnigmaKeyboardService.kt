@@ -524,6 +524,12 @@ class EnigmaKeyboardService : InputMethodService() {
             val actionBarContainer = root.findViewById<FrameLayout>(R.id.actionBarContainer)
             val mainActionRow = root.findViewById<LinearLayout>(R.id.mainActionRow)
             val attachActionRow = root.findViewById<LinearLayout>(R.id.attachActionRow)
+            val suggestionRow = root.findViewById<LinearLayout>(R.id.suggestionRow)
+            val suggestionButtons = listOf(
+                root.findViewById<EnigmaKeyView>(R.id.suggestionButton1),
+                root.findViewById<EnigmaKeyView>(R.id.suggestionButton2),
+                root.findViewById<EnigmaKeyView>(R.id.suggestionButton3),
+            )
             val enigmaToggleButton = root.findViewById<ImageButton>(R.id.enigmaToggleButton)
             val decryptButton = root.findViewById<ImageButton>(R.id.decryptButton)
             val attachToggleButton = root.findViewById<ImageButton>(R.id.attachToggleButton)
@@ -789,6 +795,8 @@ class EnigmaKeyboardService : InputMethodService() {
             setExactHeight(actionBarContainer, topControlHeightDp)
             setExactHeight(mainActionRow, topControlHeightDp)
             setExactHeight(attachActionRow, topControlHeightDp)
+            setVerticalMargins(suggestionRow, topDp = actionRowMarginDp)
+            setRowChildHeights(suggestionRow, topButtonHeightDp)
             listOf(
                 enigmaToggleButton,
                 decryptButton,
@@ -936,6 +944,17 @@ class EnigmaKeyboardService : InputMethodService() {
             numberButtons.forEach { styleKey(it, utility = false) }
             utilityButtons.forEach { styleKey(it, utility = true) }
             numericPadButtons.forEach { styleKey(it, utility = true) }
+            suggestionButtons.forEach {
+                it.applySuggestionStyle()
+                it.background = createKeyboardStateDrawable(
+                    startColor = palette.utilityStart,
+                    endColor = palette.utilityEnd,
+                    strokeColor = palette.utilityStroke,
+                    radiusDp = radiusDp,
+                    pressedOverlay = Color.WHITE,
+                )
+                it.setTextColor(Color.parseColor(palette.textPrimary))
+            }
 
             listOf(
                 enigmaToggleButton,
@@ -953,7 +972,7 @@ class EnigmaKeyboardService : InputMethodService() {
             listOf(audioRecordingPauseButton, deleteCapsuleActionButton).forEach { styleTextButton(it, primary = false) }
             listOf(sendAudioCapsuleActionButton, audioRecordingStopButton).forEach { styleTextButton(it, primary = true) }
 
-            listOf(root.findViewById<LinearLayout>(R.id.keyNumberRow), row1Layout, row2Layout, row3Layout).forEach(::styleMargins)
+            listOf(root.findViewById<LinearLayout>(R.id.keyNumberRow), suggestionRow, row1Layout, row2Layout, row3Layout).forEach(::styleMargins)
             styleMargins(root.findViewById(R.id.keyRow4))
         }
 
@@ -1950,22 +1969,12 @@ class EnigmaKeyboardService : InputMethodService() {
             val lexicon = when (currentLanguage) {
                 KeyboardLanguage.RU -> RU_SUGGESTIONS
                 KeyboardLanguage.EN -> EN_SUGGESTIONS
-                KeyboardLanguage.TR -> TR_SUGGESTIONS
-                KeyboardLanguage.ES -> ES_SUGGESTIONS
-                KeyboardLanguage.PT -> PT_SUGGESTIONS
-                KeyboardLanguage.DE -> DE_SUGGESTIONS
-                KeyboardLanguage.FR -> FR_SUGGESTIONS
-                KeyboardLanguage.IT -> IT_SUGGESTIONS
+                else -> return emptyList()
             }
             val correction = when (currentLanguage) {
                 KeyboardLanguage.RU -> RU_AUTOCORRECT[normalized]
                 KeyboardLanguage.EN -> EN_AUTOCORRECT[normalized]
-                KeyboardLanguage.TR -> TR_AUTOCORRECT[normalized]
-                KeyboardLanguage.ES -> ES_AUTOCORRECT[normalized]
-                KeyboardLanguage.PT -> PT_AUTOCORRECT[normalized]
-                KeyboardLanguage.DE -> DE_AUTOCORRECT[normalized]
-                KeyboardLanguage.FR -> FR_AUTOCORRECT[normalized]
-                KeyboardLanguage.IT -> IT_AUTOCORRECT[normalized]
+                else -> null
             }
 
             val prefixMatches = lexicon
@@ -1991,6 +2000,16 @@ class EnigmaKeyboardService : InputMethodService() {
                 .distinct()
                 .take(3)
                 .map { applyReplacementCase(word, it) }
+        }
+
+        fun supportsPredictiveTyping(): Boolean {
+            if (characterMode != CharacterMode.LETTERS) return false
+            if (currentLanguage != KeyboardLanguage.EN && currentLanguage != KeyboardLanguage.RU) return false
+            val inputType = currentInputEditorInfo?.inputType ?: 0
+            val variation = inputType and InputType.TYPE_MASK_VARIATION
+            return variation != InputType.TYPE_TEXT_VARIATION_PASSWORD &&
+                variation != InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD &&
+                variation != InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
         }
 
         fun refreshShiftAfterEdit() {
@@ -2282,6 +2301,23 @@ class EnigmaKeyboardService : InputMethodService() {
             audioCapsuleActionPanel.visibility =
                 if (audioActionVisible || videoActionVisible || photoActionVisible) View.VISIBLE else View.GONE
             val anyCapsuleVisible = audioActionVisible || videoActionVisible || photoActionVisible
+            val suggestions =
+                if (
+                    supportsPredictiveTyping() &&
+                    mode == KeyboardMode.IDLE &&
+                    !recordingVisible &&
+                    !anyCapsuleVisible
+                ) {
+                    currentWordBeforeCursor()?.let(::suggestionsForWord).orEmpty()
+                } else {
+                    emptyList()
+                }
+            suggestionButtons.forEachIndexed { index, button ->
+                val suggestion = suggestions.getOrNull(index)
+                button.text = suggestion.orEmpty()
+                button.visibility = if (suggestion.isNullOrBlank()) View.GONE else View.VISIBLE
+            }
+            suggestionRow.visibility = if (suggestions.isNotEmpty()) View.VISIBLE else View.GONE
             playAudioCapsuleActionButton.visibility = if (anyCapsuleVisible) View.VISIBLE else View.GONE
             playAudioCapsuleActionButton.isEnabled = anyCapsuleVisible
             playAudioCapsuleActionButton.alpha = if (anyCapsuleVisible) 1f else 0.55f
@@ -2366,6 +2402,7 @@ class EnigmaKeyboardService : InputMethodService() {
         utilityButtons.forEach { button ->
             button.applyUtilityStyle()
         }
+        suggestionButtons.forEach { it.applySuggestionStyle() }
         applyKeyboardAppearance()
         rowButtons.flatten().forEach { button ->
             button.setOnTouchListener { _, event ->
@@ -2411,6 +2448,17 @@ class EnigmaKeyboardService : InputMethodService() {
                 dismissActiveKeyPopup()
                 clearPreviewForTyping()
                 commitText(button.text?.toString().orEmpty())
+                render()
+            }
+        }
+        suggestionButtons.forEach { button ->
+            button.setOnClickListener {
+                val selected = button.text?.toString().orEmpty()
+                if (selected.isBlank()) return@setOnClickListener
+                dismissPressedKeyPreview()
+                dismissActiveKeyPopup()
+                clearPreviewForTyping()
+                replaceCurrentWord(selected)
                 render()
             }
         }

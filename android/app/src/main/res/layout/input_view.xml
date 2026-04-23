@@ -312,6 +312,38 @@
             </LinearLayout>
         </FrameLayout>
 
+        <LinearLayout
+            android:id="@+id/suggestionRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/suggestionButton1"
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/suggestionButton2"
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="" />
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/suggestionButton3"
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:text="" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/statusText"
             android:layout_width="match_parent"
