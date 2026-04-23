@@ -2012,7 +2012,6 @@ class EnigmaKeyboardService : InputMethodService() {
                 KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
                 else -> null
             }
-            val recentRanks = recentWords.withIndex().associate { it.value to it.index }
             val frequencyWords = when (currentLanguage) {
                 KeyboardLanguage.RU -> RU_PRIORITY_SUGGESTIONS_V2
                 KeyboardLanguage.EN -> EN_PRIORITY_SUGGESTIONS_V2
@@ -2022,56 +2021,40 @@ class EnigmaKeyboardService : InputMethodService() {
             val prefixMatches = lexicon
                 .asSequence()
                 .filter { it.startsWith(normalized) && it != normalized }
-                .take(20)
+                .take(12)
                 .toList()
 
-            val fuzzyMatches = lexicon
-                .asSequence()
-                .filter { it != normalized }
-                .map { candidate -> candidate to levenshtein(normalized, candidate) }
-                .filter { (_, distance) -> distance in 1..2 }
-                .map { it.first }
-                .take(20)
-                .toList()
+            val exactKnownWord =
+                correction.isNullOrBlank() &&
+                    (normalized in lexicon || normalized in frequencyWords)
+            if (exactKnownWord) return emptyList()
+            if (correction.isNullOrBlank() && prefixMatches.isEmpty()) return emptyList()
 
             fun candidateScore(candidate: String): Int {
                 var score = 0
-                val recentRank = recentRanks[candidate]
-                if (recentRank != null) {
-                    score += 140 - (recentRank * 6)
-                }
+                if (candidate == correction) score += 120
+                if (candidate in frequencyWords) score += 80
                 if (candidate.startsWith(normalized)) {
-                    score += 110
-                    score += normalized.length * 9
+                    score += 100
+                    score += normalized.length * 10
                     score -= (candidate.length - normalized.length).coerceAtLeast(0)
-                } else if (candidate.contains(normalized)) {
-                    score += 24
-                }
-                val distance = levenshtein(normalized, candidate)
-                if (distance in 1..2) {
-                    score += 24 - (distance * 7)
-                }
-                if (candidate in frequencyWords) {
-                    score += 26
-                }
-                if (candidate == correction) {
-                    score += 44
-                }
-                if (candidate.length <= normalized.length + 2) {
-                    score += 8
                 }
                 return score
             }
 
             return buildSet {
                 if (!correction.isNullOrBlank()) add(correction)
-                addAll(recentWords)
                 addAll(prefixMatches)
-                addAll(fuzzyMatches)
             }
                 .filter { it != normalized }
+                .filter { candidate ->
+                    correction != null ||
+                        candidate.length <= normalized.length + 6 ||
+                        candidate in frequencyWords
+                }
                 .sortedWith(
                     compareByDescending<String> { candidateScore(it) }
+                        .thenBy { lexicon.indexOf(it).takeIf { idx -> idx >= 0 } ?: Int.MAX_VALUE }
                         .thenBy { it.length }
                         .thenBy { it },
                 )
