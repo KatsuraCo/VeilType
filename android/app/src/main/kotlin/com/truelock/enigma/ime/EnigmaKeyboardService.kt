@@ -154,6 +154,7 @@ class EnigmaKeyboardService : InputMethodService() {
     private var refreshPendingVideoCapsuleState: (() -> Unit)? = null
     private var rebuildingInputView = false
     private var knownPackageUpdateTime = 0L
+    private val predictionLexiconCache = mutableMapOf<KeyboardLanguage, List<String>>()
     private val audioManager by lazy { getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     private val pendingCapsuleStore by lazy { PendingCapsuleStore(applicationContext) }
     private var lastAudioCapsuleFile: java.io.File? = null
@@ -1963,12 +1964,36 @@ class EnigmaKeyboardService : InputMethodService() {
             shiftEnabled = shouldAutoCapitalize()
         }
 
+        fun predictionLexicon(language: KeyboardLanguage): List<String> =
+            predictionLexiconCache.getOrPut(language) {
+                val assetName = when (language) {
+                    KeyboardLanguage.RU -> "prediction_ru.txt"
+                    KeyboardLanguage.EN -> "prediction_en.txt"
+                    else -> return@getOrPut emptyList()
+                }
+                runCatching {
+                    assets.open(assetName).bufferedReader(Charsets.UTF_8).use { reader ->
+                        reader.readLines()
+                            .map { it.trim() }
+                            .filter { it.length >= 2 }
+                            .distinct()
+                    }
+                }.getOrElse {
+                    when (language) {
+                        KeyboardLanguage.RU -> RU_SUGGESTIONS_V2
+                        KeyboardLanguage.EN -> EN_SUGGESTIONS_V2
+                        else -> emptyList()
+                    }
+                }
+            }
+
         fun suggestionsForWord(word: String): List<String> {
             if (word.length < 2 || characterMode != CharacterMode.LETTERS) return emptyList()
             val normalized = lowercaseForCurrentLanguage(word)
             val lexicon = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_SUGGESTIONS_V2
-                KeyboardLanguage.EN -> EN_SUGGESTIONS_V2
+                KeyboardLanguage.RU,
+                KeyboardLanguage.EN,
+                -> predictionLexicon(currentLanguage)
                 else -> return emptyList()
             }
             val correction = when (currentLanguage) {
