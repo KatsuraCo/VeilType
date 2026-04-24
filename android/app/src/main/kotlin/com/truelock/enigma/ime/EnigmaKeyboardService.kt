@@ -1571,7 +1571,7 @@ class EnigmaKeyboardService : InputMethodService() {
             characterMode = CharacterMode.LETTERS
             currentSymbolPage = SymbolPage.PRIMARY
             capsLockEnabled = false
-            shiftEnabled = false
+            shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
             previewMessage = null
             previewTone = PreviewTone.DEFAULT
             mode = KeyboardMode.IDLE
@@ -2608,12 +2608,15 @@ class EnigmaKeyboardService : InputMethodService() {
                 else -> {
                     characterMode = CharacterMode.LETTERS
                     currentSymbolPage = SymbolPage.PRIMARY
+                    shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
                 }
             }
             previewMessage = null
             previewTone = PreviewTone.DEFAULT
-            shiftEnabled = false
-            capsLockEnabled = false
+            if (characterMode != CharacterMode.LETTERS) {
+                shiftEnabled = false
+                capsLockEnabled = false
+            }
             mode = KeyboardMode.IDLE
             render()
         }
@@ -3292,9 +3295,15 @@ class EnigmaKeyboardService : InputMethodService() {
         if (!selected.isNullOrEmpty()) {
             inputConnection.commitText("", 1)
         } else {
-            inputConnection.deleteSurroundingText(1, 0)
+            val deletedInCodePoints = runCatching { inputConnection.deleteSurroundingTextInCodePoints(1, 0) }.getOrDefault(false)
+            if (!deletedInCodePoints) {
+                inputConnection.deleteSurroundingText(1, 0)
+            }
         }
         lastSpaceTapAt = 0L
+        if (!capsLockEnabled && characterMode == CharacterMode.LETTERS) {
+            shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
+        }
     }
 
     private fun handleEnter() {
@@ -3337,6 +3346,10 @@ class EnigmaKeyboardService : InputMethodService() {
         if (!sendDefaultEditorAction(false)) {
             inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
             inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+        }
+        lastSpaceTapAt = 0L
+        if (!capsLockEnabled && characterMode == CharacterMode.LETTERS) {
+            shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
         }
     }
 
