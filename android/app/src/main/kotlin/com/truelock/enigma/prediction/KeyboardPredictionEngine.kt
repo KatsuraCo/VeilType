@@ -77,7 +77,7 @@ class KeyboardPredictionEngine private constructor(
             score -= (candidate.length - input.length).coerceAtLeast(0)
         }
         if (distance in 1..2) {
-            score += 48 - (distance * 14)
+            score += 90 - (distance * 18)
         }
         return score
     }
@@ -126,7 +126,11 @@ class KeyboardPredictionEngine private constructor(
             )
         }
 
-        private fun maxEditDistance(word: String): Int = if (word.length >= 6) 2 else 1
+        private fun maxEditDistance(word: String): Int = when {
+            word.length >= 5 -> 2
+            word.length >= 3 -> 1
+            else -> 0
+        }
 
         private fun collectDeletes(word: String, maxDistance: Int): Set<String> {
             val visited = linkedSetOf(word)

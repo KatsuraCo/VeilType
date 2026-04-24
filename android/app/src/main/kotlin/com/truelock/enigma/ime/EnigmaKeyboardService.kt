@@ -1991,6 +1991,29 @@ class EnigmaKeyboardService : InputMethodService() {
             shiftEnabled = shouldAutoCapitalize()
         }
 
+        fun applySuggestion(replacement: String) {
+            val currentWord = currentWordBeforeCursor()
+            if (!currentWord.isNullOrBlank()) {
+                replaceCurrentWord(replacement)
+                return
+            }
+
+            val before = textBeforeCursor(4)
+            val needsLeadingSpace =
+                before.isNotBlank() &&
+                    before.lastOrNull()?.isWhitespace() == false &&
+                    before.lastOrNull() !in listOf('(', '[', '{', '"', '\'')
+            val textToCommit = buildString {
+                if (needsLeadingSpace) append(' ')
+                append(replacement)
+                append(' ')
+            }
+            currentInputConnection?.commitText(textToCommit, 1)
+            rememberRecentWord(lowercaseForCurrentLanguage(replacement))
+            recentWords = loadRecentWords()
+            shiftEnabled = shouldAutoCapitalize()
+        }
+
         fun predictionLexicon(language: KeyboardLanguage): List<String> =
             predictionLexiconCache.getOrPut(language) {
                 val assetName = when (language) {
@@ -2531,7 +2554,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 dismissPressedKeyPreview()
                 dismissActiveKeyPopup()
                 clearPreviewForTyping()
-                replaceCurrentWord(selected)
+                applySuggestion(selected)
                 render()
             }
         }
