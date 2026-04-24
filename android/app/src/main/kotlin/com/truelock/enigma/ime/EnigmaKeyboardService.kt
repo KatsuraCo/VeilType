@@ -615,29 +615,15 @@ class EnigmaKeyboardService : InputMethodService() {
         lateinit var render: () -> Unit
 
         fun setAttachActionsExpanded(expanded: Boolean) {
-            if (attachActionsExpanded == expanded) return
-            attachActionsExpanded = expanded
-            val incoming = if (expanded) attachActionRow else mainActionRow
-            val outgoing = if (expanded) mainActionRow else attachActionRow
-            val animationWidth = maxOf(root.width, (220 * root.resources.displayMetrics.density).toInt())
-            incoming.visibility = View.VISIBLE
-            incoming.alpha = 0f
-            incoming.translationX = if (expanded) animationWidth.toFloat() else -animationWidth.toFloat()
-            outgoing.animate()
-                .alpha(0f)
-                .translationX(if (expanded) -animationWidth.toFloat() else animationWidth.toFloat())
-                .setDuration(180L)
-                .withEndAction {
-                    outgoing.visibility = View.GONE
-                    outgoing.alpha = 1f
-                    outgoing.translationX = 0f
-                }
-                .start()
-            incoming.animate()
-                .alpha(1f)
-                .translationX(0f)
-                .setDuration(180L)
-                .start()
+            attachActionsExpanded = false
+            mainActionRow.animate().cancel()
+            attachActionRow.animate().cancel()
+            mainActionRow.visibility = View.VISIBLE
+            mainActionRow.alpha = 1f
+            mainActionRow.translationX = 0f
+            attachActionRow.visibility = View.GONE
+            attachActionRow.alpha = 1f
+            attachActionRow.translationX = 0f
         }
 
         fun installActionRowSwipe(view: View) {
@@ -2459,8 +2445,8 @@ class EnigmaKeyboardService : InputMethodService() {
             setIconActive(enigmaToggleButton, mode == KeyboardMode.ENIGMA)
             setIconActive(decryptButton, mode == KeyboardMode.DECRYPT)
             setIconActive(clearButton, false)
-            setIconActive(attachToggleButton, attachActionsExpanded)
-            setIconActive(attachBackButton, attachActionsExpanded)
+            setIconActive(attachToggleButton, false)
+            setIconActive(attachBackButton, false)
             setIconActive(audioCapsuleButton, recordingVisible || audioActionVisible)
             setIconActive(photoCapsuleButton, photoActionVisible)
             setIconActive(videoCapsuleButton, videoActionVisible)
