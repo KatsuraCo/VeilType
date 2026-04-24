@@ -2099,6 +2099,7 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         fun supportsPredictiveTyping(): Boolean {
+            if (!PREDICTIVE_TYPING_ENABLED) return false
             if (characterMode != CharacterMode.LETTERS) return false
             if (currentLanguage != KeyboardLanguage.EN && currentLanguage != KeyboardLanguage.RU) return false
             val inputType = currentInputEditorInfo?.inputType ?: 0
@@ -3508,6 +3509,7 @@ class EnigmaKeyboardService : InputMethodService() {
 
     private companion object {
         const val TAG = "EnigmaKeyboardService"
+        const val PREDICTIVE_TYPING_ENABLED = false
         const val SHIFT_UP_SYMBOL = "\u2191"
         const val SHIFT_LOCKED_SYMBOL = "\u21EA"
         val PENDING_CAPSULE_POLL_TOKEN = Any()
