@@ -65,6 +65,7 @@ import com.truelock.enigma.profiles.KeyProfile
 import com.truelock.enigma.profiles.KeyProfileStatus
 import com.truelock.enigma.profiles.ProfileSelectionPolicy
 import com.truelock.enigma.profiles.SecretSequenceKind
+import com.truelock.enigma.prediction.KeyboardPredictionEngine
 import com.truelock.enigma.settings.KeyboardAppearancePreferences
 import com.truelock.enigma.settings.KeyboardLanguagePreferences
 import com.truelock.enigma.sharing.ShareInvitePreferences
@@ -155,6 +156,7 @@ class EnigmaKeyboardService : InputMethodService() {
     private var rebuildingInputView = false
     private var knownPackageUpdateTime = 0L
     private val predictionLexiconCache = mutableMapOf<KeyboardLanguage, List<String>>()
+    private val predictionEngineCache = mutableMapOf<KeyboardLanguage, KeyboardPredictionEngine>()
     private val audioManager by lazy { getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     private val pendingCapsuleStore by lazy { PendingCapsuleStore(applicationContext) }
     private var lastAudioCapsuleFile: java.io.File? = null
@@ -1998,67 +2000,33 @@ class EnigmaKeyboardService : InputMethodService() {
                 }
             }
 
+        fun predictionPriorityWords(language: KeyboardLanguage): Set<String> = when (language) {
+            KeyboardLanguage.RU -> RU_PRIORITY_SUGGESTIONS_V2
+            KeyboardLanguage.EN -> EN_PRIORITY_SUGGESTIONS_V2
+            else -> emptySet()
+        }
+
+        fun predictionCorrections(language: KeyboardLanguage): Map<String, String> = when (language) {
+            KeyboardLanguage.RU -> RU_AUTOCORRECT_V2
+            KeyboardLanguage.EN -> EN_AUTOCORRECT_V2
+            else -> emptyMap()
+        }
+
+        fun predictionEngine(language: KeyboardLanguage): KeyboardPredictionEngine =
+            predictionEngineCache.getOrPut(language) {
+                KeyboardPredictionEngine.create(
+                    terms = predictionLexicon(language),
+                    priorityWords = predictionPriorityWords(language),
+                    explicitCorrections = predictionCorrections(language),
+                )
+            }
+
         fun suggestionsForWord(word: String): List<String> {
             if (word.length < 2 || characterMode != CharacterMode.LETTERS) return emptyList()
-            val normalized = lowercaseForCurrentLanguage(word)
-            val lexicon = when (currentLanguage) {
-                KeyboardLanguage.RU,
-                KeyboardLanguage.EN,
-                -> predictionLexicon(currentLanguage)
-                else -> return emptyList()
-            }
-            val correction = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_AUTOCORRECT_V2[normalized]
-                KeyboardLanguage.EN -> EN_AUTOCORRECT_V2[normalized]
-                else -> null
-            }
-            val frequencyWords = when (currentLanguage) {
-                KeyboardLanguage.RU -> RU_PRIORITY_SUGGESTIONS_V2
-                KeyboardLanguage.EN -> EN_PRIORITY_SUGGESTIONS_V2
-                else -> emptySet()
-            }
-
-            val prefixMatches = lexicon
-                .asSequence()
-                .filter { it.startsWith(normalized) && it != normalized }
-                .take(12)
-                .toList()
-
-            val exactKnownWord =
-                correction.isNullOrBlank() &&
-                    (normalized in lexicon || normalized in frequencyWords)
-            if (exactKnownWord) return emptyList()
-            if (correction.isNullOrBlank() && prefixMatches.isEmpty()) return emptyList()
-
-            fun candidateScore(candidate: String): Int {
-                var score = 0
-                if (candidate == correction) score += 120
-                if (candidate in frequencyWords) score += 80
-                if (candidate.startsWith(normalized)) {
-                    score += 100
-                    score += normalized.length * 10
-                    score -= (candidate.length - normalized.length).coerceAtLeast(0)
-                }
-                return score
-            }
-
-            return buildSet {
-                if (!correction.isNullOrBlank()) add(correction)
-                addAll(prefixMatches)
-            }
-                .filter { it != normalized }
-                .filter { candidate ->
-                    correction != null ||
-                        candidate.length <= normalized.length + 6 ||
-                        candidate in frequencyWords
-                }
-                .sortedWith(
-                    compareByDescending<String> { candidateScore(it) }
-                        .thenBy { lexicon.indexOf(it).takeIf { idx -> idx >= 0 } ?: Int.MAX_VALUE }
-                        .thenBy { it.length }
-                        .thenBy { it },
-                )
-                .take(3)
+            val language = currentLanguage
+            if (language != KeyboardLanguage.RU && language != KeyboardLanguage.EN) return emptyList()
+            return predictionEngine(language)
+                .suggestions(lowercaseForCurrentLanguage(word), maxSuggestions = 3)
                 .map { applyReplacementCase(word, it) }
         }
 
