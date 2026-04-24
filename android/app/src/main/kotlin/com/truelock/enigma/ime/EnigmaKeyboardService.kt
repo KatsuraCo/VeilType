@@ -2625,16 +2625,23 @@ class EnigmaKeyboardService : InputMethodService() {
             dismissPressedKeyPreview()
             dismissActiveKeyPopup()
             if (characterMode == CharacterMode.LETTERS) {
+                val now = SystemClock.uptimeMillis()
                 when {
                     capsLockEnabled -> {
                         capsLockEnabled = false
-                        shiftEnabled = false
+                        shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
+                        lastShiftTapAt = 0L
+                    }
+                    shiftEnabled && now - lastShiftTapAt < 400L -> {
+                        capsLockEnabled = true
+                        shiftEnabled = true
+                        lastShiftTapAt = 0L
                     }
                     else -> {
                         shiftEnabled = !shiftEnabled
+                        lastShiftTapAt = if (shiftEnabled) now else 0L
                     }
                 }
-                lastShiftTapAt = 0L
                 previewMessage = null
                 previewTone = PreviewTone.DEFAULT
                 render()
@@ -2645,6 +2652,7 @@ class EnigmaKeyboardService : InputMethodService() {
             if (characterMode == CharacterMode.LETTERS) {
                 capsLockEnabled = !capsLockEnabled
                 shiftEnabled = capsLockEnabled
+                lastShiftTapAt = 0L
                 previewMessage = null
                 previewTone = PreviewTone.DEFAULT
                 render()
