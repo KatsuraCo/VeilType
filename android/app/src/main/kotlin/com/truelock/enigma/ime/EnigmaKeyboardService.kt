@@ -156,6 +156,7 @@ class EnigmaKeyboardService : InputMethodService() {
     private var rebuildingInputView = false
     private var knownPackageUpdateTime = 0L
     private val predictionLexiconCache = mutableMapOf<KeyboardLanguage, List<String>>()
+    private val predictionNextWordCache = mutableMapOf<KeyboardLanguage, Map<String, List<String>>>()
     private val predictionEngineCache = mutableMapOf<KeyboardLanguage, KeyboardPredictionEngine>()
     private val audioManager by lazy { getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     private val pendingCapsuleStore by lazy { PendingCapsuleStore(applicationContext) }
@@ -1968,6 +1969,19 @@ class EnigmaKeyboardService : InputMethodService() {
         fun currentWordBeforeCursor(): String? =
             WORD_AT_END.find(textBeforeCursor(48))?.value
 
+        fun previousWordBeforeCursor(): String? {
+            val before = textBeforeCursor(64)
+            val trimmedEnd = before.trimEnd()
+            if (trimmedEnd.isBlank()) return null
+            val withoutCurrent =
+                if (before.lastOrNull()?.isWhitespace() == false) {
+                    trimmedEnd.substringBeforeLast(' ', "")
+                } else {
+                    trimmedEnd
+                }
+            return WORD_AT_END.find(withoutCurrent)?.value
+        }
+
         fun replaceCurrentWord(replacement: String) {
             val currentWord = currentWordBeforeCursor() ?: return
             currentInputConnection?.deleteSurroundingText(currentWord.length, 0)
@@ -2012,22 +2026,53 @@ class EnigmaKeyboardService : InputMethodService() {
             else -> emptyMap()
         }
 
+        fun predictionNextWords(language: KeyboardLanguage): Map<String, List<String>> =
+            predictionNextWordCache.getOrPut(language) {
+                val assetName = when (language) {
+                    KeyboardLanguage.RU -> "prediction_next_ru.txt"
+                    KeyboardLanguage.EN -> "prediction_next_en.txt"
+                    else -> return@getOrPut emptyMap()
+                }
+                runCatching {
+                    assets.open(assetName).bufferedReader(Charsets.UTF_8).useLines { lines ->
+                        lines.mapNotNull { line ->
+                            val trimmed = line.trim()
+                            if (trimmed.isBlank() || !trimmed.contains('\t')) return@mapNotNull null
+                            val (key, values) = trimmed.split('\t', limit = 2)
+                            val suggestions = values.split(',')
+                                .map { it.trim() }
+                                .filter { it.length >= 2 }
+                            if (key.isBlank() || suggestions.isEmpty()) null else key to suggestions
+                        }.toMap()
+                    }
+                }.getOrElse { emptyMap() }
+            }
+
         fun predictionEngine(language: KeyboardLanguage): KeyboardPredictionEngine =
             predictionEngineCache.getOrPut(language) {
                 KeyboardPredictionEngine.create(
                     terms = predictionLexicon(language),
                     priorityWords = predictionPriorityWords(language),
                     explicitCorrections = predictionCorrections(language),
+                    nextWordMap = predictionNextWords(language),
                 )
             }
 
-        fun suggestionsForWord(word: String): List<String> {
-            if (word.length < 2 || characterMode != CharacterMode.LETTERS) return emptyList()
+        fun suggestionsForContext(): List<String> {
+            if (characterMode != CharacterMode.LETTERS) return emptyList()
             val language = currentLanguage
             if (language != KeyboardLanguage.RU && language != KeyboardLanguage.EN) return emptyList()
-            return predictionEngine(language)
-                .suggestions(lowercaseForCurrentLanguage(word), maxSuggestions = 3)
-                .map { applyReplacementCase(word, it) }
+            val engine = predictionEngine(language)
+            val currentWord = currentWordBeforeCursor()
+            return if (!currentWord.isNullOrBlank()) {
+                engine.suggestions(lowercaseForCurrentLanguage(currentWord), maxSuggestions = 3)
+                    .map { applyReplacementCase(currentWord, it) }
+            } else {
+                previousWordBeforeCursor()?.let { previous ->
+                    engine.nextSuggestions(lowercaseForCurrentLanguage(previous), maxSuggestions = 3)
+                        .map(::applyCase)
+                }.orEmpty()
+            }
         }
 
         fun supportsPredictiveTyping(): Boolean {
@@ -2336,7 +2381,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     !recordingVisible &&
                     !anyCapsuleVisible
                 ) {
-                    currentWordBeforeCursor()?.let(::suggestionsForWord).orEmpty()
+                    suggestionsForContext()
                 } else {
                     emptyList()
                 }

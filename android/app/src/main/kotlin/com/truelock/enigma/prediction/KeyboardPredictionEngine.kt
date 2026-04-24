@@ -6,6 +6,7 @@ class KeyboardPredictionEngine private constructor(
     private val priorityWords: Set<String>,
     private val explicitCorrections: Map<String, String>,
     private val deleteIndex: Map<String, Set<String>>,
+    private val nextWordMap: Map<String, List<String>>,
 ) {
     fun suggestions(input: String, maxSuggestions: Int = 3): List<String> {
         val normalized = input.trim().lowercase()
@@ -54,6 +55,12 @@ class KeyboardPredictionEngine private constructor(
         return scored.take(maxSuggestions).map { it.word }
     }
 
+    fun nextSuggestions(previousWord: String, maxSuggestions: Int = 3): List<String> {
+        val normalized = previousWord.trim().lowercase()
+        if (normalized.length < 2) return emptyList()
+        return nextWordMap[normalized].orEmpty().take(maxSuggestions)
+    }
+
     private fun scoreCandidate(
         input: String,
         candidate: String,
@@ -88,6 +95,7 @@ class KeyboardPredictionEngine private constructor(
             terms: List<String>,
             priorityWords: Set<String>,
             explicitCorrections: Map<String, String>,
+            nextWordMap: Map<String, List<String>> = emptyMap(),
         ): KeyboardPredictionEngine {
             val normalizedTerms = terms.asSequence()
                 .map { it.trim().lowercase() }
@@ -107,6 +115,14 @@ class KeyboardPredictionEngine private constructor(
                 explicitCorrections = explicitCorrections.mapKeys { it.key.trim().lowercase() }
                     .mapValues { it.value.trim().lowercase() },
                 deleteIndex = deleteIndex,
+                nextWordMap = nextWordMap.mapKeys { it.key.trim().lowercase() }
+                    .mapValues { entry ->
+                        entry.value.asSequence()
+                            .map { it.trim().lowercase() }
+                            .filter { it.length >= 2 }
+                            .distinct()
+                            .toList()
+                    },
             )
         }
 
