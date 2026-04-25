@@ -1373,7 +1373,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     if (read == 4) MediaCapsuleType.fromMagic(magic) else null
                 }
             }.getOrNull()
-            val mimeType = capsuleType?.capsuleMimeType ?: "application/octet-stream"
+            val mimeType = "application/octet-stream"
             val uri = FileProvider.getUriForFile(
                 this@EnigmaKeyboardService,
                 "${applicationContext.packageName}.fileprovider",
