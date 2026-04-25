@@ -334,7 +334,9 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         currentPlaybackFile = draft.displayFile
         currentDecrypted = null
         showPhoto(draft.displayFile)
+        renderStatus(getString(R.string.photo_capsule_status_captured))
         rebuildThumbnails()
+        syncControls()
     }
 
     private fun removeCurrentDraft() {
@@ -353,6 +355,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         } else {
             selectDraft((selectedDraftIndex - 1).coerceAtLeast(0))
         }
+        syncControls()
     }
 
     private fun rebuildThumbnails() {
