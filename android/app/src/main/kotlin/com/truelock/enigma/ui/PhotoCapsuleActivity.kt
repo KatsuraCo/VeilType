@@ -247,6 +247,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(tempFile) }.getOrNull()
         val decryptAction = {
             val decrypted = mediaCapsuleService.decryptFile(tempFile)
+            cleanupDrafts()
             currentCapsuleFile = tempFile
             currentDecrypted = decrypted
             currentPlaybackFile = decrypted.plaintextFile
@@ -303,6 +304,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         binding.photoView.visibility = View.GONE
         binding.cameraPreviewView.visibility = View.VISIBLE
         startCameraPreview()
+        renderStatus(getString(R.string.photo_capsule_status_camera_ready))
         rebuildThumbnails()
         syncControls()
     }
@@ -411,8 +413,23 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
+        cleanupDrafts(keepCapsule = capsule)
         pendingCapsuleStore.save(MediaCapsuleType.PHOTO, capsule)
         finish()
+    }
+
+    private fun cleanupDrafts(keepCapsule: File? = null) {
+        photoDrafts.forEach { draft ->
+            if (keepCapsule?.absolutePath != draft.capsuleFile.absolutePath) {
+                deleteQuietly(draft.capsuleFile)
+            }
+            if (draft.displayFile.absolutePath != draft.photoFile.absolutePath) {
+                deleteQuietly(draft.displayFile)
+            }
+            if (keepCapsule?.absolutePath != draft.photoFile.absolutePath) {
+                deleteQuietly(draft.photoFile)
+            }
+        }
     }
 
     private fun handleIncomingIntent(intent: Intent?): Boolean {
