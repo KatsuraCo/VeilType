@@ -402,6 +402,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             clipData = ClipData.newUri(contentResolver, shareFile.name, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
+        grantUriAccess(uri, shareIntent)
         startActivity(Intent.createChooser(shareIntent, getString(R.string.media_capsule_share)))
     }
 
@@ -435,6 +436,20 @@ class PhotoCapsuleActivity : AppCompatActivity() {
                 renderStatus(getString(R.string.media_capsule_error_missing_profile))
                 null
             }
+
+    private fun grantUriAccess(uri: Uri, intent: Intent) {
+        val packageNames = buildSet {
+            intent.`package`?.takeIf { it.isNotBlank() }?.let(::add)
+            addAll(
+                packageManager.queryIntentActivities(intent, 0)
+                    .mapNotNull { it.activityInfo?.packageName }
+                    .filter { it.isNotBlank() },
+            )
+        }
+        packageNames.forEach { packageName ->
+            runCatching { grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        }
+    }
 
     private fun renderStatus(message: String) {
         binding.statusText.text = message
