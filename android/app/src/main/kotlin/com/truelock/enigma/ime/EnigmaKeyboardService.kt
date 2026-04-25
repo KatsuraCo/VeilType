@@ -1866,11 +1866,9 @@ class EnigmaKeyboardService : InputMethodService() {
 
         fun clearPreviewForTyping() {
             repeatHandler.removeCallbacksAndMessages(PREVIEW_CLEAR_TOKEN)
-            if (mode != KeyboardMode.DECRYPT) {
-                mode = KeyboardMode.IDLE
-                previewMessage = null
-                previewTone = PreviewTone.DEFAULT
-            }
+            mode = KeyboardMode.IDLE
+            previewMessage = null
+            previewTone = PreviewTone.DEFAULT
         }
 
         fun isNumericLikeEditor(info: EditorInfo?): Boolean {
