@@ -1672,8 +1672,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     return
                 }
             releaseInlineAudioPlayback()
-            clearPendingVideoCapsuleState()
-            pendingCapsuleStore.clear()
+            clearPendingCapsulesOnly()
             if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 launchFromKeyboard(
                     Intent(this, AudioPermissionRequestActivity::class.java).apply {
