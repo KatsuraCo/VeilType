@@ -317,15 +317,24 @@ class AudioCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
+        val shareFile = runCatching {
+            val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
+            val baseName = capsule.nameWithoutExtension.ifBlank { capsule.name }
+            val exported = java.io.File(dir, "$baseName.bin")
+            capsule.inputStream().use { input ->
+                exported.outputStream().use { output -> input.copyTo(output) }
+            }
+            exported
+        }.getOrElse { capsule }
         val uri = FileProvider.getUriForFile(
             this,
             "${applicationContext.packageName}.fileprovider",
-            capsule,
+            shareFile,
         )
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = MediaCapsuleType.AUDIO.capsuleMimeType
+            type = "application/octet-stream"
             putExtra(Intent.EXTRA_STREAM, uri)
-            clipData = android.content.ClipData.newUri(contentResolver, capsule.name, uri)
+            clipData = android.content.ClipData.newUri(contentResolver, shareFile.name, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         grantUriReadAccess(uri, shareIntent)

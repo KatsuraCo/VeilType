@@ -1366,24 +1366,26 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         fun buildCapsuleShareIntent(file: java.io.File): Intent {
-            val capsuleType = runCatching {
+            val shareFile = runCatching {
+                val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
+                val baseName = file.nameWithoutExtension.ifBlank { file.name }
+                val exported = java.io.File(dir, "$baseName.bin")
                 file.inputStream().use { input ->
-                    val magic = ByteArray(4)
-                    val read = input.read(magic)
-                    if (read == 4) MediaCapsuleType.fromMagic(magic) else null
+                    exported.outputStream().use { output -> input.copyTo(output) }
                 }
-            }.getOrNull()
+                exported
+            }.getOrElse { file }
             val mimeType = "application/octet-stream"
             val uri = FileProvider.getUriForFile(
                 this@EnigmaKeyboardService,
                 "${applicationContext.packageName}.fileprovider",
-                file,
+                shareFile,
             )
             val targetPackage = currentEditorPackageName()
             val targetedIntent = Intent(Intent.ACTION_SEND).apply {
                 type = mimeType
                 putExtra(Intent.EXTRA_STREAM, uri)
-                clipData = android.content.ClipData.newUri(contentResolver, file.name, uri)
+                clipData = android.content.ClipData.newUri(contentResolver, shareFile.name, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 targetPackage?.let(::setPackage)
             }
@@ -1403,7 +1405,7 @@ class EnigmaKeyboardService : InputMethodService() {
             return Intent(Intent.ACTION_SEND).apply {
                 type = mimeType
                 putExtra(Intent.EXTRA_STREAM, uri)
-                clipData = android.content.ClipData.newUri(contentResolver, file.name, uri)
+                clipData = android.content.ClipData.newUri(contentResolver, shareFile.name, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }.also { fallbackIntent ->
                 grantUriReadAccess(uri, resolveShareTargetPackages(fallbackIntent))
