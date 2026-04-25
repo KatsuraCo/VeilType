@@ -1557,6 +1557,7 @@ class EnigmaKeyboardService : InputMethodService() {
             characterMode = CharacterMode.LETTERS
             currentSymbolPage = SymbolPage.PRIMARY
             capsLockEnabled = false
+            lastShiftTapAt = 0L
             shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
             previewMessage = null
             previewTone = PreviewTone.DEFAULT
@@ -2585,15 +2586,18 @@ class EnigmaKeyboardService : InputMethodService() {
                 characterMode == CharacterMode.NUMERIC -> {
                     characterMode = CharacterMode.LETTERS
                     currentSymbolPage = SymbolPage.PRIMARY
+                    lastShiftTapAt = 0L
                     updateShiftState()
                 }
                 characterMode == CharacterMode.LETTERS -> {
                     characterMode = CharacterMode.SYMBOLS
                     currentSymbolPage = SymbolPage.PRIMARY
+                    lastShiftTapAt = 0L
                 }
                 else -> {
                     characterMode = CharacterMode.LETTERS
                     currentSymbolPage = SymbolPage.PRIMARY
+                    lastShiftTapAt = 0L
                     shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
                 }
             }
@@ -2810,6 +2814,7 @@ class EnigmaKeyboardService : InputMethodService() {
             dismissActiveKeyPopup()
             characterMode = CharacterMode.LETTERS
             currentSymbolPage = SymbolPage.PRIMARY
+            lastShiftTapAt = 0L
             refreshShiftAfterEdit()
             render()
         }
@@ -3135,6 +3140,11 @@ class EnigmaKeyboardService : InputMethodService() {
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
         repeatHandler.removeCallbacksAndMessages(PENDING_CAPSULE_POLL_TOKEN)
+        lastSpaceTapAt = 0L
+        lastShiftTapAt = 0L
+        if (!capsLockEnabled) {
+            shiftEnabled = false
+        }
     }
 
     override fun onWindowShown() {
