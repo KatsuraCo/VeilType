@@ -439,6 +439,21 @@ class PhotoCapsuleActivity : AppCompatActivity() {
                 deleteQuietly(draft.photoFile)
             }
         }
+        if (keepCapsule == null) {
+            photoDrafts.clear()
+            selectedDraftIndex = -1
+        } else {
+            val keptIndex = photoDrafts.indexOfFirst { it.capsuleFile.absolutePath == keepCapsule.absolutePath }
+            if (keptIndex >= 0) {
+                val keptDraft = photoDrafts[keptIndex]
+                photoDrafts.clear()
+                photoDrafts.add(keptDraft)
+                selectedDraftIndex = 0
+            } else {
+                photoDrafts.clear()
+                selectedDraftIndex = -1
+            }
+        }
     }
 
     private fun handleIncomingIntent(intent: Intent?): Boolean {

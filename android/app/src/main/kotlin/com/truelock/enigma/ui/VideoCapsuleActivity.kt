@@ -58,6 +58,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private var playbackSurface: Surface? = null
     private var playbackLoadedPath: String? = null
     private var playbackShouldStart = false
+    private var preserveCapsulePathOnDestroy: String? = null
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -168,12 +169,8 @@ class VideoCapsuleActivity : AppCompatActivity() {
             if (activeRecording != null) {
                 stopVideoRecording()
             } else {
-                deleteQuietly(currentVideoFile)
-                currentVideoFile = null
-                currentCapsuleFile = null
-                currentDecrypted = null
-                currentPlaybackFile = null
-                lastDurationMs = 0L
+                preserveCapsulePathOnDestroy = null
+                cleanupCurrentVideoState()
                 showCaptureMode()
                 if (hasCapturePermissions()) {
                     startCameraPreview()
@@ -236,6 +233,10 @@ class VideoCapsuleActivity : AppCompatActivity() {
         releasePlaybackPlayer()
         playbackSurface?.release()
         playbackSurface = null
+        cleanupCurrentVideoState(
+            keepCapsule = preserveCapsulePathOnDestroy?.let(::File),
+            clearUiState = false,
+        )
     }
 
     private fun ensureCameraAndStartRecording() {
@@ -288,11 +289,12 @@ class VideoCapsuleActivity : AppCompatActivity() {
         }
         if (activeRecording != null) return
 
-        deleteQuietly(currentVideoFile)
+        cleanupCurrentVideoState()
         currentVideoFile = mediaCapsuleService.createRecordingFile(MediaCapsuleType.VIDEO, "mp4")
         currentCapsuleFile = null
         currentDecrypted = null
         currentPlaybackFile = null
+        preserveCapsulePathOnDestroy = null
         lastDurationMs = 0L
         recordingStartedAt = System.currentTimeMillis()
         showCaptureMode()
@@ -326,10 +328,12 @@ class VideoCapsuleActivity : AppCompatActivity() {
                         if (sourceFile != null && sourceFile.exists()) {
                             encryptRecordedVideo(sourceFile)
                         } else {
+                            cleanupCurrentVideoState()
                             renderStatus(getString(R.string.media_capsule_error_encrypt))
                             syncControls()
                         }
                     } else {
+                        cleanupCurrentVideoState()
                         renderStatus(getString(R.string.video_capsule_status_cancelled))
                         syncControls()
                     }
@@ -399,9 +403,11 @@ class VideoCapsuleActivity : AppCompatActivity() {
         val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(tempFile) }.getOrNull()
         val decryptAction = {
             val decrypted = mediaCapsuleService.decryptFile(tempFile)
+            cleanupCurrentVideoState()
             currentCapsuleFile = tempFile
             currentDecrypted = decrypted
             currentPlaybackFile = decrypted.plaintextFile
+            preserveCapsulePathOnDestroy = null
             lastDurationMs = decrypted.metadata.durationMs
             binding.previewPlayOverlay.visibility = View.VISIBLE
             showPlaybackMode()
@@ -498,9 +504,32 @@ class VideoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
+        preserveCapsulePathOnDestroy = capsule.absolutePath
+        cleanupCurrentVideoState(keepCapsule = capsule, clearUiState = false)
         pendingCapsuleStore.save(MediaCapsuleType.VIDEO, capsule)
-        deleteQuietly(currentVideoFile)
         finish()
+    }
+
+    private fun cleanupCurrentVideoState(keepCapsule: File? = null, clearUiState: Boolean = true) {
+        deleteQuietly(currentVideoFile?.takeIf { keepCapsule?.absolutePath != it.absolutePath })
+        deleteQuietly(currentCapsuleFile?.takeIf { keepCapsule?.absolutePath != it.absolutePath })
+        currentPlaybackFile?.let { playbackFile ->
+            if (keepCapsule?.absolutePath != playbackFile.absolutePath &&
+                currentVideoFile?.absolutePath != playbackFile.absolutePath
+            ) {
+                deleteQuietly(playbackFile)
+            }
+        }
+        currentVideoFile = null
+        currentCapsuleFile = keepCapsule
+        currentDecrypted = null
+        currentPlaybackFile = null
+        playbackLoadedPath = null
+        if (clearUiState) {
+            binding.previewPlayOverlay.visibility = View.GONE
+            releasePlaybackPlayer()
+            lastDurationMs = 0L
+        }
     }
 
     private fun handleIncomingIntent(intent: Intent?): Boolean {
