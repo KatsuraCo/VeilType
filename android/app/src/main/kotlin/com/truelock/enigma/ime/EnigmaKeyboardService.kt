@@ -1749,7 +1749,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     "stopInlineAudioRecording source=${mediaCapsuleService.describeMediaFile(sourceFile)} capsule=${capsule.name}:${capsule.length()}",
                 )
                 if (tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
-                    lastAudioCapsuleNeedsManualSend = false
+                    clearPendingAudioCapsuleState()
                     setPreview(getString(R.string.keyboard_voice_capsule_received_inline), PreviewTone.SUCCESS)
                 } else if (directInsertAdvertised) {
                     lastAudioCapsuleNeedsManualSend = true
@@ -1805,7 +1805,7 @@ class EnigmaKeyboardService : InputMethodService() {
             }
             if (inlineAudioPlayer != null) {
                 releaseInlineAudioPlayback()
-                setPreview(getString(R.string.keyboard_voice_capsule_ready_manual), PreviewTone.DEFAULT)
+                setPreview(getString(R.string.audio_capsule_action_ready_text), PreviewTone.DEFAULT)
                 render()
                 return
             }
@@ -1829,7 +1829,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     setDataSource(playbackFile.absolutePath)
                     setOnCompletionListener {
                         releaseInlineAudioPlayback()
-                        setPreview(getString(R.string.keyboard_voice_capsule_ready_manual), PreviewTone.DEFAULT)
+                        setPreview(getString(R.string.audio_capsule_action_ready_text), PreviewTone.DEFAULT)
                         render()
                     }
                     prepare()
