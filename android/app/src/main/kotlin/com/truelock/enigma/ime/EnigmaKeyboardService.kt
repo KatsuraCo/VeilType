@@ -2253,18 +2253,6 @@ class EnigmaKeyboardService : InputMethodService() {
                     }
                 }
             }
-
-            languageToggleButton.text = when (currentLanguage) {
-                KeyboardLanguage.RU,
-                KeyboardLanguage.EN,
-                KeyboardLanguage.TR,
-                KeyboardLanguage.ES,
-                KeyboardLanguage.PT,
-                KeyboardLanguage.DE,
-                KeyboardLanguage.FR,
-                KeyboardLanguage.IT,
-                -> "🌐"
-            }
             languageToggleButton.text = currentLanguage.localeTag.uppercase()
             symbolsToggleButton.text = if (characterMode == CharacterMode.NUMERIC) {
                 keyboardString(R.string.keyboard_action_letters)
@@ -2273,12 +2261,8 @@ class EnigmaKeyboardService : InputMethodService() {
             } else {
                 keyboardString(R.string.keyboard_action_symbols_alt)
             }
-            shiftButton.text = if (shiftEnabled) {
-                if (capsLockEnabled) {
-                    SHIFT_LOCKED_SYMBOL
-                } else {
-                    SHIFT_LOCKED_SYMBOL
-                }
+            shiftButton.text = if (capsLockEnabled) {
+                SHIFT_LOCKED_SYMBOL
             } else {
                 SHIFT_UP_SYMBOL
             }

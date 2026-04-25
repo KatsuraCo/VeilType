@@ -60,7 +60,7 @@
   <string name="keyboard_action_language_ru">RU</string>
   <string name="keyboard_action_language_en">EN</string>
   <string name="keyboard_action_symbols">123</string>
-  <string name="keyboard_action_symbols_alt">=&lt;</string>
+    <string name="keyboard_action_symbols_alt">#+=</string>
   <string name="keyboard_action_letters">ABC</string>
   <string name="keyboard_action_shift">&#x2191;</string>
   <string name="keyboard_action_shift_locked">&#x21EA;</string>

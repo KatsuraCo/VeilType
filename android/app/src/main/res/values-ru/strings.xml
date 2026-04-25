@@ -48,14 +48,14 @@
   <string name="keyboard_action_key_desc">Переключить активную клавишу</string>
   <string name="keyboard_action_clear_desc">Очистить буфер обмена</string>
   <string name="keyboard_action_space">Пробел</string>
-  <string name="keyboard_action_enter">Входить</string>
+    <string name="keyboard_action_enter">Ввод</string>
   <string name="keyboard_action_backspace">⌫</string>
   <string name="keyboard_action_comma">,</string>
   <string name="keyboard_action_dot">.</string>
   <string name="keyboard_action_language_ru">RU</string>
   <string name="keyboard_action_language_en">EN</string>
   <string name="keyboard_action_symbols">123</string>
-  <string name="keyboard_action_symbols_alt">=&lt;</string>
+    <string name="keyboard_action_symbols_alt">#+=</string>
   <string name="keyboard_action_letters">ABC</string>
   <string name="keyboard_action_shift">↑</string>
   <string name="keyboard_action_shift_locked">⇪</string>
