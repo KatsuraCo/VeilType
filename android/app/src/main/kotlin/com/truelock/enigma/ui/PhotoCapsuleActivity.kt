@@ -61,6 +61,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
     private var pendingCaptureFile: File? = null
     private val photoDrafts = mutableListOf<PhotoDraft>()
     private var selectedDraftIndex = -1
+    private var preserveCapsulePathOnDestroy: String? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -142,6 +143,10 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         super.onDestroy()
         cameraProvider?.unbindAll()
         cameraProvider = null
+        deleteQuietly(pendingCaptureFile)
+        cleanupDrafts(
+            keepCapsule = preserveCapsulePathOnDestroy?.let(::File),
+        )
     }
 
     private fun ensureCameraPermissionAndStart() {
@@ -416,6 +421,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
+        preserveCapsulePathOnDestroy = capsule.absolutePath
         cleanupDrafts(keepCapsule = capsule)
         pendingCapsuleStore.save(MediaCapsuleType.PHOTO, capsule)
         finish()
