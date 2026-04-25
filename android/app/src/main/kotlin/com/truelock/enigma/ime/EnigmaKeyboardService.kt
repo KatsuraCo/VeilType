@@ -2939,6 +2939,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 return
             }
             if (tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
+                clearPendingAudioCapsuleState()
                 lastAudioCapsuleNeedsManualSend = false
                 setPreview(getString(R.string.keyboard_voice_capsule_received_inline), PreviewTone.SUCCESS)
                 render()
@@ -2952,7 +2953,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 render()
                 return
             }
-            lastAudioCapsuleNeedsManualSend = true
+            clearPendingAudioCapsuleState()
             setPreview(getString(R.string.media_capsule_share), PreviewTone.DEFAULT)
             render()
         }
