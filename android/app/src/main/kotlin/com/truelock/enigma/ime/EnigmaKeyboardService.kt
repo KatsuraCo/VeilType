@@ -3413,6 +3413,19 @@ class EnigmaKeyboardService : InputMethodService() {
         val currentText = extracted?.text?.toString().orEmpty()
         if (currentText.isNotEmpty()) {
             inputConnection.setSelection(0, currentText.length)
+            inputConnection.commitText(newText, 1)
+            return
+        }
+
+        val before = inputConnection.getTextBeforeCursor(4096, 0)?.toString().orEmpty()
+        val after = inputConnection.getTextAfterCursor(4096, 0)?.toString().orEmpty()
+        if (before.isNotEmpty() || after.isNotEmpty()) {
+            if (before.isNotEmpty()) {
+                inputConnection.deleteSurroundingText(before.length, 0)
+            }
+            if (after.isNotEmpty()) {
+                inputConnection.deleteSurroundingText(0, after.length)
+            }
         }
         inputConnection.commitText(newText, 1)
     }
@@ -3424,7 +3437,11 @@ class EnigmaKeyboardService : InputMethodService() {
 
         val extracted = inputConnection.getExtractedText(ExtractedTextRequest(), 0)
         val full = extracted?.text?.toString()?.trim()
-        return full?.takeIf { it.isNotEmpty() }
+        if (!full.isNullOrEmpty()) return full
+
+        val before = inputConnection.getTextBeforeCursor(4096, 0)?.toString().orEmpty()
+        val after = inputConnection.getTextAfterCursor(4096, 0)?.toString().orEmpty()
+        return (before + after).trim().takeIf { it.isNotEmpty() }
     }
 
     private fun loadRecentWords(): List<String> =
