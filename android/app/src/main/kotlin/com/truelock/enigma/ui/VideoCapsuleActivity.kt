@@ -220,6 +220,8 @@ class VideoCapsuleActivity : AppCompatActivity() {
         timerHandler.removeCallbacks(timerRunnable)
         if (playbackPlayer?.isPlaying == true) {
             playbackPlayer?.pause()
+            binding.previewPlayOverlay.visibility = View.VISIBLE
+            syncControls()
         }
     }
 
@@ -453,9 +455,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             return
         }
         if (playbackPlayer?.isPlaying == true) {
-            playbackPlayer?.pause()
-            binding.previewPlayOverlay.visibility = View.VISIBLE
-            syncControls()
+            stopPlaybackPreview()
             return
         }
         showPlaybackMode()
@@ -530,6 +530,19 @@ class VideoCapsuleActivity : AppCompatActivity() {
             releasePlaybackPlayer()
             lastDurationMs = 0L
         }
+    }
+
+    private fun stopPlaybackPreview() {
+        playbackPlayer?.pause()
+        playbackPlayer?.seekTo(1)
+        binding.previewPlayOverlay.visibility = View.VISIBLE
+        renderStatus(
+            getString(
+                R.string.media_capsule_status_saved,
+                currentCapsuleFile?.name ?: currentPlaybackFile?.name ?: "video",
+            ),
+        )
+        syncControls()
     }
 
     private fun handleIncomingIntent(intent: Intent?): Boolean {
@@ -677,13 +690,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             }
             setOnCompletionListener {
                 binding.previewPlayOverlay.visibility = View.VISIBLE
-                renderStatus(
-                    getString(
-                        R.string.media_capsule_status_saved,
-                        currentCapsuleFile?.name ?: currentPlaybackFile?.name ?: "video",
-                    ),
-                )
-                syncControls()
+                stopPlaybackPreview()
             }
             setOnErrorListener { _, _, _ ->
                 binding.previewPlayOverlay.visibility = View.VISIBLE
