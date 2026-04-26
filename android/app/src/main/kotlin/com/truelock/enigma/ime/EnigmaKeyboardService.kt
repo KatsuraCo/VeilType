@@ -2334,16 +2334,14 @@ class EnigmaKeyboardService : InputMethodService() {
             deleteCapsuleActionButton.visibility =
                 if (audioActionVisible || videoActionVisible || photoActionVisible) View.VISIBLE else View.GONE
             deleteCapsuleActionButton.text = keyboardString(R.string.keyboard_action_close)
-            audioCapsuleActionText.text =
-                if (lastAudioCapsuleNeedsManualSend) keyboardString(R.string.keyboard_voice_capsule_ready_manual)
-                else if (supportsDirectCapsuleInsert(currentInputEditorInfo, MediaCapsuleType.AUDIO.capsuleMimeType)) {
-                    keyboardString(R.string.keyboard_voice_capsule_support_direct)
-                } else {
-                    keyboardString(R.string.keyboard_voice_capsule_no_direct_support)
-                }
             when {
                 audioActionVisible -> {
-                    audioCapsuleActionText.text = keyboardString(R.string.audio_capsule_action_ready_text)
+                    audioCapsuleActionText.text =
+                        if (lastAudioCapsuleNeedsManualSend) {
+                            keyboardString(R.string.keyboard_voice_capsule_ready_manual)
+                        } else {
+                            keyboardString(R.string.keyboard_voice_capsule_support_direct)
+                        }
                     playAudioCapsuleActionButton.setImageResource(
                         if (inlineAudioPlayer != null) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
                     )
