@@ -312,6 +312,7 @@
   <string name="profile_status_key_copied_item">Key copied: %1$s</string>
   <string name="keyboard_capsule_tap_to_play">Tap the capsule to show Play.</string>
   <string name="keyboard_capsule_send_short">Send</string>
+  <string name="keyboard_capsule_insert_short">Insert</string>
   <string name="keyboard_stop_recording_before_photo_message">Stop voice recording before opening photo message.</string>
   <string name="keyboard_stop_recording_before_video_capsule">Stop voice recording before opening video capsule.</string>
   <string name="keyboard_photo_message_open_failed">Photo message could not be opened from the keyboard.</string>

@@ -266,6 +266,7 @@
   <string name="main_share_mode_minimal">Minimal</string>
   <string name="keyboard_capsule_tap_to_play">Нажмите на капсулу, чтобы показать кнопку воспроизведения.</string>
   <string name="keyboard_capsule_send_short">Отправить</string>
+  <string name="keyboard_capsule_insert_short">Вставить</string>
   <string name="keyboard_stop_recording_before_photo_message">Остановите запись голоса перед открытием фото-сообщения.</string>
   <string name="keyboard_stop_recording_before_video_capsule">Остановите запись голоса перед открытием видеокапсулы.</string>
   <string name="keyboard_photo_message_open_failed">Не удалось открыть фото-сообщение из клавиатуры.</string>

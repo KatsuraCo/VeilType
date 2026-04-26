@@ -2336,8 +2336,9 @@ class EnigmaKeyboardService : InputMethodService() {
             deleteCapsuleActionButton.text = keyboardString(R.string.keyboard_action_close)
             when {
                 audioActionVisible -> {
+                    val canInsertAudioDirectly = !lastAudioCapsuleNeedsManualSend
                     audioCapsuleActionText.text =
-                        if (lastAudioCapsuleNeedsManualSend) {
+                        if (!canInsertAudioDirectly) {
                             keyboardString(R.string.keyboard_voice_capsule_ready_manual)
                         } else {
                             keyboardString(R.string.keyboard_voice_capsule_support_direct)
@@ -2345,12 +2346,17 @@ class EnigmaKeyboardService : InputMethodService() {
                     playAudioCapsuleActionButton.setImageResource(
                         if (inlineAudioPlayer != null) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
                     )
-                    sendAudioCapsuleActionButton.text = keyboardString(R.string.keyboard_capsule_send_short)
+                    sendAudioCapsuleActionButton.text =
+                        if (canInsertAudioDirectly) {
+                            keyboardString(R.string.keyboard_capsule_insert_short)
+                        } else {
+                            keyboardString(R.string.keyboard_capsule_send_short)
+                        }
                 }
                 videoActionVisible && lastVideoCapsuleReadyForDirectInsert -> {
                     audioCapsuleActionText.text = keyboardString(R.string.keyboard_video_capsule_ready_insert)
                     playAudioCapsuleActionButton.setImageResource(android.R.drawable.ic_menu_view)
-                    sendAudioCapsuleActionButton.text = keyboardString(R.string.keyboard_capsule_send_short)
+                    sendAudioCapsuleActionButton.text = keyboardString(R.string.keyboard_capsule_insert_short)
                 }
                 videoActionVisible -> {
                     audioCapsuleActionText.text = keyboardString(R.string.keyboard_video_capsule_ready_manual)

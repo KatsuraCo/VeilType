@@ -260,6 +260,7 @@
   <string name="main_share_mode_minimal">Mínimo</string>
   <string name="keyboard_capsule_tap_to_play">Toca la cápsula para mostrar Reproducir.</string>
   <string name="keyboard_capsule_send_short">Enviar</string>
+  <string name="keyboard_capsule_insert_short">Insertar</string>
   <string name="keyboard_stop_recording_before_photo_message">Detén la grabación de voz antes de abrir el mensaje con foto.</string>
   <string name="keyboard_stop_recording_before_video_capsule">Detén la grabación de voz antes de abrir la cápsula de video.</string>
   <string name="keyboard_photo_message_open_failed">No se pudo abrir el mensaje con foto desde el teclado.</string>

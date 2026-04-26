@@ -260,6 +260,7 @@
   <string name="main_share_mode_minimal">Minimale</string>
   <string name="keyboard_capsule_tap_to_play">Tocca la capsula per mostrare Riproduci.</string>
   <string name="keyboard_capsule_send_short">Invia</string>
+  <string name="keyboard_capsule_insert_short">Inserisci</string>
   <string name="keyboard_stop_recording_before_photo_message">Interrompi la registrazione vocale prima di aprire il messaggio fotografico.</string>
   <string name="keyboard_stop_recording_before_video_capsule">Interrompi la registrazione vocale prima di aprire la capsula video.</string>
   <string name="keyboard_photo_message_open_failed">Non è stato possibile aprire il messaggio fotografico dalla tastiera.</string>

@@ -260,6 +260,7 @@
   <string name="main_share_mode_minimal">Minimal</string>
   <string name="keyboard_capsule_tap_to_play">Tippen Sie auf die Kapsel, um „Wiedergeben“ anzuzeigen.</string>
   <string name="keyboard_capsule_send_short">Senden</string>
+  <string name="keyboard_capsule_insert_short">Einfügen</string>
   <string name="keyboard_stop_recording_before_photo_message">Beenden Sie die Sprachaufnahme, bevor Sie die Foto-Nachricht öffnen.</string>
   <string name="keyboard_stop_recording_before_video_capsule">Beenden Sie die Sprachaufnahme, bevor Sie die Videokapsel öffnen.</string>
   <string name="keyboard_photo_message_open_failed">Die Foto-Nachricht konnte nicht über die Tastatur geöffnet werden.</string>
