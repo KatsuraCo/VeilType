@@ -221,6 +221,7 @@
   <string name="keyboard_voice_capsule_inline_failed_support">Le chat indique qu\'il prend en charge les capsules, mais l\'insertion a échoué. Envoyez-le avec le bouton ci-dessous.</string>
   <string name="keyboard_voice_capsule_inline_failed_no_support">Ce chat ne prend pas en charge l\'insertion directe d\'une capsule vocale depuis le clavier. Envoyez-le avec le bouton ci-dessous.</string>
   <string name="keyboard_voice_capsule_ready_manual">Capsule vocale prête. Envoyez-le depuis ce panneau.</string>
+  <string name="keyboard_voice_capsule_ready_insert">Capsule vocale prête. Appuyez sur le bouton ci-dessous pour l\'insérer dans ce chat.</string>
   <string name="keyboard_voice_capsule_support_direct">Ce chat prend en charge l\'insertion directe de capsules.</string>
   <string name="keyboard_voice_capsule_no_direct_support">Ce chat ne prend pas en charge l\'insertion directe de capsules.</string>
   <string name="keyboard_voice_capsule_manual_send_failed">L\'envoi manuel a échoué pour la dernière capsule vocale.</string>

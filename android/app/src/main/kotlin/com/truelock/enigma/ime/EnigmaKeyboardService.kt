@@ -2341,7 +2341,7 @@ class EnigmaKeyboardService : InputMethodService() {
                         if (!canInsertAudioDirectly) {
                             keyboardString(R.string.keyboard_voice_capsule_ready_manual)
                         } else {
-                            keyboardString(R.string.keyboard_voice_capsule_support_direct)
+                            keyboardString(R.string.keyboard_voice_capsule_ready_insert)
                         }
                     playAudioCapsuleActionButton.setImageResource(
                         if (inlineAudioPlayer != null) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,

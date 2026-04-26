@@ -227,6 +227,7 @@
   <string name="keyboard_voice_capsule_inline_failed_support">В чате написано, что поддерживает капсулы, но вставить не удалось. Отправьте его с помощью кнопки ниже.</string>
   <string name="keyboard_voice_capsule_inline_failed_no_support">Этот чат не поддерживает прямую вставку голосовой капсулы с клавиатуры. Отправьте его с помощью кнопки ниже.</string>
   <string name="keyboard_voice_capsule_ready_manual">Голосовая капсула готова. Отправьте его с этой панели.</string>
+  <string name="keyboard_voice_capsule_ready_insert">Голосовая капсула готова. Нажмите кнопку ниже, чтобы вставить ее в этот чат.</string>
   <string name="keyboard_voice_capsule_support_direct">Этот чат поддерживает прямую вставку капсул.</string>
   <string name="keyboard_voice_capsule_no_direct_support">Этот чат не поддерживает прямую вставку капсулы.</string>
   <string name="keyboard_voice_capsule_manual_send_failed">Не удалось отправить вручную последнюю голосовую капсулу.</string>

@@ -221,6 +221,7 @@
   <string name="keyboard_voice_capsule_inline_failed_support">The chat says it supports capsules, but the insert failed. Send it with the button below.</string>
   <string name="keyboard_voice_capsule_inline_failed_no_support">This chat does not support direct insertion of a voice capsule from the keyboard. Send it with the button below.</string>
   <string name="keyboard_voice_capsule_ready_manual">Voice capsule ready. Send it from this panel.</string>
+  <string name="keyboard_voice_capsule_ready_insert">Voice capsule ready. Tap the button below to insert it into this chat.</string>
   <string name="keyboard_voice_capsule_support_direct">This chat supports direct capsule insertion.</string>
   <string name="keyboard_voice_capsule_no_direct_support">This chat does not support direct capsule insertion.</string>
   <string name="keyboard_voice_capsule_manual_send_failed">Manual sending failed for the last voice capsule.</string>

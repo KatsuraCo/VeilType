@@ -221,6 +221,7 @@
   <string name="keyboard_voice_capsule_inline_failed_support">Der Chat meldet Kapselunterstützung, aber das Einfügen ist fehlgeschlagen. Bitte senden Sie sie über die Schaltfläche unten.</string>
   <string name="keyboard_voice_capsule_inline_failed_no_support">Dieser Chat unterstützt das direkte Einfügen einer Sprachkapsel von der Tastatur nicht. Bitte senden Sie sie über die Schaltfläche unten.</string>
   <string name="keyboard_voice_capsule_ready_manual">Sprachkapsel bereit. Senden Sie sie aus diesem Bereich.</string>
+  <string name="keyboard_voice_capsule_ready_insert">Sprachkapsel bereit. Tippen Sie unten auf die Schaltfläche, um sie in diesen Chat einzufügen.</string>
   <string name="keyboard_voice_capsule_support_direct">Dieser Chat unterstützt direktes Einfügen von Kapseln.</string>
   <string name="keyboard_voice_capsule_no_direct_support">Dieser Chat unterstützt kein direktes Einfügen von Kapseln.</string>
   <string name="keyboard_voice_capsule_manual_send_failed">Manuelles Senden der letzten Sprachkapsel ist fehlgeschlagen.</string>

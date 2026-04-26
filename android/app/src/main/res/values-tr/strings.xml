@@ -221,6 +221,7 @@
   <string name="keyboard_voice_capsule_inline_failed_support">Sohbet kapsülleri desteklediğini söylüyor ama ekleme başarısız oldu. Aşağıdaki düğmeyle gönderin.</string>
   <string name="keyboard_voice_capsule_inline_failed_no_support">Bu sohbet klavyeden doğrudan ses kapsülü eklemeyi desteklemiyor. Aşağıdaki düğmeyle gönderin.</string>
   <string name="keyboard_voice_capsule_ready_manual">Ses kapsülü hazır. Bu panelden gönderin.</string>
+  <string name="keyboard_voice_capsule_ready_insert">Ses kapsülü hazır. Bu sohbete eklemek için aşağıdaki düğmeye dokunun.</string>
   <string name="keyboard_voice_capsule_support_direct">Bu sohbet doğrudan kapsül eklemeyi destekliyor.</string>
   <string name="keyboard_voice_capsule_no_direct_support">Bu sohbet doğrudan kapsül eklemeyi desteklemiyor.</string>
   <string name="keyboard_voice_capsule_manual_send_failed">Son ses kapsülü için manuel gönderim başarısız oldu.</string>
