@@ -227,6 +227,9 @@ class VideoCapsuleActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         timerHandler.removeCallbacks(timerRunnable)
+        if (activeRecording != null) {
+            suppressNextRecordingFinalize = true
+        }
         activeRecording?.close()
         activeRecording = null
         cameraProvider?.unbindAll()
