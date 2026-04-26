@@ -537,8 +537,9 @@ class VideoCapsuleActivity : AppCompatActivity() {
     }
 
     private fun stopPlaybackPreview() {
-        playbackPlayer?.pause()
-        playbackPlayer?.seekTo(1)
+        playbackShouldStart = false
+        runCatching { playbackPlayer?.pause() }
+        runCatching { playbackPlayer?.seekTo(1) }
         binding.previewPlayOverlay.visibility = View.VISIBLE
         renderStatus(
             getString(
@@ -693,10 +694,12 @@ class VideoCapsuleActivity : AppCompatActivity() {
                 syncControls()
             }
             setOnCompletionListener {
+                playbackShouldStart = false
                 binding.previewPlayOverlay.visibility = View.VISIBLE
                 stopPlaybackPreview()
             }
             setOnErrorListener { _, _, _ ->
+                playbackShouldStart = false
                 binding.previewPlayOverlay.visibility = View.VISIBLE
                 releasePlaybackPlayer()
                 renderStatus(getString(R.string.media_capsule_error_open_first))
