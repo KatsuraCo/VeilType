@@ -64,6 +64,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private var videoCapture: VideoCapture<Recorder>? = null
     private var activeRecording: Recording? = null
     private var isRecordingPaused = false
+    private var suppressNextRecordingFinalize = false
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var recordingStartedAt = 0L
     private var lastDurationMs = 0L
@@ -307,7 +308,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             pending = pending.withAudioEnabled()
         }
 
-        activeRecording = pending.start(ContextCompat.getMainExecutor(this)) { event ->
+        activeRecording = pending.start(ContextCompat.getMainExecutor(this)) recordingEvent@ { event ->
             when (event) {
                 is VideoRecordEvent.Start -> {
                     isRecordingPaused = false
@@ -322,6 +323,12 @@ class VideoCapsuleActivity : AppCompatActivity() {
                     activeRecording = null
                     isRecordingPaused = false
                     timerHandler.removeCallbacks(timerRunnable)
+                    if (suppressNextRecordingFinalize) {
+                        suppressNextRecordingFinalize = false
+                        cleanupCurrentVideoState()
+                        syncControls()
+                        return@recordingEvent
+                    }
                     lastDurationMs = event.recordingStats.recordedDurationNanos / 1_000_000L
                     if (!event.hasError()) {
                         val sourceFile = currentVideoFile
@@ -576,12 +583,27 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private fun handleIncomingIntent(intent: Intent?): Boolean {
         val previewPath = intent?.getStringExtra(EXTRA_PREVIEW_CAPSULE_PATH)
         if (!previewPath.isNullOrBlank()) {
+            prepareForIncomingContent()
             importCapsule(Uri.fromFile(File(previewPath)), autoPlay = false)
             return true
         }
         val uri = resolveIncomingUri(intent) ?: return false
+        prepareForIncomingContent()
         importCapsule(uri, autoPlay = true)
         return true
+    }
+
+    private fun prepareForIncomingContent() {
+        if (activeRecording != null) {
+            suppressNextRecordingFinalize = true
+            runCatching { activeRecording?.close() }
+            activeRecording = null
+            isRecordingPaused = false
+            timerHandler.removeCallbacks(timerRunnable)
+        }
+        cleanupCurrentVideoState()
+        showCaptureMode()
+        syncControls()
     }
 
     private fun resolveIncomingUri(intent: Intent?): Uri? {
