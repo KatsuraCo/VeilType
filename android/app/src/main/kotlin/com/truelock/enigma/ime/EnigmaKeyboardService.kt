@@ -610,12 +610,10 @@ class EnigmaKeyboardService : InputMethodService() {
             backspaceButton,
             enterButton,
         )
-        var attachActionsExpanded = false
         var currentHeightProfile: KeyboardHeightProfile? = null
         lateinit var render: () -> Unit
 
         fun setAttachActionsExpanded(expanded: Boolean) {
-            attachActionsExpanded = false
             mainActionRow.animate().cancel()
             attachActionRow.animate().cancel()
             mainActionRow.visibility = View.VISIBLE
@@ -624,50 +622,6 @@ class EnigmaKeyboardService : InputMethodService() {
             attachActionRow.visibility = View.GONE
             attachActionRow.alpha = 1f
             attachActionRow.translationX = 0f
-        }
-
-        fun installActionRowSwipe(view: View) {
-            var downX = 0f
-            var downY = 0f
-            var swipeHandled = false
-            val threshold = dpFloat(18f)
-            view.isClickable = true
-            view.setOnTouchListener { touchedView, event ->
-                when (event.actionMasked) {
-                    MotionEvent.ACTION_DOWN -> {
-                        downX = event.rawX
-                        downY = event.rawY
-                        swipeHandled = false
-                        touchedView.parent?.requestDisallowInterceptTouchEvent(true)
-                        true
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        val dx = event.rawX - downX
-                        val dy = event.rawY - downY
-                        if (!swipeHandled && kotlin.math.abs(dx) > threshold && kotlin.math.abs(dx) > kotlin.math.abs(dy)) {
-                            swipeHandled = true
-                            setAttachActionsExpanded(dx < 0)
-                        }
-                        true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        val dx = event.rawX - downX
-                        val dy = event.rawY - downY
-                        if (!swipeHandled && kotlin.math.abs(dx) > threshold && kotlin.math.abs(dx) > kotlin.math.abs(dy)) {
-                            setAttachActionsExpanded(dx < 0)
-                        } else if (!swipeHandled) {
-                            touchedView.performClick()
-                        }
-                        touchedView.parent?.requestDisallowInterceptTouchEvent(false)
-                        true
-                    }
-                    MotionEvent.ACTION_CANCEL -> {
-                        touchedView.parent?.requestDisallowInterceptTouchEvent(false)
-                        true
-                    }
-                    else -> true
-                }
-            }
         }
 
         fun setExactHeight(view: View, heightDp: Int) {
@@ -950,8 +904,6 @@ class EnigmaKeyboardService : InputMethodService() {
                 enigmaToggleButton,
                 decryptButton,
                 clearButton,
-                attachToggleButton,
-                attachBackButton,
                 audioCapsuleButton,
                 photoCapsuleButton,
                 videoCapsuleButton,
@@ -2429,8 +2381,6 @@ class EnigmaKeyboardService : InputMethodService() {
             setIconActive(enigmaToggleButton, mode == KeyboardMode.ENIGMA)
             setIconActive(decryptButton, mode == KeyboardMode.DECRYPT)
             setIconActive(clearButton, false)
-            setIconActive(attachToggleButton, false)
-            setIconActive(attachBackButton, false)
             setIconActive(audioCapsuleButton, recordingVisible || audioActionVisible)
             setIconActive(photoCapsuleButton, photoActionVisible)
             setIconActive(videoCapsuleButton, videoActionVisible)
@@ -2887,17 +2837,6 @@ class EnigmaKeyboardService : InputMethodService() {
             clearPreviewForTyping()
             mode = KeyboardMode.IDLE
             render()
-        }
-
-        attachToggleButton.setOnClickListener {
-            dismissPressedKeyPreview()
-            dismissActiveKeyPopup()
-        }
-
-        attachBackButton.setOnClickListener {
-            dismissPressedKeyPreview()
-            dismissActiveKeyPopup()
-            setAttachActionsExpanded(false)
         }
 
         fun launchPhotoCapsuleActivity() {
