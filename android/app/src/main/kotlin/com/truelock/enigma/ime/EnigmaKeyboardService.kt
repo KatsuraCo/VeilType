@@ -527,7 +527,6 @@ class EnigmaKeyboardService : InputMethodService() {
             val sendAudioCapsuleActionButton = root.findViewById<Button>(R.id.sendAudioCapsuleActionButton)
             val actionBarContainer = root.findViewById<FrameLayout>(R.id.actionBarContainer)
             val mainActionRow = root.findViewById<LinearLayout>(R.id.mainActionRow)
-            val attachActionRow = root.findViewById<LinearLayout>(R.id.attachActionRow)
             val suggestionRow = root.findViewById<LinearLayout>(R.id.suggestionRow)
             val suggestionButtons = listOf(
                 root.findViewById<EnigmaKeyView>(R.id.suggestionButton1),
@@ -536,8 +535,6 @@ class EnigmaKeyboardService : InputMethodService() {
             )
             val enigmaToggleButton = root.findViewById<ImageButton>(R.id.enigmaToggleButton)
             val decryptButton = root.findViewById<ImageButton>(R.id.decryptButton)
-            val attachToggleButton = root.findViewById<ImageButton>(R.id.attachToggleButton)
-            val attachBackButton = root.findViewById<ImageButton>(R.id.attachBackButton)
             val photoCapsuleButton = root.findViewById<ImageButton>(R.id.photoCapsuleButton)
             val clearButton = root.findViewById<ImageButton>(R.id.clearButton)
             val audioCapsuleButton = root.findViewById<ImageButton>(R.id.audioCapsuleButton)
@@ -615,13 +612,9 @@ class EnigmaKeyboardService : InputMethodService() {
 
         fun setAttachActionsExpanded(expanded: Boolean) {
             mainActionRow.animate().cancel()
-            attachActionRow.animate().cancel()
             mainActionRow.visibility = View.VISIBLE
             mainActionRow.alpha = 1f
             mainActionRow.translationX = 0f
-            attachActionRow.visibility = View.GONE
-            attachActionRow.alpha = 1f
-            attachActionRow.translationX = 0f
         }
 
         fun setExactHeight(view: View, heightDp: Int) {
@@ -738,7 +731,6 @@ class EnigmaKeyboardService : InputMethodService() {
             setExactHeight(sendAudioCapsuleActionButton, topButtonHeightDp)
             setExactHeight(actionBarContainer, topControlHeightDp)
             setExactHeight(mainActionRow, topControlHeightDp)
-            setExactHeight(attachActionRow, topControlHeightDp)
             setVerticalMargins(suggestionRow, topDp = actionRowMarginDp)
             setRowChildHeights(suggestionRow, topButtonHeightDp)
             listOf(

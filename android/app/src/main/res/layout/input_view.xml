@@ -209,17 +209,6 @@
                     app:tint="#FFFFFF" />
 
                 <ImageButton
-                    android:id="@+id/attachToggleButton"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:visibility="gone"
-                    android:contentDescription="@string/keyboard_action_attach_desc"
-                    android:padding="7dp"
-                    android:scaleType="centerInside"
-                    android:src="@android:drawable/ic_menu_add"
-                    app:tint="#FFFFFF" />
-
-                <ImageButton
                     android:id="@+id/audioCapsuleButton"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
@@ -245,61 +234,6 @@
 
                 <ImageButton
                     android:id="@+id/videoCapsuleButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/open_video_capsule"
-                    android:padding="7dp"
-                    android:scaleType="centerInside"
-                    android:src="@android:drawable/ic_menu_slideshow"
-                    app:tint="#FFFFFF" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/attachActionRow"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageButton
-                    android:id="@+id/attachBackButton"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:visibility="gone"
-                    android:contentDescription="@string/keyboard_action_attach_desc"
-                    android:padding="7dp"
-                    android:scaleType="centerInside"
-                    android:src="@android:drawable/ic_media_previous"
-                    app:tint="#FFFFFF" />
-
-                <ImageButton
-                    android:id="@+id/audioCapsuleButtonHidden"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/open_audio_capsule"
-                    android:padding="7dp"
-                    android:scaleType="centerInside"
-                    android:src="@android:drawable/ic_btn_speak_now"
-                    app:tint="#FFFFFF" />
-
-                <ImageButton
-                    android:id="@+id/photoCapsuleButtonHidden"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/open_photo_message"
-                    android:padding="7dp"
-                    android:scaleType="centerInside"
-                    android:src="@android:drawable/ic_menu_camera"
-                    app:tint="#FFFFFF" />
-
-                <ImageButton
-                    android:id="@+id/videoCapsuleButtonHidden"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_marginStart="4dp"
