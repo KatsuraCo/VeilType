@@ -387,6 +387,10 @@ class VideoCapsuleActivity : AppCompatActivity() {
     }
 
     private fun importCapsule(uri: Uri, autoPlay: Boolean = false) {
+        preserveCapsulePathOnDestroy = null
+        cleanupCurrentVideoState()
+        showCaptureMode()
+        syncControls()
         val tempFile = runCatching {
             mediaCapsuleService.createRecordingFile(
                 MediaCapsuleType.VIDEO,
@@ -397,6 +401,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             contentResolver.copyUriToFileWithLimit(uri, tempFile, MediaCapsuleService.MAX_MEDIA_BYTES)
         }.onFailure {
             renderStatus(getString(R.string.media_capsule_error_decrypt))
+            showCaptureMode()
             syncControls()
             return
         }
@@ -423,6 +428,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
                 onError = {
                     deleteQuietly(tempFile)
                     renderStatus(it)
+                    showCaptureMode()
                     syncControls()
                 },
             )
@@ -436,17 +442,34 @@ class VideoCapsuleActivity : AppCompatActivity() {
                         getString(R.string.media_capsule_error_decrypt)
                     },
                 )
+                showCaptureMode()
                 syncControls()
             }
         }
     }
 
     private fun playCurrentCapsule() {
-        val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let {
-            runCatching { mediaCapsuleService.decryptFile(it) }.getOrNull()?.also { decrypted ->
-                currentDecrypted = decrypted
-                currentPlaybackFile = decrypted.plaintextFile
-            }?.plaintextFile
+        val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let { capsuleFile ->
+            runCatching {
+                mediaCapsuleService.decryptFile(capsuleFile).also { decrypted ->
+                    currentDecrypted = decrypted
+                    currentPlaybackFile = decrypted.plaintextFile
+                    lastDurationMs = decrypted.metadata.durationMs
+                }.plaintextFile
+            }.getOrElse {
+                val profileTitle = runCatching {
+                    mediaCapsuleService.resolveProfileForCapsule(capsuleFile)?.title
+                }.getOrElse { getString(R.string.clipboard_unknown_profile) }
+                renderStatus(
+                    if (it.message?.contains("already opened", ignoreCase = true) == true) {
+                        getString(R.string.decrypt_one_time_consumed, profileTitle ?: getString(R.string.clipboard_unknown_profile))
+                    } else {
+                        getString(R.string.media_capsule_error_decrypt)
+                    },
+                )
+                syncControls()
+                return
+            }
         }
         if (playbackFile == null) {
             renderStatus(getString(R.string.media_capsule_error_open_first))
