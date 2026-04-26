@@ -2250,6 +2250,20 @@ class EnigmaKeyboardService : InputMethodService() {
             profileInfoText.text = ""
             profileInfoText.visibility = View.GONE
             statusText.visibility = View.GONE
+            val recordingVisible = inlineAudioRecorder != null
+            val audioActionVisible = lastAudioCapsuleFile != null && !recordingVisible
+            val videoActionVisible = lastVideoCapsuleFile != null && !recordingVisible
+            val photoActionVisible = lastPhotoCapsuleFile != null && !recordingVisible
+            val anyCapsuleVisible = audioActionVisible || videoActionVisible || photoActionVisible
+            val shouldShowPreview =
+                !previewMessage.isNullOrBlank() &&
+                    !recordingVisible &&
+                    !anyCapsuleVisible &&
+                    (
+                        previewTone == PreviewTone.DECRYPTED ||
+                            previewTone == PreviewTone.ERROR ||
+                            previewTone == PreviewTone.SUCCESS
+                        )
             when (mode) {
                 KeyboardMode.IDLE -> {
                     previewText.text = previewMessage ?: getString(R.string.keyboard_preview_placeholder)
@@ -2263,17 +2277,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     previewText.text = previewMessage ?: getString(R.string.keyboard_preview_decrypt_hint)
                 }
             }
-            previewScroll.visibility =
-                if (!previewMessage.isNullOrBlank() && (
-                    previewTone == PreviewTone.DECRYPTED ||
-                        previewTone == PreviewTone.ERROR ||
-                        previewTone == PreviewTone.SUCCESS
-                    )
-                ) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+            previewScroll.visibility = if (shouldShowPreview) View.VISIBLE else View.GONE
             when (previewTone) {
                 PreviewTone.DEFAULT -> previewText.setTextColor(0xFFEAF4FF.toInt())
                 PreviewTone.SUCCESS -> previewText.setTextColor(0xFFC9F7D4.toInt())
@@ -2288,7 +2292,6 @@ class EnigmaKeyboardService : InputMethodService() {
                 if (inlineAudioRecorder != null) android.R.drawable.ic_media_pause
                 else android.R.drawable.ic_btn_speak_now,
             )
-            val recordingVisible = inlineAudioRecorder != null
             audioRecordingPanel.visibility = if (recordingVisible) View.VISIBLE else View.GONE
             if (recordingVisible) {
                 val now = System.currentTimeMillis()
@@ -2302,16 +2305,12 @@ class EnigmaKeyboardService : InputMethodService() {
             }
             videoCapsuleButton.isEnabled = !recordingVisible
             photoCapsuleButton.isEnabled = !recordingVisible
-            val audioActionVisible = lastAudioCapsuleFile != null && inlineAudioRecorder == null
-            val videoActionVisible = lastVideoCapsuleFile != null && inlineAudioRecorder == null
-            val photoActionVisible = lastPhotoCapsuleFile != null && inlineAudioRecorder == null
             Log.d(
                 TAG,
                 "render audioActionVisible=$audioActionVisible videoActionVisible=$videoActionVisible photoActionVisible=$photoActionVisible lastAudio=${lastAudioCapsuleFile?.name} lastVideo=${lastVideoCapsuleFile?.name} lastPhoto=${lastPhotoCapsuleFile?.name}",
             )
             audioCapsuleActionPanel.visibility =
                 if (audioActionVisible || videoActionVisible || photoActionVisible) View.VISIBLE else View.GONE
-            val anyCapsuleVisible = audioActionVisible || videoActionVisible || photoActionVisible
             val suggestions =
                 if (
                     supportsPredictiveTyping() &&
