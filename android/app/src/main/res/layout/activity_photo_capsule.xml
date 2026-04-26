@@ -34,12 +34,12 @@
         android:paddingStart="18dp"
         android:paddingTop="20dp"
         android:paddingEnd="18dp"
-        android:paddingBottom="14dp"
-        android:visibility="gone">
+        android:paddingBottom="14dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="@string/photo_capsule_title"
             android:textColor="#FFFFFF"
             android:textSize="26sp"
@@ -47,9 +47,13 @@
 
         <TextView
             android:id="@+id/statusText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_capsule_play_overlay"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
             android:text="@string/media_capsule_status_ready"
             android:textColor="#D7E2EE"
             android:textSize="14sp" />
