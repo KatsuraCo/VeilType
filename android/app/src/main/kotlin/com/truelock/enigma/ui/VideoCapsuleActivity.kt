@@ -219,9 +219,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
         super.onStop()
         timerHandler.removeCallbacks(timerRunnable)
         if (playbackPlayer?.isPlaying == true) {
-            playbackPlayer?.pause()
-            binding.previewPlayOverlay.visibility = View.VISIBLE
-            syncControls()
+            stopPlaybackPreview()
         }
     }
 
@@ -470,6 +468,9 @@ class VideoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
+        if (playbackPlayer?.isPlaying == true) {
+            stopPlaybackPreview()
+        }
         val shareFile = runCatching {
             val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
             val baseName = capsule.nameWithoutExtension.ifBlank { capsule.name }
@@ -503,6 +504,9 @@ class VideoCapsuleActivity : AppCompatActivity() {
         val capsule = currentCapsuleFile ?: run {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
+        }
+        if (playbackPlayer?.isPlaying == true) {
+            stopPlaybackPreview()
         }
         preserveCapsulePathOnDestroy = capsule.absolutePath
         cleanupCurrentVideoState(keepCapsule = capsule, clearUiState = false)
