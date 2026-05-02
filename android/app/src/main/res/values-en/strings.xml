@@ -45,7 +45,7 @@
   <string name="keyboard_action_clear_desc">Clear the clipboard</string>
   <string name="keyboard_action_space">Space</string>
   <string name="keyboard_action_enter">Enter</string>
-  <string name="keyboard_action_backspace">?</string>
+  <string name="keyboard_action_backspace">⌫</string>
   <string name="keyboard_action_comma">,</string>
   <string name="keyboard_action_dot">.</string>
   <string name="keyboard_action_language_ru">RU</string>
@@ -75,7 +75,7 @@
   <string name="keyboard_profile_info_format">%1$s ? %2$s ? %3$s</string>
   <string name="keyboard_preview_encrypt_hint">Type plain text and tap "Encrypt".</string>
   <string name="keyboard_preview_decrypt_hint">Copy TL1 to the clipboard and tap "Read".</string>
-  <string name="keyboard_preview_decrypt_success">[%1$s]\n\n%2$s</string>
+  <string name="keyboard_preview_decrypt_success">%2$s</string>
   <string name="keyboard_preview_profile_switched">Active key: %1$s ? %2$s</string>
   <string name="keyboard_preview_encrypt_success">[%1$s] %2$s</string>
   <string name="keyboard_preview_language_switched">Keyboard language: %1$s</string>
@@ -142,13 +142,13 @@
   <string name="open_audio_capsule">Voice capsule</string>
   <string name="open_video_capsule">Video capsule</string>
   <string name="audio_capsule_title">Voice capsule</string>
-  <string name="audio_capsule_subtitle">Record voice, encrypt it into a TLA1 file, and send it as a capsule.</string>
+  <string name="audio_capsule_subtitle">Record voice, encrypt it into a .veil file, and send it as a capsule.</string>
   <string name="audio_capsule_record">Start recording</string>
   <string name="audio_capsule_stop">Stop and encrypt</string>
   <string name="audio_capsule_play">Play</string>
   <string name="audio_capsule_status_playing">Voice capsule is playing.</string>
   <string name="video_capsule_title">Video capsule</string>
-  <string name="video_capsule_subtitle">Record a short video, encrypt it into a TLV1 file, and open it via VeilType.</string>
+  <string name="video_capsule_subtitle">Record a short video, encrypt it into a .veil file, and open it via VeilType.</string>
   <string name="video_capsule_record">Record video</string>
   <string name="video_capsule_play">Play video</string>
   <string name="video_capsule_status_recording">Camera is opening to record the video capsule.</string>

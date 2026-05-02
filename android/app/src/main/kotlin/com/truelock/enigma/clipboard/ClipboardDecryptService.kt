@@ -48,11 +48,17 @@ class ClipboardDecryptService(
         if (candidates.isEmpty()) return ClipboardDecryptResult.WrongKeyOrInvalidMessage
 
         val fingerprint = usageStore.messageFingerprint(text)
-        var biometricCandidate: com.truelock.enigma.profiles.KeyProfile? = null
+        val preferredCandidate = ProfileSelectionPolicy.selectDefault(candidates) ?: candidates.first()
+        if (preferredCandidate.requireBiometricForDecrypt) {
+            return ClipboardDecryptResult.RequiresBiometric(
+                encodedMessage = text,
+                profileId = preferredCandidate.id,
+                profileTitle = preferredCandidate.title,
+            )
+        }
 
         candidates.forEach { candidate ->
             if (candidate.requireBiometricForDecrypt) {
-                if (biometricCandidate == null) biometricCandidate = candidate
                 return@forEach
             }
             if (candidate.oneTimeRead && usageStore.isConsumed(candidate.id, fingerprint)) {
@@ -67,14 +73,6 @@ class ClipboardDecryptService(
             return ClipboardDecryptResult.Success(
                 plaintext = plaintext,
                 profileTitle = candidate.title.ifBlank { context.getString(R.string.clipboard_unknown_profile) },
-            )
-        }
-
-        if (biometricCandidate != null) {
-            return ClipboardDecryptResult.RequiresBiometric(
-                encodedMessage = text,
-                profileId = biometricCandidate!!.id,
-                profileTitle = biometricCandidate!!.title,
             )
         }
 

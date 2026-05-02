@@ -46,34 +46,6 @@
             android:textStyle="bold" />
 
         <LinearLayout
-            android:id="@+id/createKeyCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/bg_app_card"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-        <TextView
-            android:id="@+id/profileCountText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/profile_current_key_title"
-            android:textColor="#F6F8FC"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/selectedProfileLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/profile_manager_selected_placeholder"
-            android:textColor="#A6B0C3"
-            android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/profileSummaryCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,11 +123,25 @@
 
                 <Button
                     android:id="@+id/shareKeyButton"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="48dp"
+                    android:layout_weight="1"
                     android:background="@drawable/bg_app_button_secondary"
                     android:backgroundTint="@null"
                     android:text="@string/profile_share_key"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/editGeneratedKeyButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_app_button_secondary"
+                    android:backgroundTint="@null"
+                    android:text="@string/profile_action_edit"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -304,7 +290,7 @@
             android:background="@drawable/bg_app_card"
             android:orientation="vertical"
             android:padding="16dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/titleInput"
@@ -463,7 +449,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:text="@string/profile_old_keys_title"
+            android:text="@string/profile_saved_keys_title"
             android:textColor="#F6F8FC"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -473,7 +459,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="@string/profile_old_keys_subtitle"
+            android:text="@string/profile_saved_keys_subtitle"
             android:textColor="#A6B0C3"
             android:textSize="14sp" />
 

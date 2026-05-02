@@ -35,6 +35,7 @@
   <string name="profile_action_archive">Архив</string>
   <string name="profile_action_delete">Удалить</string>
   <string name="profile_action_edit">Редактировать</string>
+  <string name="profile_return">Вернуться</string>
   <string name="profile_export_allowed">Разрешить экспорт ключа</string>
   <string name="profile_export_blocked">Экспорт для этого ключа отключен.</string>
   <string name="profile_no_export_short">без экспорта</string>
@@ -79,9 +80,7 @@
   <string name="keyboard_profile_info_format">%1$s • %2$s • %3$s</string>
   <string name="keyboard_preview_encrypt_hint">Введите обычный текст и нажмите «Зашифровать».</string>
   <string name="keyboard_preview_decrypt_hint">Скопируйте TL1 в буфер обмена и нажмите «Читать».</string>
-  <string name="keyboard_preview_decrypt_success">[%1$s]
-
-%2$s</string>
+  <string name="keyboard_preview_decrypt_success">%2$s</string>
   <string name="keyboard_preview_profile_switched">Активный ключ: %1$s • %2$s</string>
   <string name="keyboard_preview_encrypt_success">[%1$s] %2$s</string>
   <string name="keyboard_preview_language_switched">Язык клавиатуры: %1$s</string>
@@ -148,13 +147,13 @@
   <string name="open_audio_capsule">Голосовая капсула</string>
   <string name="open_video_capsule">Видео капсула</string>
   <string name="audio_capsule_title">Голосовая капсула</string>
-  <string name="audio_capsule_subtitle">Запишите голос, зашифруйте его в файл TLA1 и отправьте в виде капсулы.</string>
+  <string name="audio_capsule_subtitle">Запишите голос, зашифруйте его в файл .veil и отправьте в виде капсулы.</string>
   <string name="audio_capsule_record">Начать запись</string>
   <string name="audio_capsule_stop">Остановить и зашифровать</string>
   <string name="audio_capsule_play">Играть</string>
   <string name="audio_capsule_status_playing">Голосовая капсула играет.</string>
   <string name="video_capsule_title">Видео капсула</string>
-  <string name="video_capsule_subtitle">Запишите короткое видео, зашифруйте его в файл TLV1 и откройте с помощью VeilType.</string>
+  <string name="video_capsule_subtitle">Запишите короткое видео, зашифруйте его в файл .veil и откройте с помощью VeilType.</string>
   <string name="video_capsule_record">Запись видео</string>
   <string name="video_capsule_play">Воспроизвести видео</string>
   <string name="video_capsule_status_recording">Камера открывается для записи видеокапсулы.</string>
@@ -312,6 +311,12 @@
   <string name="video_capsule_preview_from_keyboard">Просмотреть</string>
   <string name="video_capsule_status_paused">Запись на паузе.</string>
   <string name="photo_capsule_capture">Сделать фото</string>
-  <string name="main_keyboard_icons_body">🔒 Зашифровать текст\n👁 Расшифровать из буфера обмена\n✕ Очистить буфер и временные капсулы\n🎙 Голосовая капсула\n📷 Фото-сообщение\n🎬 Видеокапсула</string>
+  <string name="main_keyboard_icons_body">Подсказка по иконкам клавиатуры</string>
+  <string name="main_keyboard_icons_encrypt">Зашифровать текст</string>
+  <string name="main_keyboard_icons_decrypt">Расшифровать из буфера обмена</string>
+  <string name="main_keyboard_icons_clear">Очистить буфер, поле ввода и временные капсулы</string>
+  <string name="main_keyboard_icons_voice">Голосовая капсула</string>
+  <string name="main_keyboard_icons_photo">Фото-сообщение</string>
+  <string name="main_keyboard_icons_video">Видеокапсула</string>
   <string name="keyboard_action_close">Закрыть</string>
 </resources>

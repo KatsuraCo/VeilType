@@ -5,24 +5,34 @@ enum class MediaCapsuleType(
     val fileExtension: String,
     val capsuleMimeType: String,
     val legacyMimeTypes: List<String> = emptyList(),
+    val legacyFileExtensions: List<String> = emptyList(),
 ) {
     AUDIO(
         "TLA1",
-        "tla1",
+        "veil",
         "application/x-veiltype-audio-capsule",
-        legacyMimeTypes = listOf("application/x-enigma-audio-capsule"),
+        legacyMimeTypes = listOf(
+            "application/x-enigma-audio-capsule",
+        ),
+        legacyFileExtensions = listOf("tla1"),
     ),
     VIDEO(
         "TLV1",
-        "tlv1",
+        "veil",
         "application/x-veiltype-video-capsule",
-        legacyMimeTypes = listOf("application/x-enigma-video-capsule"),
+        legacyMimeTypes = listOf(
+            "application/x-enigma-video-capsule",
+        ),
+        legacyFileExtensions = listOf("tlv1"),
     ),
     PHOTO(
         "TLP1",
-        "tlp1",
+        "veil",
         "application/x-veiltype-photo-capsule",
-        legacyMimeTypes = listOf("application/x-enigma-photo-capsule"),
+        legacyMimeTypes = listOf(
+            "application/x-enigma-photo-capsule",
+        ),
+        legacyFileExtensions = listOf("tlp1"),
     ),
     ;
 

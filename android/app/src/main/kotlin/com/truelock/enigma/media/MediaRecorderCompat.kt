@@ -10,10 +10,11 @@ data class PreparedSpeechRecorder(
 @Suppress("DEPRECATION")
 fun createSpeechMediaRecorder(outputPath: String): PreparedSpeechRecorder {
     val candidateSources = listOf(
-        MediaRecorder.AudioSource.VOICE_RECOGNITION,
         MediaRecorder.AudioSource.MIC,
         MediaRecorder.AudioSource.CAMCORDER,
+        MediaRecorder.AudioSource.VOICE_COMMUNICATION,
         MediaRecorder.AudioSource.DEFAULT,
+        MediaRecorder.AudioSource.VOICE_RECOGNITION,
     ).distinct()
 
     var lastError: Throwable? = null
@@ -44,6 +45,7 @@ fun describeAudioSource(audioSource: Int): String =
         MediaRecorder.AudioSource.DEFAULT -> "DEFAULT"
         MediaRecorder.AudioSource.MIC -> "MIC"
         MediaRecorder.AudioSource.CAMCORDER -> "CAMCORDER"
+        MediaRecorder.AudioSource.VOICE_COMMUNICATION -> "VOICE_COMMUNICATION"
         MediaRecorder.AudioSource.VOICE_RECOGNITION -> "VOICE_RECOGNITION"
         else -> audioSource.toString()
     }

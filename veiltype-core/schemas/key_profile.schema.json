@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://enigma.local/schemas/key_profile.schema.json",
+  "title": "Enigma Key Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "secret_sequence_kind",
+    "profile_version",
+    "profile_salt_b64",
+    "wrapped_profile_key_b64",
+    "profile_hint_b64",
+    "created_at",
+    "expires_at",
+    "status",
+    "allow_decrypt_after_expiry",
+    "rotation_period_hours"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 8
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "app_package": {
+      "type": ["string", "null"],
+      "maxLength": 128
+    },
+    "peer_hint": {
+      "type": ["string", "null"],
+      "maxLength": 128
+    },
+    "secret_sequence_kind": {
+      "type": "string",
+      "enum": ["emoji_sequence", "visual_sequence"]
+    },
+    "profile_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "profile_salt_b64": {
+      "type": "string",
+      "minLength": 8
+    },
+    "wrapped_profile_key_b64": {
+      "type": "string",
+      "minLength": 8
+    },
+    "profile_hint_b64": {
+      "type": "string",
+      "minLength": 8
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_used_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "expiring", "expired", "archived"]
+    },
+    "allow_decrypt_after_expiry": {
+      "type": "boolean"
+    },
+    "rotation_period_hours": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 720
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "vectors": [
+    {
+      "vector_id": "tl1-001-ru-short",
+      "format": "TL1",
+      "algorithm": "AES-256-GCM",
+      "argon2id": {
+        "time_cost": 2,
+        "memory_cost_kib": 19456,
+        "parallelism": 1,
+        "hash_len": 32
+      },
+      "cards": [
+        3,
+        17,
+        8,
+        24,
+        11
+      ],
+      "sequence": "03-17-08-24-11",
+      "plaintext": "Завтра в 18:00",
+      "plaintext_utf8_hex": "d097d0b0d0b2d182d180d0b020d0b22031383a3030",
+      "profile_salt_hex": "3a8f94d9b2d12055e6f4b6c39018cf41",
+      "derived_key_hex": "4f3dbdf40fdf38b4131990efc6d319ebb80f5c32faffe8df4e97a02cc607b453",
+      "profile_hint_hex": "1e69f31d92861b44",
+      "nonce_hex": "00112233445566778899aabb",
+      "header_hex": "010103001e69f31d92861b4400112233445566778899aabb",
+      "ciphertext_hex": "9c6139e83dddd7a34089953d71fe27b3736d5f62a0",
+      "tag_hex": "b8961815e3bb91bff6dbe649129da206",
+      "payload_hex": "010103001e69f31d92861b4400112233445566778899aabb9c6139e83dddd7a34089953d71fe27b3736d5f62a0b8961815e3bb91bff6dbe649129da206",
+      "message": "TL1:AQEDAB5p8x2ShhtEABEiM0RVZneImaq7nGE56D3d16NAiZU9cf4ns3NtX2KguJYYFeO7kb_22-ZJEp2iBg"
+    },
+    {
+      "vector_id": "tl1-002-en-short",
+      "format": "TL1",
+      "algorithm": "AES-256-GCM",
+      "argon2id": {
+        "time_cost": 2,
+        "memory_cost_kib": 19456,
+        "parallelism": 1,
+        "hash_len": 32
+      },
+      "cards": [
+        3,
+        17,
+        8,
+        24,
+        11
+      ],
+      "sequence": "03-17-08-24-11",
+      "plaintext": "Meet at the second entrance.",
+      "plaintext_utf8_hex": "4d65657420617420746865207365636f6e6420656e7472616e63652e",
+      "profile_salt_hex": "3a8f94d9b2d12055e6f4b6c39018cf41",
+      "derived_key_hex": "4f3dbdf40fdf38b4131990efc6d319ebb80f5c32faffe8df4e97a02cc607b453",
+      "profile_hint_hex": "1e69f31d92861b44",
+      "nonce_hex": "102132435465768798a9bacb",
+      "header_hex": "010103001e69f31d92861b44102132435465768798a9bacb",
+      "ciphertext_hex": "66597e3460efd280a2fbfefcae8723a207fc44b56e50e9172ba3a415",
+      "tag_hex": "938726877487b000f33c2ea5cb8a9feb",
+      "payload_hex": "010103001e69f31d92861b44102132435465768798a9bacb66597e3460efd280a2fbfefcae8723a207fc44b56e50e9172ba3a415938726877487b000f33c2ea5cb8a9feb",
+      "message": "TL1:AQEDAB5p8x2ShhtEECEyQ1RldoeYqbrLZll-NGDv0oCi-_78rocjogf8RLVuUOkXK6OkFZOHJod0h7AA8zwupcuKn-s"
+    },
+    {
+      "vector_id": "tl1-003-ru-medium",
+      "format": "TL1",
+      "algorithm": "AES-256-GCM",
+      "argon2id": {
+        "time_cost": 2,
+        "memory_cost_kib": 19456,
+        "parallelism": 1,
+        "hash_len": 32
+      },
+      "cards": [
+        14,
+        5,
+        22,
+        1,
+        9
+      ],
+      "sequence": "14-05-22-01-09",
+      "plaintext": "Переходи на запасной канал и не пересылай это сообщение дальше.",
+      "plaintext_utf8_hex": "d09fd0b5d180d0b5d185d0bed0b4d0b820d0bdd0b020d0b7d0b0d0bfd0b0d181d0bdd0bed0b920d0bad0b0d0bdd0b0d0bb20d0b820d0bdd0b520d0bfd0b5d180d0b5d181d18bd0bbd0b0d0b920d18dd182d0be20d181d0bed0bed0b1d189d0b5d0bdd0b8d0b520d0b4d0b0d0bbd18cd188d0b52e",
+      "profile_salt_hex": "6b4a125d0914f1d2aa39d3ea25c8bb17",
+      "derived_key_hex": "c5b0a45b435360162f59668de64c133ab948c1079de78249322335d441bf3586",
+      "profile_hint_hex": "49f5eeb3eedb1a02",
+      "nonce_hex": "abcdef0123456789fedcba98",
+      "header_hex": "0101030049f5eeb3eedb1a02abcdef0123456789fedcba98",
+      "ciphertext_hex": "a5164d03d79f6a100f1ae1d4534a18fa55f339dd1aac4c3dce313d8bceb7ea9533be9c4a34d3da1d49cca9b5d7140ababbd5de9f86b3aeb8f1c99605aed2174e6206aebf5403764ceccbce4507210427343af65646e124f51ec406b48cd72a73a01ce56cbe9cc952e11207c41c65a78b65fab084",
+      "tag_hex": "b4a758cfdf5ddca892450ecf0754694f",
+      "payload_hex": "0101030049f5eeb3eedb1a02abcdef0123456789fedcba98a5164d03d79f6a100f1ae1d4534a18fa55f339dd1aac4c3dce313d8bceb7ea9533be9c4a34d3da1d49cca9b5d7140ababbd5de9f86b3aeb8f1c99605aed2174e6206aebf5403764ceccbce4507210427343af65646e124f51ec406b48cd72a73a01ce56cbe9cc952e11207c41c65a78b65fab084b4a758cfdf5ddca892450ecf0754694f",
+      "message": "TL1:AQEDAEn17rPu2xoCq83vASNFZ4n-3LqYpRZNA9efahAPGuHUU0oY-lXzOd0arEw9zjE9i8636pUzvpxKNNPaHUnMqbXXFAq6u9Xen4azrrjxyZYFrtIXTmIGrr9UA3ZM7MvORQchBCc0OvZWRuEk9R7EBrSM1ypzoBzlbL6cyVLhEgfEHGWni2X6sIS0p1jP313cqJJFDs8HVGlP"
+    }
+  ]
+}

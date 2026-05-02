@@ -25,15 +25,13 @@
 
         <TextView
             android:id="@+id/previewPlayOverlay"
-            android:layout_width="88dp"
-            android:layout_height="88dp"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
             android:layout_gravity="center"
-            android:background="@drawable/bg_capsule_play_overlay"
-            android:gravity="center"
+            android:alpha="0"
+            android:clickable="false"
+            android:focusable="false"
             android:text="PLAY"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
             android:visibility="gone" />
 
         <TextView
@@ -54,39 +52,12 @@
             android:textStyle="bold" />
     </FrameLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:background="@android:color/transparent"
-        android:orientation="vertical"
-        android:paddingStart="18dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="18dp"
-        android:paddingBottom="14dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="@string/video_capsule_title"
-            android:textColor="#FFFFFF"
-            android:textSize="26sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_capsule_play_overlay"
-            android:paddingStart="14dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="14dp"
-            android:paddingBottom="8dp"
-            android:text="@string/media_capsule_status_ready"
-            android:textColor="#D7E2EE"
-            android:textSize="14sp" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:alpha="0"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -198,6 +169,17 @@
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/videoPlaybackSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="8dp"
+            android:max="1000"
+            android:progress="0"
+            android:progressTint="#8CEBFF"
+            android:thumbTint="#F0D28E"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"

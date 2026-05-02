@@ -16,13 +16,13 @@ class MediaCapsuleService(
         const val MAX_MEDIA_BYTES = 32L * 1024L * 1024L
     }
 
-    private val capsuleStore = MediaCapsuleFileStore(File(context.filesDir, "media_capsules"))
+    private val capsuleStore = MediaCapsuleFileStore(File(context.cacheDir, "media_capsules").apply { mkdirs() })
     private val decryptedStore = File(context.cacheDir, "media_plain").apply { mkdirs() }
     private val recordingStore = File(context.cacheDir, "media_recordings").apply { mkdirs() }
     private val usageStore = DecryptUsageStore(context)
 
     fun createRecordingFile(type: MediaCapsuleType, extension: String): File =
-        File(recordingStore, "${type.magic.lowercase()}_${System.currentTimeMillis()}.$extension")
+        File(recordingStore, "veil_${type.name.lowercase()}_${System.currentTimeMillis()}.$extension")
 
     fun describeMediaFile(file: File): String {
         if (!file.exists()) {
@@ -97,11 +97,17 @@ class MediaCapsuleService(
         val extension = decoded.metadata.originalFileName
             ?.substringAfterLast('.', "")
             ?.takeIf { it.isNotBlank() }
+            ?.takeUnless { it.equals(decoded.type.fileExtension, ignoreCase = true) }
+            ?.takeUnless { candidate ->
+                MediaCapsuleType.entries.any { type ->
+                    type.legacyFileExtensions.any { it.equals(candidate, ignoreCase = true) }
+                }
+            }
             ?: defaultPlaintextExtension(decoded.type)
 
         val plaintextFile = File(
             decryptedStore,
-            "${decoded.type.magic.lowercase()}_${System.currentTimeMillis()}.$extension",
+            "veil_plain_${decoded.type.name.lowercase()}_${System.currentTimeMillis()}.$extension",
         )
         plaintextFile.writeBytes(decoded.mediaBytes)
 

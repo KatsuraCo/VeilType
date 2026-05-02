@@ -5,8 +5,11 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -54,9 +57,8 @@ class ProfileManagerActivity : AppCompatActivity() {
         clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         biometricHelper = BiometricDecryptHelper(this)
 
-        binding.generateKeyButton.setOnClickListener {
-            generateRandomKey()
-        }
+        binding.generateKeyButton.setOnClickListener { generateRandomKey() }
+        binding.editGeneratedKeyButton.setOnClickListener { showCurrentKeyEditDialog() }
         binding.copyKeyButton.setOnClickListener {
             copyKeyBundle()
         }
@@ -70,7 +72,7 @@ class ProfileManagerActivity : AppCompatActivity() {
             importKeyBundle()
         }
         binding.saveImportedKeyButton.setOnClickListener {
-            upsertProfileFromInputs(forceCreate = true)
+            upsertProfileFromInputs()
         }
         binding.keyExpiryButton.setOnClickListener {
             showExpiryPicker()
@@ -100,8 +102,8 @@ class ProfileManagerActivity : AppCompatActivity() {
 
         seedDefaults()
         focusImportMode = intent.getBooleanExtra(EXTRA_FOCUS_IMPORT, false)
-        binding.createKeyCard.visibility = if (focusImportMode) android.view.View.GONE else android.view.View.VISIBLE
         binding.importKeyCard.visibility = if (focusImportMode) android.view.View.VISIBLE else android.view.View.GONE
+        binding.manualKeyEditCard.visibility = android.view.View.GONE
         if (focusImportMode) {
             prepareImportMode()
         } else {
@@ -129,7 +131,7 @@ class ProfileManagerActivity : AppCompatActivity() {
 
     private fun clearSelectedProfileForNewKey() {
         binding.selectedProfileIdInput.setText("")
-        binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
+        binding.manualKeyEditCard.visibility = android.view.View.GONE
         binding.createProfileButton.setText(R.string.save_profile)
         binding.saveGeneratedKeyButton.setText(R.string.save_profile)
         binding.saveImportedKeyButton.setText(R.string.save_profile)
@@ -141,7 +143,7 @@ class ProfileManagerActivity : AppCompatActivity() {
     private fun generateRandomKey() {
         clearSelectedProfileForNewKey()
         currentKeyBundle = keyBundleCodec.createRandomBundle(
-            title = binding.titleInput.text?.toString(),
+            title = nextDefaultKeyTitle(),
             appPackage = null,
             peerHint = null,
         )
@@ -149,7 +151,7 @@ class ProfileManagerActivity : AppCompatActivity() {
             bundle = currentKeyBundle ?: return,
             keepImportField = false,
         )
-        renderProfiles(getString(R.string.profile_status_key_generated))
+        renderProfiles(getString(R.string.profile_status_ready))
     }
 
     private fun copyKeyBundle() {
@@ -210,6 +212,9 @@ class ProfileManagerActivity : AppCompatActivity() {
             renderProfiles(getString(R.string.profile_status_key_missing))
             return
         }
+        binding.importKeyInput.setText("")
+        binding.importKeyInput.setText(raw)
+        binding.importKeyInput.setSelection(binding.importKeyInput.text?.length ?: 0)
         val bundle = runCatching { keyBundleCodec.decode(raw) }.getOrElse {
             renderProfiles(getString(R.string.profile_status_key_invalid))
             return
@@ -243,7 +248,6 @@ class ProfileManagerActivity : AppCompatActivity() {
         binding.emojiSequenceInput.hint = getString(R.string.profile_import_key_hint)
         binding.createProfileButton.setText(R.string.save_profile)
         binding.saveImportedKeyButton.setText(R.string.save_profile)
-        binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
     }
 
     private fun resolveExportBundle(): EmojiKeyBundle? {
@@ -372,7 +376,7 @@ class ProfileManagerActivity : AppCompatActivity() {
             binding.createProfileButton.setText(R.string.save_profile)
             currentKeyBundle = matchingBundle
                 ?: EmojiKeyBundle(title, emojis, result.profile.profileSalt, null, null)
-            renderProfiles(getString(R.string.profile_status_updated, title))
+            renderProfiles(getString(R.string.profile_status_ready))
             return
         }
 
@@ -381,7 +385,7 @@ class ProfileManagerActivity : AppCompatActivity() {
         binding.createProfileButton.setText(R.string.save_profile)
         currentKeyBundle = matchingBundle
             ?: EmojiKeyBundle(title, emojis, result.profile.profileSalt, null, null)
-        renderProfiles(getString(R.string.profile_status_created, result.profile.title))
+        renderProfiles(getString(R.string.profile_status_ready))
     }
 
     private fun renewSelectedProfile() {
@@ -425,6 +429,7 @@ class ProfileManagerActivity : AppCompatActivity() {
 
     private fun bindSelectedProfile(profile: KeyProfile) {
         binding.selectedProfileIdInput.setText(profile.id)
+        binding.manualKeyEditCard.visibility = View.GONE
         binding.titleInput.setText(profile.title)
         binding.appPackageInput.setText("")
         binding.peerHintInput.setText("")
@@ -435,7 +440,6 @@ class ProfileManagerActivity : AppCompatActivity() {
         binding.createProfileButton.setText(R.string.save_profile)
         binding.saveGeneratedKeyButton.setText(R.string.save_profile)
         binding.saveImportedKeyButton.setText(R.string.save_profile)
-        binding.selectedProfileLabel.text = getString(R.string.profile_manager_selected_format, profile.title)
         selectedRotationHours = profile.rotationPeriodHours
         binding.oneTimeReadCheckBox.isChecked = profile.oneTimeRead
         binding.biometricDecryptCheckBox.isChecked = profile.requireBiometricForDecrypt
@@ -466,7 +470,7 @@ class ProfileManagerActivity : AppCompatActivity() {
         binding.createProfileButton.setText(R.string.save_profile)
         binding.saveGeneratedKeyButton.setText(R.string.save_profile)
         binding.saveImportedKeyButton.setText(R.string.save_profile)
-        binding.selectedProfileLabel.setText(R.string.profile_manager_selected_placeholder)
+        binding.manualKeyEditCard.visibility = android.view.View.GONE
         selectedRotationHours = 48
         binding.oneTimeReadCheckBox.isChecked = false
         binding.biometricDecryptCheckBox.isChecked = false
@@ -475,6 +479,138 @@ class ProfileManagerActivity : AppCompatActivity() {
         generateRandomKey()
         renderProfiles(status)
     }
+
+    private fun showCurrentKeyEditDialog() {
+        val title = binding.titleInput.text?.toString()?.trim().orEmpty()
+            .ifBlank { currentKeyBundle?.title.orEmpty().ifBlank { nextDefaultKeyTitle() } }
+        val emojiSequence = binding.emojiSequenceInput.text?.toString()?.trim().orEmpty()
+            .ifBlank { currentKeyBundle?.emojis?.joinToString(" ").orEmpty() }
+        showKeyEditDialog(
+            title = getString(R.string.profile_action_edit),
+            initialTitle = title,
+            initialEmojiSequence = emojiSequence,
+            positiveLabel = getString(R.string.profile_return),
+        ) { keyTitle, editedEmojiSequence ->
+            val emojis = splitEmojiSequence(editedEmojiSequence)
+            binding.titleInput.setText(keyTitle)
+            binding.emojiSequenceInput.setText(editedEmojiSequence.trim())
+            binding.generatedEmojiText.text = buildString {
+                append(keyTitle)
+                append("\n")
+                append(editedEmojiSequence.trim())
+            }
+            currentKeyBundle = (currentKeyBundle ?: keyBundleCodec.createRandomBundle(title = keyTitle)).copy(
+                title = keyTitle,
+                emojis = emojis,
+            )
+            renderProfiles(getString(R.string.profile_status_ready))
+        }
+    }
+
+    private fun showCreateKeyDialog() {
+        val randomBundle = keyBundleCodec.createRandomBundle(title = nextDefaultKeyTitle())
+        showKeyEditDialog(
+            title = getString(R.string.profile_generate_key),
+            initialTitle = randomBundle.title.orEmpty(),
+            initialEmojiSequence = randomBundle.emojis.joinToString(" "),
+            positiveLabel = getString(R.string.save_profile),
+        ) { keyTitle, emojiSequence ->
+            currentKeyBundle = randomBundle.copy(
+                title = keyTitle,
+                emojis = splitEmojiSequence(emojiSequence),
+            )
+            binding.selectedProfileIdInput.setText("")
+            binding.titleInput.setText(keyTitle)
+            binding.emojiSequenceInput.setText(emojiSequence.trim())
+            upsertProfileFromInputs(forceCreate = true)
+            binding.manualKeyEditCard.visibility = View.GONE
+        }
+    }
+
+    private fun showEditKeyDialog(profile: KeyProfile) {
+        showKeyEditDialog(
+            title = getString(R.string.profile_action_edit),
+            initialTitle = profile.title,
+            initialEmojiSequence = profile.secretSequenceDisplay.orEmpty(),
+            positiveLabel = getString(R.string.save_profile),
+        ) { keyTitle, emojiSequence ->
+            binding.selectedProfileIdInput.setText(profile.id)
+            binding.titleInput.setText(keyTitle)
+            binding.emojiSequenceInput.setText(emojiSequence.trim())
+            selectedRotationHours = profile.rotationPeriodHours
+            binding.oneTimeReadCheckBox.isChecked = profile.oneTimeRead
+            binding.biometricDecryptCheckBox.isChecked = profile.requireBiometricForDecrypt
+            binding.exportAllowedCheckBox.isChecked = profile.exportAllowed
+            upsertProfileFromInputs()
+            binding.manualKeyEditCard.visibility = View.GONE
+        }
+    }
+
+    private fun showKeyEditDialog(
+        title: String,
+        initialTitle: String,
+        initialEmojiSequence: String,
+        positiveLabel: String,
+        onSave: (String, String) -> Unit,
+    ) {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(8), dp(20), 0)
+        }
+        val titleInput = EditText(this).apply {
+            hint = getString(R.string.profile_title_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+            setSingleLine(true)
+            setText(initialTitle)
+        }
+        val emojiInput = EditText(this).apply {
+            hint = getString(R.string.profile_emoji_sequence_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            setSingleLine(true)
+            setText(initialEmojiSequence)
+        }
+        container.addView(titleInput)
+        container.addView(emojiInput)
+
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setView(container)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(positiveLabel, null)
+            .create()
+            .also { dialog ->
+                dialog.setOnShowListener {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        val keyTitle = titleInput.text?.toString()?.trim().orEmpty()
+                            .ifBlank { nextDefaultKeyTitle() }
+                        val emojiSequence = emojiInput.text?.toString()?.trim().orEmpty()
+                        if (splitEmojiSequence(emojiSequence).size != ProfileKeyDeriver.EMOJI_SEQUENCE_LENGTH) {
+                            binding.statusText.text = getString(R.string.profile_error_exactly_five_emoji)
+                            binding.statusText.visibility = View.VISIBLE
+                            return@setOnClickListener
+                        }
+                        onSave(keyTitle, emojiSequence)
+                        dialog.dismiss()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun splitEmojiSequence(raw: String): List<String> =
+        raw.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+
+    private fun nextDefaultKeyTitle(): String {
+        val maxNumber = secureProfileStore.listProfiles()
+            .mapNotNull { profile ->
+                Regex("""^Key_(\d+)$""").matchEntire(profile.title)?.groupValues?.getOrNull(1)?.toIntOrNull()
+            }
+            .maxOrNull() ?: secureProfileStore.listProfiles().size
+        return "Key_${maxNumber + 1}"
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
 
     private fun findSelectedProfile(): KeyProfile? {
         val id = binding.selectedProfileIdInput.text?.toString()?.trim().orEmpty()
@@ -537,19 +673,28 @@ class ProfileManagerActivity : AppCompatActivity() {
         binding.statusText.text = status
         binding.statusText.visibility =
             if (status == getString(R.string.profile_status_ready)) android.view.View.GONE else android.view.View.VISIBLE
-        binding.profileCountText.setText(R.string.profile_current_key_title)
         val hasProfiles = profiles.isNotEmpty()
-        binding.createKeyCard.visibility =
-            if (!focusImportMode) android.view.View.VISIBLE else android.view.View.GONE
-        binding.selectedProfileLabel.text = currentProfile?.title ?: getString(R.string.profile_current_key_none)
         val showSavedKeys = hasProfiles && !focusImportMode
         binding.profileSummaryCard.visibility =
             if (!focusImportMode) android.view.View.VISIBLE else android.view.View.GONE
+        binding.manualKeyEditCard.visibility = android.view.View.GONE
         binding.savedKeysTitleText.visibility = if (showSavedKeys) android.view.View.VISIBLE else android.view.View.GONE
         binding.savedKeysSubtitleText.visibility = if (showSavedKeys) android.view.View.VISIBLE else android.view.View.GONE
         binding.profileListSurface.visibility = if (showSavedKeys) android.view.View.VISIBLE else android.view.View.GONE
         binding.deleteOldKeysButton.visibility = android.view.View.GONE
         binding.clearProfilesButton.visibility = if (hasProfiles) android.view.View.VISIBLE else android.view.View.GONE
+        currentProfile
+            ?.takeIf {
+                currentKeyBundle == null &&
+                    binding.selectedProfileIdInput.text?.toString()?.trim().isNullOrBlank()
+            }
+            ?.let { profile ->
+            binding.generatedEmojiText.text = buildString {
+                append(profile.title)
+                append("\n")
+                append(profile.secretSequenceDisplay.orEmpty())
+            }
+        }
 
         val selectedId = binding.selectedProfileIdInput.text?.toString()?.trim().orEmpty()
         renderProfilesList(profiles, selectedId, currentProfile?.id)
@@ -579,14 +724,13 @@ class ProfileManagerActivity : AppCompatActivity() {
             itemView.setOnClickListener {
                 secureProfileStore.touchProfile(profile.id)
                 bindSelectedProfile(profile)
-                renderProfiles(getString(R.string.profile_status_selected, profile.title))
+                renderProfiles(getString(R.string.profile_status_ready))
             }
             itemView.findViewById<View>(R.id.copyProfileItemButton).setOnClickListener {
                 copyProfileItem(profile)
             }
             itemView.findViewById<View>(R.id.editProfileItemButton).setOnClickListener {
-                bindSelectedProfile(profile)
-                renderProfiles(getString(R.string.profile_status_selected, profile.title))
+                showEditKeyDialog(profile)
             }
             itemView.findViewById<View>(R.id.deleteProfileItemButton).setOnClickListener {
                 secureProfileStore.deleteProfile(profile.id)

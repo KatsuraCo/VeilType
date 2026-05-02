@@ -54,7 +54,7 @@
   <string name="keyboard_action_clear_desc">Effacer le presse-papier</string>
   <string name="keyboard_action_space">Espace</string>
   <string name="keyboard_action_enter">Entrer</string>
-  <string name="keyboard_action_backspace">?</string>
+  <string name="keyboard_action_backspace">⌫</string>
   <string name="keyboard_action_comma">None</string>
   <string name="keyboard_action_dot">None</string>
   <string name="keyboard_action_language_ru">RU</string>
@@ -84,7 +84,7 @@
   <string name="keyboard_profile_info_format">%1$s ? %2$s ? %3$s</string>
   <string name="keyboard_preview_encrypt_hint">Tapez du texte brut et appuyez sur « Chiffrer ».</string>
   <string name="keyboard_preview_decrypt_hint">Copiez TL1 dans le presse-papiers et appuyez sur « Lire ».</string>
-  <string name="keyboard_preview_decrypt_success">[%1$s]\n\n%2$s</string>
+  <string name="keyboard_preview_decrypt_success">%2$s</string>
   <string name="keyboard_preview_profile_switched">Cl? active : %1$s ? %2$s</string>
   <string name="keyboard_preview_encrypt_success">[%1$s] %2$s</string>
   <string name="keyboard_preview_language_switched">Langue du clavier : %1$s</string>
@@ -142,13 +142,13 @@
   <string name="open_audio_capsule">Capsule vocale</string>
   <string name="open_video_capsule">Capsule vidéo</string>
   <string name="audio_capsule_title">Capsule vocale</string>
-  <string name="audio_capsule_subtitle">Enregistrez la voix, cryptez-la dans un fichier TLA1 et envoyez-la sous forme de capsule.</string>
+  <string name="audio_capsule_subtitle">Enregistrez la voix, cryptez-la dans un fichier .veil et envoyez-la sous forme de capsule.</string>
   <string name="audio_capsule_record">Commencer l\'enregistrement</string>
   <string name="audio_capsule_stop">Arrêtez et chiffrez</string>
   <string name="audio_capsule_play">Jouer</string>
   <string name="audio_capsule_status_playing">La capsule vocale est en cours de lecture.</string>
   <string name="video_capsule_title">Capsule vidéo</string>
-  <string name="video_capsule_subtitle">Enregistrez une courte vidéo, cryptez-la dans un fichier TLV1 et ouvrez-la via VeilType.</string>
+  <string name="video_capsule_subtitle">Enregistrez une courte vidéo, cryptez-la dans un fichier .veil et ouvrez-la via VeilType.</string>
   <string name="video_capsule_record">Enregistrer une vidéo</string>
   <string name="video_capsule_play">Lire la vidéo</string>
   <string name="video_capsule_status_recording">La caméra s\'ouvre pour enregistrer la capsule vidéo.</string>

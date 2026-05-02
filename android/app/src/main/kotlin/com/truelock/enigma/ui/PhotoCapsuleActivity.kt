@@ -38,6 +38,9 @@ import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
 import java.io.File
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 class PhotoCapsuleActivity : AppCompatActivity() {
     private data class PhotoDraft(
@@ -62,6 +65,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
     private val photoDrafts = mutableListOf<PhotoDraft>()
     private var selectedDraftIndex = -1
     private var preserveCapsulePathOnDestroy: String? = null
+    private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -123,6 +127,16 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             }
         }
         binding.retakeButton.setOnClickListener { removeCurrentDraft() }
+        binding.switchCameraButton.setOnClickListener {
+            if (binding.photoView.visibility != View.VISIBLE) {
+                cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                    CameraSelector.DEFAULT_FRONT_CAMERA
+                } else {
+                    CameraSelector.DEFAULT_BACK_CAMERA
+                }
+                startCameraPreview()
+            }
+        }
 
         renderStatus(getString(R.string.media_capsule_status_ready))
         syncControls()
@@ -168,7 +182,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
                 }
                 val capture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
                 provider.unbindAll()
-                provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, capture)
+                provider.bindToLifecycle(this, cameraSelector, preview, capture)
                 imageCapture = capture
                 binding.cameraPreviewView.visibility = View.VISIBLE
                 binding.photoView.visibility = View.GONE
@@ -255,15 +269,22 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             cleanupDrafts()
             currentCapsuleFile = tempFile
             currentDecrypted = decrypted
-            currentPlaybackFile = decrypted.plaintextFile
             photoDrafts.clear()
-            photoDrafts.add(
-                PhotoDraft(
-                    photoFile = decrypted.plaintextFile,
-                    capsuleFile = tempFile,
-                    displayFile = decrypted.plaintextFile,
-                ),
-            )
+            val displayFiles = if (decrypted.metadata.mimeType == "application/zip") {
+                extractPhotoSet(decrypted.plaintextFile)
+            } else {
+                listOf(decrypted.plaintextFile)
+            }
+            currentPlaybackFile = displayFiles.firstOrNull()
+            displayFiles.forEach { file ->
+                photoDrafts.add(
+                    PhotoDraft(
+                        photoFile = file,
+                        capsuleFile = tempFile,
+                        displayFile = file,
+                    ),
+                )
+            }
             selectDraft(0)
             renderStatus(getString(R.string.media_capsule_status_decrypted, decrypted.profile.title, "photo"))
             syncControls()
@@ -337,7 +358,6 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         currentPhotoFile = draft.photoFile
         currentCapsuleFile = draft.capsuleFile
         currentPlaybackFile = draft.displayFile
-        currentDecrypted = null
         showPhoto(draft.displayFile)
         renderStatus(getString(R.string.photo_capsule_status_captured))
         rebuildThumbnails()
@@ -388,14 +408,15 @@ class PhotoCapsuleActivity : AppCompatActivity() {
     }
 
     private fun shareCurrentCapsule() {
-        val capsule = currentCapsuleFile ?: run {
+        val capsule = resolvePhotoCapsuleForExport() ?: run {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
         val shareFile = runCatching {
             val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
+            dir.listFiles()?.forEach(::deleteQuietly)
             val baseName = capsule.nameWithoutExtension.ifBlank { capsule.name }
-            val exported = java.io.File(dir, "$baseName.bin")
+            val exported = java.io.File(dir, "$baseName.veil")
             capsule.inputStream().use { input ->
                 exported.outputStream().use { output -> input.copyTo(output) }
             }
@@ -417,7 +438,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
     }
 
     private fun sendCurrentCapsuleToKeyboard() {
-        val capsule = currentCapsuleFile ?: run {
+        val capsule = resolvePhotoCapsuleForExport() ?: run {
             renderStatus(getString(R.string.media_capsule_error_share_missing))
             return
         }
@@ -425,6 +446,61 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         cleanupDrafts(keepCapsule = capsule)
         pendingCapsuleStore.save(MediaCapsuleType.PHOTO, capsule)
         finish()
+    }
+
+    private fun resolvePhotoCapsuleForExport(): File? {
+        if (currentDecrypted != null || photoDrafts.size <= 1) {
+            return currentCapsuleFile
+        }
+        val profile = resolveActiveProfile() ?: return null
+        val zipFile = createPhotoSetZip(photoDrafts.map { it.photoFile })
+        val capsule = runCatching {
+            mediaCapsuleService.encryptFile(
+                sourceFile = zipFile,
+                type = MediaCapsuleType.PHOTO,
+                mimeType = "application/zip",
+                durationMs = 0L,
+                profile = profile,
+            )
+        }.getOrElse {
+            deleteQuietly(zipFile)
+            renderStatus(getString(R.string.media_capsule_error_encrypt))
+            return null
+        }
+        deleteQuietly(zipFile)
+        currentCapsuleFile = capsule
+        return capsule
+    }
+
+    private fun createPhotoSetZip(files: List<File>): File {
+        val zipFile = mediaCapsuleService.createRecordingFile(MediaCapsuleType.PHOTO, "zip")
+        ZipOutputStream(zipFile.outputStream()).use { zip ->
+            files.filter { it.exists() }.forEachIndexed { index, file ->
+                zip.putNextEntry(ZipEntry("photo_${index + 1}.jpg"))
+                file.inputStream().use { input -> input.copyTo(zip) }
+                zip.closeEntry()
+            }
+        }
+        return zipFile
+    }
+
+    private fun extractPhotoSet(zipFile: File): List<File> {
+        val outputDir = File(cacheDir, "photo_sets_${System.currentTimeMillis()}").apply { mkdirs() }
+        val extracted = mutableListOf<File>()
+        ZipInputStream(zipFile.inputStream()).use { zip ->
+            var entry = zip.nextEntry
+            var index = 1
+            while (entry != null) {
+                if (!entry.isDirectory) {
+                    val output = File(outputDir, "photo_${index++}.jpg")
+                    output.outputStream().use { zip.copyTo(it) }
+                    extracted.add(output)
+                }
+                zip.closeEntry()
+                entry = zip.nextEntry
+            }
+        }
+        return extracted.ifEmpty { listOf(zipFile) }
     }
 
     private fun cleanupDrafts(keepCapsule: File? = null) {
@@ -499,12 +575,13 @@ class PhotoCapsuleActivity : AppCompatActivity() {
     private fun syncControls() {
         val hasPhotoPreview = binding.photoView.visibility == View.VISIBLE
         val hasCapsule = currentCapsuleFile != null
-        val hasDrafts = photoDrafts.isNotEmpty()
+        val isOpenedCapsule = currentDecrypted != null
         binding.captureButton.text = if (hasPhotoPreview) {
             getString(R.string.photo_capsule_add_more)
         } else {
             getString(R.string.photo_capsule_capture)
         }
+        binding.captureButton.visibility = if (isOpenedCapsule) View.GONE else View.VISIBLE
         binding.shareButton.isEnabled = hasCapsule
         binding.shareButton.visibility = if (hasCapsule) View.VISIBLE else View.GONE
         binding.shareButton.text = if (launchedFromKeyboard()) {
@@ -512,10 +589,11 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         } else {
             getString(R.string.media_capsule_share)
         }
-        binding.openCapsuleButton.visibility = if (launchedFromKeyboard()) View.GONE else View.VISIBLE
-        binding.openCapsuleButton.isEnabled = !launchedFromKeyboard()
-        binding.retakeButton.visibility = if (hasPhotoPreview) View.VISIBLE else View.GONE
-        binding.retakeButton.isEnabled = hasPhotoPreview
+        binding.openCapsuleButton.visibility = if (launchedFromKeyboard() || isOpenedCapsule) View.GONE else View.VISIBLE
+        binding.openCapsuleButton.isEnabled = !launchedFromKeyboard() && !isOpenedCapsule
+        binding.retakeButton.visibility = if (hasPhotoPreview && !isOpenedCapsule) View.VISIBLE else View.GONE
+        binding.retakeButton.isEnabled = hasPhotoPreview && !isOpenedCapsule
+        binding.switchCameraButton.visibility = if (hasPhotoPreview || isOpenedCapsule) View.GONE else View.VISIBLE
     }
 
     private fun loadOrientedBitmap(file: File, sampleSize: Int = 1): Bitmap? {

@@ -34,6 +34,6 @@ class MediaCapsuleFileStore(
             .withZone(ZoneOffset.UTC)
             .format(Instant.now())
         val hint = capsule.profileHint.joinToString("") { "%02x".format(it) }.take(8)
-        return "${type.magic.lowercase()}_${timestamp}_${hint}.${type.fileExtension}"
+        return "veil_${type.name.lowercase()}_${timestamp}_${hint}.${type.fileExtension}"
     }
 }

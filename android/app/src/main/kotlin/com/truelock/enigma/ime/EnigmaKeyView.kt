@@ -41,6 +41,7 @@ class EnigmaKeyView @JvmOverloads constructor(
         setTextColor(Color.parseColor("#F2F8FF"))
         typeface = Typeface.DEFAULT_BOLD
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+        setPadding(dp(4), dp(2), dp(4), dp(2))
         background = AppCompatResources.getDrawable(context, R.drawable.bg_key_utility)
     }
 
@@ -49,6 +50,16 @@ class EnigmaKeyView @JvmOverloads constructor(
         setTextColor(Color.parseColor("#F6F8FC"))
         typeface = Typeface.DEFAULT_BOLD
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+        setPadding(dp(4), dp(2), dp(4), dp(2))
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_key)
+    }
+
+    fun applyEdgeActionStyle() {
+        ellipsize = null
+        setTextColor(Color.parseColor("#F6F8FC"))
+        typeface = Typeface.DEFAULT_BOLD
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        setPadding(dp(4), dp(1), dp(4), dp(1))
         background = AppCompatResources.getDrawable(context, R.drawable.bg_key)
     }
 

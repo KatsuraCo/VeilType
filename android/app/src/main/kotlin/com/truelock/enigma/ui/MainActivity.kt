@@ -6,14 +6,25 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ImageSpan
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import com.truelock.enigma.R
@@ -28,6 +39,7 @@ import com.truelock.enigma.sharing.ShareInvitePreferences
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
+import com.truelock.enigma.storage.TemporaryMediaJanitor
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -62,7 +74,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val contentRoot = FrameLayout(this).apply {
+            addView(
+                binding.root,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                ),
+            )
+        }
+        setContentView(contentRoot)
+        showLaunchSplash(contentRoot)
 
         secureProfileStore = SecureProfileStore(
             repository = FileKeyProfileRepository(applicationContext),
@@ -141,6 +163,70 @@ class MainActivity : AppCompatActivity() {
         maybeShowPermissionsNotice()
         renderMainState(getString(R.string.main_status_ready))
     }
+
+    private fun showLaunchSplash(contentRoot: FrameLayout) {
+        val overlay = FrameLayout(this).apply {
+            isClickable = true
+            setBackground(
+                GradientDrawable(
+                    GradientDrawable.Orientation.TL_BR,
+                    intArrayOf(
+                        Color.parseColor("#1F5EA8"),
+                        Color.parseColor("#123B6D"),
+                        Color.parseColor("#0D2340"),
+                    ),
+                ),
+            )
+        }
+        val logo = ImageView(this).apply {
+            setImageResource(R.drawable.ic_launcher_foreground)
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            alpha = 0f
+            scaleX = 0.88f
+            scaleY = 0.88f
+        }
+        overlay.addView(
+            logo,
+            FrameLayout.LayoutParams(dp(156), dp(156), Gravity.CENTER),
+        )
+        val title = TextView(this).apply {
+            text = getString(R.string.app_name)
+            gravity = Gravity.CENTER
+            textSize = 28f
+            setTextColor(Color.parseColor("#E4BE67"))
+            alpha = 0f
+            letterSpacing = 0.04f
+        }
+        overlay.addView(
+            title,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER,
+            ).apply {
+                topMargin = dp(182)
+            },
+        )
+        contentRoot.addView(
+            overlay,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        logo.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(420L).start()
+        title.animate().alpha(1f).setStartDelay(140L).setDuration(360L).start()
+        overlay.postDelayed({
+            overlay.animate()
+                .alpha(0f)
+                .setDuration(320L)
+                .withEndAction { contentRoot.removeView(overlay) }
+                .start()
+        }, 980L)
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -229,6 +315,7 @@ class MainActivity : AppCompatActivity() {
             R.string.main_share_mode_current_format,
             shareModeLabel(shareInvitePreferences.getMode()),
         )
+        binding.keyboardIconsHelpText.text = buildKeyboardIconsHelpText()
         binding.keyboardStateText.text = getString(R.string.main_keyboard_state_format, keyboardState.label)
         binding.primaryActionButton.visibility = View.VISIBLE
         binding.quickActionsCard.visibility = View.VISIBLE
@@ -454,7 +541,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun performPanicWipe() {
         secureProfileStore.clearAll()
-        PendingCapsuleStore(applicationContext).clear()
         (getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.let { clipboard ->
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                 clipboard.clearPrimaryClip()
@@ -473,8 +559,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         deleteRecursively(java.io.File(filesDir, "media_capsules"))
-        deleteRecursively(java.io.File(cacheDir, "media_plain"))
-        deleteRecursively(java.io.File(cacheDir, "media_recordings"))
+        TemporaryMediaJanitor.purgeTransientMedia(applicationContext)
 
         renderMainState(getString(R.string.main_panic_done))
     }
@@ -498,7 +583,6 @@ class MainActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this)
             .setTitle(R.string.main_share_mode_title)
-            .setMessage(R.string.main_share_mode_body)
             .setSingleChoiceItems(labels, currentIndex) { dialog, which ->
                 val selectedMode = modes[which]
                 shareInvitePreferences.setMode(selectedMode)
@@ -511,6 +595,33 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    private fun buildKeyboardIconsHelpText(): CharSequence {
+        val rows = listOf(
+            android.R.drawable.ic_lock_lock to getString(R.string.main_keyboard_icons_encrypt),
+            android.R.drawable.ic_menu_view to getString(R.string.main_keyboard_icons_decrypt),
+            android.R.drawable.ic_menu_close_clear_cancel to getString(R.string.main_keyboard_icons_clear),
+            android.R.drawable.ic_btn_speak_now to getString(R.string.main_keyboard_icons_voice),
+            android.R.drawable.ic_menu_camera to getString(R.string.main_keyboard_icons_photo),
+            android.R.drawable.ic_menu_slideshow to getString(R.string.main_keyboard_icons_video),
+        )
+        val tint = ContextCompat.getColor(this, android.R.color.white)
+        val size = (binding.keyboardIconsHelpText.lineHeight * 0.95f).toInt().coerceAtLeast(24)
+        return SpannableStringBuilder().apply {
+            rows.forEachIndexed { index, (iconRes, label) ->
+                val start = length
+                append("  ")
+                AppCompatResources.getDrawable(this@MainActivity, iconRes)?.mutate()?.let { drawable ->
+                    drawable.setTint(tint)
+                    drawable.setBounds(0, 0, size, size)
+                    setSpan(ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM), start, start + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                append(" ")
+                append(label)
+                if (index != rows.lastIndex) append('\n')
+            }
+        }
     }
 
     private fun languageLabel(tag: String): String {

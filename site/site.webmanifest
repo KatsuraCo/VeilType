@@ -1,0 +1,17 @@
+{
+  "name": "VeilType",
+  "short_name": "VeilType",
+  "description": "Private messages in any chat.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F5F1E8",
+  "theme_color": "#0D2340",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

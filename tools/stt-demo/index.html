@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeilType STT Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: #121a2f;
+      --panel-2: #1a2642;
+      --text: #f6f8fc;
+      --muted: #9fb0c9;
+      --accent: #8cc7ff;
+      --accent-2: #f0d28e;
+      --danger: #e58d8d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #111a30);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .app {
+      width: min(760px, 100%);
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid rgba(140, 199, 255, 0.18);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .toolbar {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+    }
+    select, button, textarea {
+      font: inherit;
+    }
+    select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid rgba(140, 199, 255, 0.18);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #102030;
+      background: linear-gradient(180deg, var(--accent-2), #e6c577);
+    }
+    button.secondary {
+      background: linear-gradient(180deg, #d9e0ea, #bcc9d6);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 14px;
+      min-height: 24px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .status.error {
+      color: var(--danger);
+    }
+    textarea {
+      margin-top: 16px;
+      min-height: 260px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .hint {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    @media (max-width: 640px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>VeilType STT Demo</h1>
+    <p>Quick browser test for speech-to-text UX before adding any API or offline engine.</p>
+
+    <div class="toolbar">
+      <select id="languageSelect" aria-label="Language">
+        <option value="ru-RU">Russian</option>
+        <option value="en-US">English</option>
+        <option value="tr-TR">Turkish</option>
+        <option value="es-ES">Spanish</option>
+        <option value="pt-PT">Portuguese</option>
+        <option value="de-DE">German</option>
+        <option value="fr-FR">French</option>
+        <option value="it-IT">Italian</option>
+      </select>
+      <button id="toggleButton">Start recording</button>
+      <button id="clearButton" class="secondary">Clear</button>
+    </div>
+
+    <div id="status" class="status">Ready.</div>
+    <textarea id="transcriptBox" placeholder="Transcription will appear here..."></textarea>
+    <div class="hint">
+      This test uses the browser speech engine (`SpeechRecognition` / `webkitSpeechRecognition`) if available.
+      It is only a lightweight UX harness, not the final offline implementation.
+    </div>
+  </main>
+
+  <script>
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const toggleButton = document.getElementById('toggleButton');
+    const clearButton = document.getElementById('clearButton');
+    const languageSelect = document.getElementById('languageSelect');
+    const transcriptBox = document.getElementById('transcriptBox');
+    const status = document.getElementById('status');
+
+    let recognition = null;
+    let listening = false;
+
+    function setStatus(text, isError = false) {
+      status.textContent = text;
+      status.classList.toggle('error', isError);
+    }
+
+    function stopListening() {
+      if (!recognition || !listening) return;
+      recognition.stop();
+    }
+
+    if (!Recognition) {
+      toggleButton.disabled = true;
+      setStatus('SpeechRecognition is not available in this browser.', true);
+    } else {
+      recognition = new Recognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        listening = true;
+        toggleButton.textContent = 'Stop recording';
+        setStatus(`Listening: ${languageSelect.value}`);
+      };
+
+      recognition.onend = () => {
+        listening = false;
+        toggleButton.textContent = 'Start recording';
+        setStatus('Stopped.');
+      };
+
+      recognition.onerror = (event) => {
+        setStatus(`Recognition error: ${event.error}`, true);
+      };
+
+      recognition.onresult = (event) => {
+        let finalText = transcriptBox.dataset.finalText || '';
+        let interimText = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const phrase = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalText += (finalText ? ' ' : '') + phrase.trim();
+          } else {
+            interimText += phrase;
+          }
+        }
+
+        transcriptBox.dataset.finalText = finalText.trim();
+        transcriptBox.value = [finalText.trim(), interimText.trim()].filter(Boolean).join(' ');
+      };
+
+      toggleButton.addEventListener('click', () => {
+        if (listening) {
+          stopListening();
+          return;
+        }
+        recognition.lang = languageSelect.value;
+        recognition.start();
+      });
+    }
+
+    clearButton.addEventListener('click', () => {
+      transcriptBox.value = '';
+      transcriptBox.dataset.finalText = '';
+      setStatus('Cleared.');
+    });
+  </script>
+</body>
+</html>

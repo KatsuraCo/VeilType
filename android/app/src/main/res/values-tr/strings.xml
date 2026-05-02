@@ -54,7 +54,7 @@
   <string name="keyboard_action_clear_desc">Panoyu temizle</string>
   <string name="keyboard_action_space">Boşluk</string>
   <string name="keyboard_action_enter">Giriş</string>
-  <string name="keyboard_action_backspace">?</string>
+  <string name="keyboard_action_backspace">⌫</string>
   <string name="keyboard_action_comma">,</string>
   <string name="keyboard_action_dot">.</string>
   <string name="keyboard_action_language_ru">RU</string>
@@ -84,7 +84,7 @@
   <string name="keyboard_profile_info_format">%1$s ? %2$s ? %3$s</string>
   <string name="keyboard_preview_encrypt_hint">Düz metni yaz ve "Şifrele"ye dokun.</string>
   <string name="keyboard_preview_decrypt_hint">TL1’i panoya kopyalayın ve Oku düğmesine dokunun.</string>
-  <string name="keyboard_preview_decrypt_success">[%1$s]\n\n%2$s</string>
+  <string name="keyboard_preview_decrypt_success">%2$s</string>
   <string name="keyboard_preview_profile_switched">Etkin anahtar: %1$s ? %2$s</string>
   <string name="keyboard_preview_encrypt_success">[%1$s] %2$s</string>
   <string name="keyboard_preview_language_switched">Klavye dili: %1$s</string>
@@ -141,13 +141,13 @@
   <string name="open_audio_capsule">Ses kapsülü</string>
   <string name="open_video_capsule">Video kapsülü</string>
   <string name="audio_capsule_title">Ses kapsülü</string>
-  <string name="audio_capsule_subtitle">Sesi kaydet, TLA1 dosyasına şifrele ve kapsül olarak gönder.</string>
+  <string name="audio_capsule_subtitle">Sesi kaydet, .veil dosyasına şifrele ve kapsül olarak gönder.</string>
   <string name="audio_capsule_record">Kaydı başlat</string>
   <string name="audio_capsule_stop">Durdur ve şifrele</string>
   <string name="audio_capsule_play">Oynat</string>
   <string name="audio_capsule_status_playing">Ses kapsülü oynatılıyor.</string>
   <string name="video_capsule_title">Video kapsülü</string>
-  <string name="video_capsule_subtitle">Kısa bir video kaydedin, bunu TLV1 dosyasına şifreleyin ve VeilType ile açın.</string>
+  <string name="video_capsule_subtitle">Kısa bir video kaydedin, bunu .veil dosyasına şifreleyin ve VeilType ile açın.</string>
   <string name="video_capsule_record">Video kaydet</string>
   <string name="video_capsule_play">Videoyu oynat</string>
   <string name="video_capsule_status_recording">Video kapsülü kaydetmek için kamera açılıyor.</string>

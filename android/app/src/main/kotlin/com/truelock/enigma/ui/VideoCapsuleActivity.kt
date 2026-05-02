@@ -13,6 +13,7 @@ import android.view.Surface
 import android.view.TextureView
 import android.view.View
 import android.view.ViewOutlineProvider
+import android.widget.SeekBar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -59,20 +60,34 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private var playbackLoadedPath: String? = null
     private var playbackShouldStart = false
     private var preserveCapsulePathOnDestroy: String? = null
+    private var userSeekingPlayback = false
+    private var playbackPrepared = false
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var activeRecording: Recording? = null
     private var isRecordingPaused = false
+    private var recordingPausedAt = 0L
+    private var recordingPausedDurationMs = 0L
     private var suppressNextRecordingFinalize = false
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var recordingStartedAt = 0L
     private var lastDurationMs = 0L
     private val timerHandler = Handler(Looper.getMainLooper())
+    private val playbackProgressRunnable = object : Runnable {
+        override fun run() {
+            refreshPlaybackSeekBar()
+            if (playbackPlayer?.isPlaying == true) {
+                timerHandler.postDelayed(this, 250L)
+            }
+        }
+    }
     private val timerRunnable = object : Runnable {
         override fun run() {
             val duration = if (activeRecording != null) {
-                (System.currentTimeMillis() - recordingStartedAt).coerceAtLeast(0L)
+                val pausedNow = if (isRecordingPaused) System.currentTimeMillis() - recordingPausedAt else 0L
+                (System.currentTimeMillis() - recordingStartedAt - recordingPausedDurationMs - pausedNow)
+                    .coerceAtLeast(0L)
             } else {
                 lastDurationMs
             }
@@ -179,8 +194,25 @@ class VideoCapsuleActivity : AppCompatActivity() {
                 syncControls()
             }
         }
-        binding.previewPlayOverlay.setOnClickListener { playCurrentCapsule() }
         binding.videoView.setOnClickListener { playCurrentCapsule() }
+        binding.videoPlaybackSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val player = playbackPlayer ?: return
+                val duration = runCatching { player.duration }.getOrDefault(0)
+                if (fromUser && duration > 0) {
+                    player.seekTo((duration * (progress / 1000f)).toInt().coerceAtLeast(0))
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                userSeekingPlayback = true
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                userSeekingPlayback = false
+                refreshPlaybackSeekBar()
+            }
+        })
         binding.videoView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
                 playbackSurface?.release()
@@ -219,14 +251,16 @@ class VideoCapsuleActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         timerHandler.removeCallbacks(timerRunnable)
+        timerHandler.removeCallbacks(playbackProgressRunnable)
         if (playbackPlayer?.isPlaying == true) {
-            stopPlaybackPreview()
+            pausePlaybackPreview()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         timerHandler.removeCallbacks(timerRunnable)
+        timerHandler.removeCallbacks(playbackProgressRunnable)
         if (activeRecording != null) {
             suppressNextRecordingFinalize = true
         }
@@ -301,6 +335,8 @@ class VideoCapsuleActivity : AppCompatActivity() {
         preserveCapsulePathOnDestroy = null
         lastDurationMs = 0L
         recordingStartedAt = System.currentTimeMillis()
+        recordingPausedAt = 0L
+        recordingPausedDurationMs = 0L
         showCaptureMode()
 
         val output = FileOutputOptions.Builder(currentVideoFile!!).build()
@@ -325,6 +361,8 @@ class VideoCapsuleActivity : AppCompatActivity() {
                     activeRecording?.close()
                     activeRecording = null
                     isRecordingPaused = false
+                    recordingPausedAt = 0L
+                    recordingPausedDurationMs = 0L
                     timerHandler.removeCallbacks(timerRunnable)
                     if (suppressNextRecordingFinalize) {
                         suppressNextRecordingFinalize = false
@@ -364,10 +402,13 @@ class VideoCapsuleActivity : AppCompatActivity() {
         val recording = activeRecording ?: return
         if (isRecordingPaused) {
             recording.resume()
+            recordingPausedDurationMs += (System.currentTimeMillis() - recordingPausedAt).coerceAtLeast(0L)
+            recordingPausedAt = 0L
             isRecordingPaused = false
             renderStatus(getString(R.string.video_capsule_status_recording_hint))
         } else {
             recording.pause()
+            recordingPausedAt = System.currentTimeMillis()
             isRecordingPaused = true
             renderStatus(getString(R.string.video_capsule_status_paused))
         }
@@ -386,7 +427,6 @@ class VideoCapsuleActivity : AppCompatActivity() {
             )
             currentCapsuleFile = capsule
             currentPlaybackFile = sourceFile
-            binding.previewPlayOverlay.visibility = View.VISIBLE
             showPlaybackMode()
             renderStatus(getString(R.string.media_capsule_status_saved, capsule.name))
             syncControls()
@@ -424,7 +464,6 @@ class VideoCapsuleActivity : AppCompatActivity() {
             currentPlaybackFile = decrypted.plaintextFile
             preserveCapsulePathOnDestroy = null
             lastDurationMs = decrypted.metadata.durationMs
-            binding.previewPlayOverlay.visibility = View.VISIBLE
             showPlaybackMode()
             renderStatus(getString(R.string.media_capsule_status_decrypted, decrypted.profile.title, "video"))
             syncControls()
@@ -460,41 +499,71 @@ class VideoCapsuleActivity : AppCompatActivity() {
 
     private fun playCurrentCapsule() {
         val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let { capsuleFile ->
-            runCatching {
-                mediaCapsuleService.decryptFile(capsuleFile).also { decrypted ->
-                    currentDecrypted = decrypted
-                    currentPlaybackFile = decrypted.plaintextFile
-                    lastDurationMs = decrypted.metadata.durationMs
-                }.plaintextFile
-            }.getOrElse {
-                val profileTitle = runCatching {
-                    mediaCapsuleService.resolveProfileForCapsule(capsuleFile)?.title
-                }.getOrElse { getString(R.string.clipboard_unknown_profile) }
-                renderStatus(
-                    if (it.message?.contains("already opened", ignoreCase = true) == true) {
-                        getString(R.string.decrypt_one_time_consumed, profileTitle ?: getString(R.string.clipboard_unknown_profile))
-                    } else {
-                        getString(R.string.media_capsule_error_decrypt)
+            val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsuleFile) }.getOrNull()
+            if (profile?.requireBiometricForDecrypt == true) {
+                biometricHelper.authenticate(
+                    onSuccess = { decryptCapsuleForPlayback(capsuleFile, autoPlay = true) },
+                    onError = {
+                        renderStatus(it)
+                        syncControls()
                     },
                 )
-                syncControls()
                 return
             }
+            decryptCapsuleForPlayback(capsuleFile, autoPlay = false) ?: return
         }
         if (playbackFile == null) {
             renderStatus(getString(R.string.media_capsule_error_open_first))
             return
         }
-        if (playbackPlayer?.isPlaying == true) {
-            stopPlaybackPreview()
+        val existingPlayer = playbackPlayer
+        if (existingPlayer?.isPlaying == true) {
+            pausePlaybackPreview()
+            return
+        }
+        if (existingPlayer != null && playbackPrepared) {
+            runCatching { existingPlayer.start() }
+            playbackShouldStart = true
+            timerHandler.removeCallbacks(playbackProgressRunnable)
+            timerHandler.post(playbackProgressRunnable)
+            renderStatus(getString(R.string.video_capsule_status_playing))
+            syncControls()
             return
         }
         showPlaybackMode()
-        binding.previewPlayOverlay.visibility = View.GONE
         preparePlayback(playbackFile, autoplay = true)
         renderStatus(getString(R.string.video_capsule_status_playing))
         syncControls()
     }
+
+    private fun decryptCapsuleForPlayback(capsuleFile: File, autoPlay: Boolean): File? =
+        runCatching {
+            mediaCapsuleService.decryptFile(capsuleFile).also { decrypted ->
+                currentDecrypted = decrypted
+                currentPlaybackFile = decrypted.plaintextFile
+                lastDurationMs = decrypted.metadata.durationMs
+            }.plaintextFile
+        }.getOrElse {
+            val profileTitle = runCatching {
+                mediaCapsuleService.resolveProfileForCapsule(capsuleFile)?.title
+            }.getOrElse { getString(R.string.clipboard_unknown_profile) }
+            renderStatus(
+                if (it.message?.contains("already opened", ignoreCase = true) == true) {
+                    getString(R.string.decrypt_one_time_consumed, profileTitle ?: getString(R.string.clipboard_unknown_profile))
+                } else {
+                    getString(R.string.media_capsule_error_decrypt)
+                },
+            )
+            syncControls()
+            null
+        }?.also { file ->
+            showPlaybackMode()
+            if (autoPlay) {
+                preparePlayback(file, autoplay = true)
+                renderStatus(getString(R.string.video_capsule_status_playing))
+                syncControls()
+            }
+        }
 
     private fun shareCurrentCapsule() {
         val capsule = currentCapsuleFile ?: run {
@@ -502,12 +571,13 @@ class VideoCapsuleActivity : AppCompatActivity() {
             return
         }
         if (playbackPlayer?.isPlaying == true) {
-            stopPlaybackPreview()
+            pausePlaybackPreview()
         }
         val shareFile = runCatching {
             val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
+            dir.listFiles()?.forEach(::deleteQuietly)
             val baseName = capsule.nameWithoutExtension.ifBlank { capsule.name }
-            val exported = java.io.File(dir, "$baseName.bin")
+            val exported = java.io.File(dir, "$baseName.veil")
             capsule.inputStream().use { input ->
                 exported.outputStream().use { output -> input.copyTo(output) }
             }
@@ -539,7 +609,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
             return
         }
         if (playbackPlayer?.isPlaying == true) {
-            stopPlaybackPreview()
+            pausePlaybackPreview()
         }
         preserveCapsulePathOnDestroy = capsule.absolutePath
         cleanupCurrentVideoState(keepCapsule = capsule, clearUiState = false)
@@ -563,17 +633,15 @@ class VideoCapsuleActivity : AppCompatActivity() {
         currentPlaybackFile = null
         playbackLoadedPath = null
         if (clearUiState) {
-            binding.previewPlayOverlay.visibility = View.GONE
             releasePlaybackPlayer()
             lastDurationMs = 0L
         }
     }
 
-    private fun stopPlaybackPreview() {
+    private fun pausePlaybackPreview() {
         playbackShouldStart = false
         runCatching { playbackPlayer?.pause() }
-        runCatching { playbackPlayer?.seekTo(1) }
-        binding.previewPlayOverlay.visibility = View.VISIBLE
+        timerHandler.removeCallbacks(playbackProgressRunnable)
         renderStatus(
             getString(
                 R.string.media_capsule_status_saved,
@@ -602,6 +670,8 @@ class VideoCapsuleActivity : AppCompatActivity() {
             runCatching { activeRecording?.close() }
             activeRecording = null
             isRecordingPaused = false
+            recordingPausedAt = 0L
+            recordingPausedDurationMs = 0L
             timerHandler.removeCallbacks(timerRunnable)
         }
         cleanupCurrentVideoState()
@@ -647,7 +717,6 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private fun showCaptureMode() {
         binding.cameraPreviewView.visibility = View.VISIBLE
         binding.videoView.visibility = View.GONE
-        binding.previewPlayOverlay.visibility = View.GONE
         binding.timerText.visibility = View.GONE
         binding.switchCameraButton.visibility = View.VISIBLE
         playbackShouldStart = false
@@ -675,6 +744,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
         val hasPlayback = currentPlaybackFile != null || currentDecrypted != null
         val isPlaying = playbackPlayer?.isPlaying == true
         val isReady = !isRecording && (hasCapsule || hasPlayback)
+        val isOpenedCapsule = currentDecrypted != null
 
         binding.actionTitleText.visibility = View.GONE
         binding.actionSubtitleText.visibility = View.GONE
@@ -695,18 +765,27 @@ class VideoCapsuleActivity : AppCompatActivity() {
             getString(R.string.media_capsule_share)
         }
         binding.retakeButton.isEnabled = !isRecording
-        binding.retakeButton.visibility = if (isReady) View.VISIBLE else View.GONE
+        binding.retakeButton.visibility = if (isReady && !isOpenedCapsule) View.VISIBLE else View.GONE
         binding.openCapsuleButton.text =
             if (isRecordingPaused) getString(R.string.video_capsule_resume) else getString(R.string.video_capsule_pause)
         binding.playButton.text = when {
             isRecording -> getString(R.string.video_capsule_stop_text)
-            isPlaying -> getString(R.string.video_capsule_stop_text)
+            isPlaying -> getString(R.string.video_capsule_pause)
             else -> getString(R.string.video_capsule_play)
         }
-        binding.previewPlayOverlay.visibility = if (hasPlayback && !isPlaying) View.VISIBLE else View.GONE
+        binding.videoPlaybackSeekBar.visibility = if (isReady) View.VISIBLE else View.GONE
+        refreshPlaybackSeekBar()
         if (!isRecording) {
             binding.timerText.text = formatDuration(lastDurationMs)
         }
+    }
+
+    private fun refreshPlaybackSeekBar() {
+        val player = playbackPlayer
+        val duration = player?.duration?.takeIf { it > 0 } ?: lastDurationMs.toInt().takeIf { it > 0 } ?: 0
+        if (duration <= 0 || userSeekingPlayback) return
+        val position = player?.currentPosition ?: 0
+        binding.videoPlaybackSeekBar.progress = ((position.coerceAtLeast(0) / duration.toFloat()) * 1000).toInt().coerceIn(0, 1000)
     }
 
     private fun formatDuration(durationMs: Long): String {
@@ -723,32 +802,49 @@ class VideoCapsuleActivity : AppCompatActivity() {
     }
 
     private fun preparePlayback(file: File, autoplay: Boolean) {
+        if (playbackLoadedPath == file.absolutePath && playbackPlayer != null) {
+            playbackShouldStart = autoplay
+            if (autoplay && playbackPrepared) {
+                runCatching { playbackPlayer?.start() }
+                timerHandler.removeCallbacks(playbackProgressRunnable)
+                timerHandler.post(playbackProgressRunnable)
+            }
+            refreshPlaybackSeekBar()
+            syncControls()
+            return
+        }
         playbackLoadedPath = file.absolutePath
         playbackShouldStart = autoplay
         val surface = playbackSurface ?: return
         releasePlaybackPlayer()
+        playbackPrepared = false
         playbackPlayer = MediaPlayer().apply {
             setSurface(surface)
             isLooping = false
             setDataSource(file.absolutePath)
             setOnPreparedListener { player ->
+                playbackPrepared = true
                 if (autoplay) {
-                    binding.previewPlayOverlay.visibility = View.GONE
                     player.start()
+                    timerHandler.removeCallbacks(playbackProgressRunnable)
+                    timerHandler.post(playbackProgressRunnable)
                 } else {
                     player.seekTo(1)
-                    binding.previewPlayOverlay.visibility = View.VISIBLE
                 }
+                refreshPlaybackSeekBar()
                 syncControls()
             }
             setOnCompletionListener {
                 playbackShouldStart = false
-                binding.previewPlayOverlay.visibility = View.VISIBLE
-                stopPlaybackPreview()
+                timerHandler.removeCallbacks(playbackProgressRunnable)
+                runCatching { it.pause() }
+                runCatching { it.seekTo(0) }
+                refreshPlaybackSeekBar()
+                syncControls()
             }
             setOnErrorListener { _, _, _ ->
                 playbackShouldStart = false
-                binding.previewPlayOverlay.visibility = View.VISIBLE
+                timerHandler.removeCallbacks(playbackProgressRunnable)
                 releasePlaybackPlayer()
                 renderStatus(getString(R.string.media_capsule_error_open_first))
                 syncControls()
@@ -767,6 +863,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
         }
         runCatching { playbackPlayer?.release() }
         playbackPlayer = null
+        playbackPrepared = false
     }
 
     private fun launchedFromKeyboard(): Boolean =

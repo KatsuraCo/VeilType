@@ -100,7 +100,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:orientation="vertical"
-            android:padding="4dp"
+            android:paddingStart="8dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp"
             android:visibility="gone">
 
             <TextView
@@ -109,16 +112,62 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
-                android:paddingStart="12dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="6dp"
                 android:text="@string/audio_capsule_action_ready_text"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/audioCapsulePlaybackRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/capsuleInlineStatusText"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <SeekBar
+                    android:id="@+id/audioCapsuleSeekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:minWidth="0dp"
+                    android:max="1000"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:progress="0" />
+
+                <ImageButton
+                    android:id="@+id/playAudioCapsuleActionButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@string/audio_capsule_play"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_media_play"
+                    app:tint="#FFFFFF" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/audioCapsuleBottomActionsRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -126,21 +175,10 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/playAudioCapsuleActionButton"
-                    android:layout_width="42dp"
-                    android:layout_height="40dp"
-                    android:contentDescription="@string/audio_capsule_play"
-                    android:padding="8dp"
-                    android:scaleType="centerInside"
-                    android:src="@android:drawable/ic_media_play"
-                    app:tint="#FFFFFF" />
-
                 <Button
                     android:id="@+id/deleteCapsuleActionButton"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:text="@string/keyboard_action_close"
                     android:textAllCaps="false"
@@ -395,7 +433,7 @@
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey1" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="1" />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey2" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="2" />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey3" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="3" />
-                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericDeleteButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="@string/keyboard_action_backspace" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericDeleteButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="@string/keyboard_action_backspace" />
             </LinearLayout>
 
             <LinearLayout
@@ -408,7 +446,7 @@
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey4" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="4" />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey5" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="5" />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey6" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="6" />
-                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericEnterButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="@string/keyboard_action_enter" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericEnterButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="@string/keyboard_action_enter" />
             </LinearLayout>
 
             <LinearLayout
@@ -421,7 +459,7 @@
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey7" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="7" />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey8" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="8" />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey9" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="9" />
-                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericMinusButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="-" />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericLettersButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="@string/keyboard_action_letters" />
             </LinearLayout>
 
             <LinearLayout
@@ -432,11 +470,18 @@
                 android:layout_marginBottom="3dp"
                 android:orientation="horizontal">
 
-                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericLettersButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1.1" android:text="@string/keyboard_action_letters" />
-                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericCommaButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="," />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericCommaButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_weight="1" android:text="," />
                 <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericKey0" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="0" />
-                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericDotButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1.1" android:text="." />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericDotButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="." />
+                <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/numericPlusButton" android:layout_width="0dp" android:layout_height="42dp" android:layout_marginStart="2dp" android:layout_weight="1" android:text="+" />
             </LinearLayout>
+
+            <com.truelock.enigma.ime.EnigmaKeyView
+                android:id="@+id/numericMinusButton"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:visibility="gone"
+                android:text="-" />
         </LinearLayout>
 
         <LinearLayout
@@ -491,7 +536,7 @@
                 android:id="@+id/shiftButton"
                 android:layout_width="0dp"
                 android:layout_height="41dp"
-                android:layout_weight="1.18"
+                android:layout_weight="1"
                 android:text="@string/keyboard_action_shift" />
 
             <com.truelock.enigma.ime.EnigmaKeyView android:id="@+id/keyR3C2" android:layout_width="0dp" android:layout_height="41dp" android:layout_marginStart="2dp" android:layout_weight="1" />
@@ -509,7 +554,7 @@
                 android:layout_width="0dp"
                 android:layout_height="41dp"
                 android:layout_marginStart="2dp"
-                android:layout_weight="1.18"
+                android:layout_weight="1"
                 android:text="@string/keyboard_action_backspace" />
         </LinearLayout>
 

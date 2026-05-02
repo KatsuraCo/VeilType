@@ -271,10 +271,35 @@ class AudioCapsuleActivity : AppCompatActivity() {
             return
         }
 
-        val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let {
-            runCatching { mediaCapsuleService.decryptFile(it) }.getOrNull()?.also { decrypted ->
+        val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let { capsuleFile ->
+            val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsuleFile) }.getOrNull()
+            if (profile?.requireBiometricForDecrypt == true) {
+                biometricHelper.authenticate(
+                    onSuccess = {
+                        runCatching {
+                            mediaCapsuleService.decryptFile(capsuleFile).also { decrypted ->
+                                currentDecrypted = decrypted
+                                currentPlaybackFile = decrypted.plaintextFile
+                                lastDurationMs = decrypted.metadata.durationMs
+                            }
+                        }.onSuccess {
+                            playCurrentCapsule()
+                        }.onFailure {
+                            renderStatus(getString(R.string.media_capsule_error_decrypt))
+                            syncControls()
+                        }
+                    },
+                    onError = {
+                        renderStatus(it)
+                        syncControls()
+                    },
+                )
+                return
+            }
+            runCatching { mediaCapsuleService.decryptFile(capsuleFile) }.getOrNull()?.also { decrypted ->
                 currentDecrypted = decrypted
                 currentPlaybackFile = decrypted.plaintextFile
+                lastDurationMs = decrypted.metadata.durationMs
             }?.plaintextFile
         }
         if (playbackFile == null) {
@@ -319,8 +344,9 @@ class AudioCapsuleActivity : AppCompatActivity() {
         }
         val shareFile = runCatching {
             val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
+            dir.listFiles()?.forEach(::deleteQuietly)
             val baseName = capsule.nameWithoutExtension.ifBlank { capsule.name }
-            val exported = java.io.File(dir, "$baseName.bin")
+            val exported = java.io.File(dir, "$baseName.veil")
             capsule.inputStream().use { input ->
                 exported.outputStream().use { output -> input.copyTo(output) }
             }

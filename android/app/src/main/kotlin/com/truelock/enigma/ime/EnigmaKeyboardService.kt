@@ -37,6 +37,7 @@ import android.view.inputmethod.InputConnection
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageButton
 import android.widget.ScrollView
+import android.widget.SeekBar
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Button
@@ -76,6 +77,7 @@ import com.truelock.enigma.ui.AudioPermissionRequestActivity
 import com.truelock.enigma.ui.AudioCapsuleActivity
 import com.truelock.enigma.ui.DecryptGateActivity
 import com.truelock.enigma.ui.MainActivity
+import com.truelock.enigma.ui.MediaBiometricGateActivity
 import com.truelock.enigma.ui.MediaCapsuleRouterActivity
 import com.truelock.enigma.ui.PhotoCapsuleActivity
 import com.truelock.enigma.ui.VideoCapsuleActivity
@@ -169,6 +171,11 @@ class EnigmaKeyboardService : InputMethodService() {
     private var inlineAudioPausedAt: Long = 0L
     private var inlineAudioPausedDurationMs: Long = 0L
     private var inlineAudioPlayer: MediaPlayer? = null
+    private var inlineAudioPlaybackDurationMs: Int = 0
+    private var inlineAudioUserSeeking = false
+    private var lastAudioCapsuleOpenedFromExternal: Boolean = false
+    private var mediaBiometricApprovedCapsulePath: String? = null
+    private var playPendingAudioAfterBiometric: (() -> Unit)? = null
     private var inlineAudioSourceFile: java.io.File? = null
     private var inlineAudioStartedAt = 0L
     private var lastVideoCapsuleFile: java.io.File? = null
@@ -176,17 +183,15 @@ class EnigmaKeyboardService : InputMethodService() {
     private var lastVideoCapsuleReadyForDirectInsert: Boolean = false
     private var lastPhotoCapsuleFile: java.io.File? = null
     private var lastPhotoCapsuleNeedsManualSend: Boolean = false
+    private var startInlineAudioRecordingCallback: (() -> Unit)? = null
     private val decryptResultReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action != DecryptGateActivity.ACTION_DECRYPT_RESULT) return
             val success = intent.getBooleanExtra(DecryptGateActivity.EXTRA_SUCCESS, false)
             if (success) {
                 val plaintext = intent.getStringExtra(DecryptGateActivity.EXTRA_PLAINTEXT).orEmpty()
-                val profileTitle = intent.getStringExtra(DecryptGateActivity.EXTRA_PROFILE_TITLE)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.clipboard_unknown_profile) }
                 mode = KeyboardMode.DECRYPT
-                previewMessage = getString(R.string.keyboard_preview_decrypt_success, profileTitle, plaintext)
+                previewMessage = plaintext
                 previewTone = PreviewTone.DECRYPTED
             } else {
                 mode = KeyboardMode.DECRYPT
@@ -196,11 +201,69 @@ class EnigmaKeyboardService : InputMethodService() {
                 previewTone = PreviewTone.ERROR
             }
             renderInputView?.invoke()
+            scheduleShowSelfForPendingCapsule()
+        }
+    }
+    private val audioPermissionResultReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != AudioPermissionRequestActivity.ACTION_AUDIO_PERMISSION_RESULT) return
+            if (intent.getBooleanExtra(AudioPermissionRequestActivity.EXTRA_GRANTED, false)) {
+                startInlineAudioRecordingCallback?.invoke()
+            } else {
+                mode = KeyboardMode.IDLE
+                previewMessage = getString(R.string.media_capsule_error_audio_permission)
+                previewTone = PreviewTone.ERROR
+                renderInputView?.invoke()
+            }
+        }
+    }
+    private val pendingCapsuleReadyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != MediaCapsuleRouterActivity.ACTION_PENDING_CAPSULE_READY) return
+            refreshPendingVideoCapsuleState?.invoke()
+            renderInputView?.invoke()
+            scheduleShowSelfForPendingCapsule()
+        }
+    }
+    private val mediaBiometricResultReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != MediaBiometricGateActivity.ACTION_MEDIA_BIOMETRIC_RESULT) return
+            val capsulePath = intent.getStringExtra(MediaBiometricGateActivity.EXTRA_CAPSULE_PATH).orEmpty()
+            if (capsulePath != lastAudioCapsuleFile?.absolutePath.orEmpty()) return
+            if (intent.getBooleanExtra(MediaBiometricGateActivity.EXTRA_SUCCESS, false)) {
+                mediaBiometricApprovedCapsulePath = capsulePath
+                renderInputView?.invoke()
+                scheduleShowSelfForPendingCapsule()
+                repeatHandler.postDelayed({ playPendingAudioAfterBiometric?.invoke() }, 240L)
+            } else {
+                previewMessage = intent.getStringExtra(MediaBiometricGateActivity.EXTRA_ERROR_MESSAGE)
+                    ?: getString(R.string.biometric_failed)
+                previewTone = PreviewTone.ERROR
+                renderInputView?.invoke()
+                scheduleShowSelfForPendingCapsule()
+            }
         }
     }
     private val shareInvitePreferences by lazy { ShareInvitePreferences(applicationContext) }
     private val keyboardLanguagePreferences by lazy { KeyboardLanguagePreferences(applicationContext) }
     private val keyboardAppearancePreferences by lazy { KeyboardAppearancePreferences(applicationContext) }
+
+    private fun scheduleShowSelfForPendingCapsule() {
+        repeatHandler.removeCallbacksAndMessages(PENDING_CAPSULE_SHOW_TOKEN)
+        listOf(80L, 320L, 760L, 1250L).forEach { delayMs ->
+            repeatHandler.postAtTime(
+                {
+                    if (pendingCapsuleStore.peek() != null) {
+                        Log.d(TAG, "requestShowSelf pendingCapsule delayMs=$delayMs")
+                        requestShowSelf(0)
+                        renderInputView?.invoke()
+                    }
+                },
+                PENDING_CAPSULE_SHOW_TOKEN,
+                SystemClock.uptimeMillis() + delayMs,
+            )
+        }
+    }
     private val liveSettingsListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
@@ -260,9 +323,9 @@ class EnigmaKeyboardService : InputMethodService() {
     )
 
     private val enRows = listOf(
-        listOf("", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", ""),
-        listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", ""),
-        listOf("", "z", "x", "c", "v", "b", "n", "m", ""),
+        listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
+        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
+        listOf("z", "x", "c", "v", "b", "n", "m"),
     )
 
     private val trRows = listOf(
@@ -272,15 +335,15 @@ class EnigmaKeyboardService : InputMethodService() {
     )
 
     private val esRows = listOf(
-        listOf("", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", ""),
+        listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
         listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", "ñ"),
-        listOf("", "z", "x", "c", "v", "b", "n", "m", ""),
+        listOf("z", "x", "c", "v", "b", "n", "m"),
     )
 
     private val ptRows = listOf(
-        listOf("", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", ""),
+        listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
         listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", "ç"),
-        listOf("", "z", "x", "c", "v", "b", "n", "m", ""),
+        listOf("z", "x", "c", "v", "b", "n", "m"),
     )
 
     private val deRows = listOf(
@@ -290,15 +353,15 @@ class EnigmaKeyboardService : InputMethodService() {
     )
 
     private val frRows = listOf(
-        listOf("a", "z", "e", "r", "t", "y", "u", "i", "o", "p", "", ""),
-        listOf("q", "s", "d", "f", "g", "h", "j", "k", "l", "m", ""),
+        listOf("a", "z", "e", "r", "t", "y", "u", "i", "o", "p"),
+        listOf("q", "s", "d", "f", "g", "h", "j", "k", "l", "m"),
         listOf("w", "x", "c", "v", "b", "n", "ç", ""),
     )
 
     private val itRows = listOf(
-        listOf("", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", ""),
-        listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", ""),
-        listOf("", "z", "x", "c", "v", "b", "n", "m", ""),
+        listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
+        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l"),
+        listOf("z", "x", "c", "v", "b", "n", "m"),
     )
 
     private val symbolRows = listOf(
@@ -471,6 +534,24 @@ class EnigmaKeyboardService : InputMethodService() {
             }
             decryptResultReceiverRegistered = true
         }
+        val audioPermissionFilter = IntentFilter(AudioPermissionRequestActivity.ACTION_AUDIO_PERMISSION_RESULT)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(audioPermissionResultReceiver, audioPermissionFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(audioPermissionResultReceiver, audioPermissionFilter)
+        }
+        val pendingCapsuleFilter = IntentFilter(MediaCapsuleRouterActivity.ACTION_PENDING_CAPSULE_READY)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(pendingCapsuleReadyReceiver, pendingCapsuleFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(pendingCapsuleReadyReceiver, pendingCapsuleFilter)
+        }
+        val mediaBiometricFilter = IntentFilter(MediaBiometricGateActivity.ACTION_MEDIA_BIOMETRIC_RESULT)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mediaBiometricResultReceiver, mediaBiometricFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(mediaBiometricResultReceiver, mediaBiometricFilter)
+        }
     }
 
     override fun onDestroy() {
@@ -480,6 +561,11 @@ class EnigmaKeyboardService : InputMethodService() {
             unregisterReceiver(decryptResultReceiver)
             decryptResultReceiverRegistered = false
         }
+        startInlineAudioRecordingCallback = null
+        playPendingAudioAfterBiometric = null
+        runCatching { unregisterReceiver(audioPermissionResultReceiver) }
+        runCatching { unregisterReceiver(pendingCapsuleReadyReceiver) }
+        runCatching { unregisterReceiver(mediaBiometricResultReceiver) }
         super.onDestroy()
     }
 
@@ -488,6 +574,7 @@ class EnigmaKeyboardService : InputMethodService() {
             currentLanguage = loadKeyboardLanguagePreference()
             lastKeyboardLanguage = loadLastKeyboardLanguagePreference(currentLanguage)
             refreshEnabledKeyboardLanguageState()
+            startInlineAudioRecordingCallback = null
             if (recentWords.isEmpty()) {
                 recentWords = loadRecentWords()
             }
@@ -522,6 +609,8 @@ class EnigmaKeyboardService : InputMethodService() {
             val audioRecordingStopButton = root.findViewById<Button>(R.id.audioRecordingStopButton)
             val audioCapsuleActionPanel = root.findViewById<LinearLayout>(R.id.audioCapsuleActionPanel)
             val audioCapsuleActionText = root.findViewById<TextView>(R.id.audioCapsuleActionText)
+            val capsuleInlineStatusText = root.findViewById<TextView>(R.id.capsuleInlineStatusText)
+            val audioCapsuleSeekBar = root.findViewById<SeekBar>(R.id.audioCapsuleSeekBar)
             val playAudioCapsuleActionButton = root.findViewById<ImageButton>(R.id.playAudioCapsuleActionButton)
             val deleteCapsuleActionButton = root.findViewById<Button>(R.id.deleteCapsuleActionButton)
             val sendAudioCapsuleActionButton = root.findViewById<Button>(R.id.sendAudioCapsuleActionButton)
@@ -555,6 +644,7 @@ class EnigmaKeyboardService : InputMethodService() {
             val numericLettersButton = root.findViewById<EnigmaKeyView>(R.id.numericLettersButton)
             val numericCommaButton = root.findViewById<EnigmaKeyView>(R.id.numericCommaButton)
             val numericDotButton = root.findViewById<EnigmaKeyView>(R.id.numericDotButton)
+            val numericPlusButton = root.findViewById<EnigmaKeyView>(R.id.numericPlusButton)
             val numericDigitButtons = listOf(
                 root.findViewById<EnigmaKeyView>(R.id.numericKey1),
                 root.findViewById<EnigmaKeyView>(R.id.numericKey2),
@@ -576,6 +666,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     numericLettersButton,
                     numericCommaButton,
                     numericDotButton,
+                    numericPlusButton,
                 )
         val secureProfileStore = SecureProfileStore(
             repository = FileKeyProfileRepository(applicationContext),
@@ -603,10 +694,9 @@ class EnigmaKeyboardService : InputMethodService() {
             dotButton,
             spaceButton,
             symbolsToggleButton,
-            shiftButton,
-            backspaceButton,
             enterButton,
         )
+        val edgeActionButtons = listOf(shiftButton, backspaceButton)
         var currentHeightProfile: KeyboardHeightProfile? = null
         lateinit var render: () -> Unit
 
@@ -672,6 +762,20 @@ class EnigmaKeyboardService : InputMethodService() {
             for (index in 0 until row.childCount) {
                 setExactHeight(row.getChildAt(index), heightDp)
             }
+        }
+
+        fun clearCurrentInputField() {
+            val inputConnection = currentInputConnection ?: return
+            inputConnection.beginBatchEdit()
+            val beforeCursor = inputConnection.getTextBeforeCursor(10000, 0)?.length ?: 0
+            val afterCursor = inputConnection.getTextAfterCursor(10000, 0)?.length ?: 0
+            if (beforeCursor > 0 || afterCursor > 0) {
+                inputConnection.deleteSurroundingText(beforeCursor, afterCursor)
+            } else {
+                inputConnection.commitText("", 1)
+            }
+            inputConnection.finishComposingText()
+            inputConnection.endBatchEdit()
         }
 
         fun setRowChildHeightsPx(row: LinearLayout, heightPx: Int) {
@@ -875,10 +979,19 @@ class EnigmaKeyboardService : InputMethodService() {
                 Color.WHITE,
             )
             audioCapsuleActionText.setTextColor(Color.parseColor(palette.textPrimary))
+            capsuleInlineStatusText.background = createKeyboardStateDrawable(
+                palette.utilityStart,
+                palette.utilityEnd,
+                palette.utilityStroke,
+                radiusDp,
+                Color.WHITE,
+            )
+            capsuleInlineStatusText.setTextColor(Color.parseColor(palette.textPrimary))
 
             rowButtons.flatten().forEach { styleKey(it, utility = false) }
             numberButtons.forEach { styleKey(it, utility = false) }
             utilityButtons.forEach { styleKey(it, utility = true) }
+            edgeActionButtons.forEach { styleKey(it, utility = false) }
             numericPadButtons.forEach { styleKey(it, utility = true) }
             suggestionButtons.forEach {
                 it.applySuggestionStyle()
@@ -936,6 +1049,7 @@ class EnigmaKeyboardService : InputMethodService() {
             lastAudioPlaybackFile = null
             lastAudioPlaybackCapsulePath = null
             lastAudioCapsuleNeedsManualSend = false
+            lastAudioCapsuleOpenedFromExternal = false
         }
 
         fun clearPendingCapsulesOnly() {
@@ -956,11 +1070,27 @@ class EnigmaKeyboardService : InputMethodService() {
         fun releaseInlineAudioPlayback(deletePlaybackFile: Boolean = true) {
             inlineAudioPlayer?.release()
             inlineAudioPlayer = null
+            inlineAudioPlaybackDurationMs = 0
+            inlineAudioUserSeeking = false
             if (deletePlaybackFile) {
                 deleteQuietly(lastAudioPlaybackFile)
                 lastAudioPlaybackFile = null
                 lastAudioPlaybackCapsulePath = null
             }
+        }
+
+        fun refreshAudioPlaybackProgress() {
+            if (inlineAudioUserSeeking) return
+            val player = inlineAudioPlayer
+            if (player == null || inlineAudioPlaybackDurationMs <= 0) {
+                audioCapsuleSeekBar.progress = 0
+                return
+            }
+            val position = runCatching { player.currentPosition }.getOrDefault(0)
+            audioCapsuleSeekBar.progress =
+                ((position.coerceAtLeast(0).toFloat() / inlineAudioPlaybackDurationMs.coerceAtLeast(1)) * 1000f)
+                    .toInt()
+                    .coerceIn(0, 1000)
         }
 
         fun refreshPendingCapsule() {
@@ -972,6 +1102,8 @@ class EnigmaKeyboardService : InputMethodService() {
                         return
                     }
                     lastAudioCapsuleFile = pending.file
+                    mediaBiometricApprovedCapsulePath = null
+                    lastAudioCapsuleOpenedFromExternal = true
                     Log.d(TAG, "refreshPendingCapsule audio imported=${pending.file.name}")
                     val editorInfo = currentInputEditorInfo
                     val supportedMimeTypes = if (editorInfo == null) {
@@ -1277,6 +1409,17 @@ class EnigmaKeyboardService : InputMethodService() {
                 requestHideSelf(0)
             }
 
+        fun launchGateFromKeyboard(intent: Intent): Result<Unit> =
+            runCatching {
+                startActivity(
+                    intent.addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_NO_ANIMATION or
+                            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                    ),
+                )
+            }
+
         fun currentEditorPackageName(): String? = currentInputEditorInfo?.packageName?.takeIf { it.isNotBlank() }
 
         fun shouldUseShareFallback(editorPackageName: String?): Boolean = when (editorPackageName) {
@@ -1312,8 +1455,11 @@ class EnigmaKeyboardService : InputMethodService() {
         fun buildCapsuleShareIntent(file: java.io.File): Intent {
             val shareFile = runCatching {
                 val dir = java.io.File(cacheDir, "shared_capsules").apply { mkdirs() }
+                dir.listFiles()?.forEach { stale ->
+                    runCatching { stale.delete() }
+                }
                 val baseName = file.nameWithoutExtension.ifBlank { file.name }
-                val exported = java.io.File(dir, "$baseName.bin")
+                val exported = java.io.File(dir, "$baseName.veil")
                 file.inputStream().use { input ->
                     exported.outputStream().use { output -> input.copyTo(output) }
                 }
@@ -1647,6 +1793,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 lastAudioPlaybackFile = null
                 lastAudioPlaybackCapsulePath = null
                 lastAudioCapsuleNeedsManualSend = false
+                lastAudioCapsuleOpenedFromExternal = false
                 mode = KeyboardMode.IDLE
                 previewTone = PreviewTone.DEFAULT
                 previewMessage = "Voice capsule recording: 0:00 • ${profile.title}"
@@ -1659,6 +1806,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 render()
             }
         }
+        startInlineAudioRecordingCallback = ::startInlineAudioRecording
 
         fun stopInlineAudioRecording() {
             val recorder = inlineAudioRecorder
@@ -1689,6 +1837,7 @@ class EnigmaKeyboardService : InputMethodService() {
                     profile = profile,
                 )
                 lastAudioCapsuleFile = capsule
+                lastAudioCapsuleOpenedFromExternal = false
                 pendingCapsuleStore.save(MediaCapsuleType.AUDIO, capsule)
                 Log.d(
                     TAG,
@@ -1698,12 +1847,18 @@ class EnigmaKeyboardService : InputMethodService() {
                     clearPendingAudioCapsuleState()
                     setPreview(getString(R.string.keyboard_voice_capsule_received_inline), PreviewTone.SUCCESS)
                 } else if (directInsertAdvertised) {
+                    lastAudioPlaybackFile = sourceFile
+                    lastAudioPlaybackCapsulePath = capsule.absolutePath
+                    inlineAudioPlaybackDurationMs = durationMs.toInt().coerceAtLeast(1)
                     lastAudioCapsuleNeedsManualSend = true
                     setPreview(
                         getString(R.string.keyboard_voice_capsule_inline_failed_support),
                         PreviewTone.DEFAULT,
                     )
                 } else {
+                    lastAudioPlaybackFile = sourceFile
+                    lastAudioPlaybackCapsulePath = capsule.absolutePath
+                    inlineAudioPlaybackDurationMs = durationMs.toInt().coerceAtLeast(1)
                     lastAudioCapsuleNeedsManualSend = true
                     setPreview(
                         getString(R.string.keyboard_voice_capsule_inline_failed_no_support),
@@ -1725,22 +1880,62 @@ class EnigmaKeyboardService : InputMethodService() {
             if (lastAudioPlaybackCapsulePath == capsule.absolutePath && lastAudioPlaybackFile?.exists() == true) {
                 return lastAudioPlaybackFile
             }
+            releaseInlineAudioPlayback()
             val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsule) }.getOrNull()
-            if (profile?.requireBiometricForDecrypt == true) {
-                launchFromKeyboard(buildAudioCapsulePreviewIntent(capsule))
+            if (profile?.requireBiometricForDecrypt == true &&
+                mediaBiometricApprovedCapsulePath != capsule.absolutePath
+            ) {
+                Log.w(TAG, "resolveLastAudioPlaybackFile biometricRequired profile=${profile.title} capsule=${capsule.name}:${capsule.length()}")
                 setPreview(getString(R.string.biometric_prompt_subtitle), PreviewTone.DEFAULT)
+                render()
+                launchGateFromKeyboard(
+                    Intent(this@EnigmaKeyboardService, MediaBiometricGateActivity::class.java).apply {
+                        putExtra(MediaBiometricGateActivity.EXTRA_CAPSULE_PATH, capsule.absolutePath)
+                    },
+                ).onFailure {
+                    Log.e(TAG, "resolveLastAudioPlaybackFile biometric gate failed", it)
+                    setPreview(getString(R.string.biometric_unavailable), PreviewTone.ERROR)
+                    render()
+                }
+                return null
+            }
+            val decrypted = try {
+                mediaCapsuleService.decryptFile(capsule)
+            } catch (error: Throwable) {
+                Log.e(TAG, "resolveLastAudioPlaybackFile decrypt failed capsule=${capsule.name}:${capsule.length()}", error)
+                val profileTitle = profile?.title ?: getString(R.string.clipboard_unknown_profile)
+                setPreview(
+                    if (error.message?.contains("already opened", ignoreCase = true) == true) {
+                        getString(R.string.decrypt_one_time_consumed, profileTitle)
+                    } else {
+                        getString(R.string.media_capsule_error_decrypt)
+                    },
+                    PreviewTone.ERROR,
+                )
                 render()
                 return null
             }
-            releaseInlineAudioPlayback()
-            val decrypted = mediaCapsuleService.decryptFile(capsule)
-            lastAudioPlaybackFile = decrypted.plaintextFile
-            lastAudioPlaybackCapsulePath = capsule.absolutePath
-            Log.d(
+                lastAudioPlaybackFile = decrypted.plaintextFile
+                lastAudioPlaybackCapsulePath = capsule.absolutePath
+                inlineAudioPlaybackDurationMs = decrypted.metadata.durationMs.toInt().coerceAtLeast(1)
+                Log.d(
                 TAG,
                 "resolveLastAudioPlaybackFile playback=${mediaCapsuleService.describeMediaFile(decrypted.plaintextFile)} capsule=${capsule.name}:${capsule.length()}",
             )
             return lastAudioPlaybackFile
+        }
+
+        fun scheduleInlineAudioProgress() {
+            val player = inlineAudioPlayer ?: return
+            repeatHandler.post(object : Runnable {
+                override fun run() {
+                    if (inlineAudioPlayer !== player) return
+                    refreshAudioPlaybackProgress()
+                    if (player.isPlaying) {
+                        repeatHandler.postDelayed(this, 250L)
+                    }
+                }
+            })
         }
 
         fun toggleInlineAudioPlayback() {
@@ -1749,16 +1944,24 @@ class EnigmaKeyboardService : InputMethodService() {
                 render()
                 return
             }
+            Log.d(TAG, "toggleInlineAudioPlayback requested capsule=${capsule.name}:${capsule.length()} player=${inlineAudioPlayer != null}")
             if (inlineAudioPlayer != null) {
-                releaseInlineAudioPlayback()
-                setPreview(getString(R.string.audio_capsule_action_ready_text), PreviewTone.DEFAULT)
+                val player = inlineAudioPlayer
+                if (player?.isPlaying == true) {
+                    runCatching { player.pause() }
+                    setPreview(getString(R.string.audio_capsule_action_ready_text), PreviewTone.DEFAULT)
+                } else {
+                    runCatching { player?.start() }
+                    setPreview(getString(R.string.audio_capsule_status_playing), PreviewTone.DEFAULT)
+                    scheduleInlineAudioProgress()
+                }
+                refreshAudioPlaybackProgress()
                 render()
                 return
             }
 
-            val playbackFile = runCatching { resolveLastAudioPlaybackFile() }.getOrNull()
+            val playbackFile = resolveLastAudioPlaybackFile()
             if (playbackFile == null) {
-                setPreview(getString(R.string.media_capsule_error_decrypt), PreviewTone.ERROR)
                 render()
                 return
             }
@@ -1779,9 +1982,11 @@ class EnigmaKeyboardService : InputMethodService() {
                         render()
                     }
                     prepare()
+                    inlineAudioPlaybackDurationMs = duration.coerceAtLeast(1)
                     start()
                 }
                 setPreview(getString(R.string.audio_capsule_status_playing), PreviewTone.DEFAULT)
+                scheduleInlineAudioProgress()
             }.onFailure {
                 Log.e(TAG, "toggleInlineAudioPlayback failed", it)
                 releaseInlineAudioPlayback()
@@ -1789,6 +1994,7 @@ class EnigmaKeyboardService : InputMethodService() {
             }
             render()
         }
+        playPendingAudioAfterBiometric = ::toggleInlineAudioPlayback
 
         fun schedulePreviewClear() {
             repeatHandler.removeCallbacksAndMessages(PREVIEW_CLEAR_TOKEN)
@@ -2176,12 +2382,18 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         fun updateCharacterKeys() {
-            val rows = currentRows()
+            val rows = currentRows().map { row -> row.filter { it.isNotBlank() } }
 
             rowButtons.forEachIndexed { rowIndex, buttons ->
                 val chars = rows.getOrElse(rowIndex) { emptyList() }
                 buttons.forEachIndexed { index, button ->
                     val value = chars.getOrNull(index)
+                    (button.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+                        if (params.weight != 1f) {
+                            params.weight = 1f
+                            button.layoutParams = params
+                        }
+                    }
                     if (value.isNullOrBlank()) {
                         button.visibility = View.GONE
                         button.isEnabled = false
@@ -2331,6 +2543,16 @@ class EnigmaKeyboardService : InputMethodService() {
             playAudioCapsuleActionButton.visibility = if (anyCapsuleVisible) View.VISIBLE else View.GONE
             playAudioCapsuleActionButton.isEnabled = anyCapsuleVisible
             playAudioCapsuleActionButton.alpha = if (anyCapsuleVisible) 1f else 0.55f
+            audioCapsuleSeekBar.visibility = if (audioActionVisible) View.VISIBLE else View.GONE
+            capsuleInlineStatusText.visibility =
+                if (!audioActionVisible && (videoActionVisible || photoActionVisible)) View.VISIBLE else View.GONE
+            audioCapsuleActionText.visibility = if (audioActionVisible) View.VISIBLE else View.GONE
+            audioCapsuleSeekBar.isEnabled = audioActionVisible && inlineAudioPlaybackDurationMs > 0
+            if (!audioActionVisible) {
+                audioCapsuleSeekBar.progress = 0
+            } else {
+                refreshAudioPlaybackProgress()
+            }
             deleteCapsuleActionButton.visibility =
                 if (audioActionVisible || videoActionVisible || photoActionVisible) View.VISIBLE else View.GONE
             deleteCapsuleActionButton.text = keyboardString(R.string.keyboard_action_close)
@@ -2344,27 +2566,29 @@ class EnigmaKeyboardService : InputMethodService() {
                             keyboardString(R.string.keyboard_voice_capsule_ready_insert)
                         }
                     playAudioCapsuleActionButton.setImageResource(
-                        if (inlineAudioPlayer != null) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
+                        if (inlineAudioPlayer?.isPlaying == true) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
                     )
                     sendAudioCapsuleActionButton.text =
-                        if (canInsertAudioDirectly) {
+                        if (lastAudioCapsuleOpenedFromExternal) {
+                            keyboardString(R.string.media_capsule_share)
+                        } else if (canInsertAudioDirectly) {
                             keyboardString(R.string.keyboard_capsule_insert_short)
                         } else {
                             keyboardString(R.string.keyboard_capsule_send_short)
                         }
                 }
                 videoActionVisible && lastVideoCapsuleReadyForDirectInsert -> {
-                    audioCapsuleActionText.text = keyboardString(R.string.keyboard_video_capsule_ready_insert)
+                    capsuleInlineStatusText.text = keyboardString(R.string.keyboard_video_capsule_ready_insert)
                     playAudioCapsuleActionButton.setImageResource(android.R.drawable.ic_menu_view)
                     sendAudioCapsuleActionButton.text = keyboardString(R.string.keyboard_capsule_insert_short)
                 }
                 videoActionVisible -> {
-                    audioCapsuleActionText.text = keyboardString(R.string.keyboard_video_capsule_ready_manual)
+                    capsuleInlineStatusText.text = keyboardString(R.string.keyboard_video_capsule_ready_manual)
                     playAudioCapsuleActionButton.setImageResource(android.R.drawable.ic_menu_view)
                     sendAudioCapsuleActionButton.text = keyboardString(R.string.keyboard_capsule_send_short)
                 }
                 photoActionVisible -> {
-                    audioCapsuleActionText.text = keyboardString(R.string.photo_capsule_ready_manual)
+                    capsuleInlineStatusText.text = keyboardString(R.string.photo_capsule_ready_manual)
                     playAudioCapsuleActionButton.setImageResource(android.R.drawable.ic_menu_view)
                     sendAudioCapsuleActionButton.text = keyboardString(R.string.keyboard_capsule_send_short)
                 }
@@ -2380,6 +2604,8 @@ class EnigmaKeyboardService : InputMethodService() {
             setIconActive(photoCapsuleButton, photoActionVisible)
             setIconActive(videoCapsuleButton, videoActionVisible)
             setIconActive(playAudioCapsuleActionButton, anyCapsuleVisible || inlineAudioPlayer != null)
+            shiftButton.alpha = if (capsLockEnabled) 1f else 0.86f
+            shiftButton.setTextColor(if (capsLockEnabled) Color.WHITE else Color.parseColor("#D7E2EE"))
             previewScroll.post { previewScroll.scrollTo(0, 0) }
             updateKeyboardHeightProfile()
             updateCharacterKeys()
@@ -2413,6 +2639,9 @@ class EnigmaKeyboardService : InputMethodService() {
 
         utilityButtons.forEach { button ->
             button.applyUtilityStyle()
+        }
+        edgeActionButtons.forEach { button ->
+            button.applyEdgeActionStyle()
         }
         suggestionButtons.forEach { it.applySuggestionStyle() }
         applyKeyboardAppearance()
@@ -2550,14 +2779,14 @@ class EnigmaKeyboardService : InputMethodService() {
                         shiftEnabled = shouldAutoCapitalizeFor(currentInputEditorInfo)
                         lastShiftTapAt = 0L
                     }
-                    shiftEnabled && now - lastShiftTapAt < 400L -> {
+                    now - lastShiftTapAt < 400L -> {
                         capsLockEnabled = true
                         shiftEnabled = true
                         lastShiftTapAt = 0L
                     }
                     else -> {
                         shiftEnabled = !shiftEnabled
-                        lastShiftTapAt = if (shiftEnabled) now else 0L
+                        lastShiftTapAt = now
                     }
                 }
                 previewMessage = null
@@ -2760,6 +2989,13 @@ class EnigmaKeyboardService : InputMethodService() {
             commitText(java.text.DecimalFormatSymbols.getInstance(currentLanguage.locale).decimalSeparator.toString())
             render()
         }
+        numericPlusButton.setOnClickListener {
+            dismissPressedKeyPreview()
+            dismissActiveKeyPopup()
+            clearPreviewForTyping()
+            commitText("+")
+            render()
+        }
 
         enterButton.setOnClickListener {
             dismissPressedKeyPreview()
@@ -2799,7 +3035,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 }
 
                 is ClipboardDecryptResult.RequiresBiometric -> {
-                    launchFromKeyboard(
+                    launchGateFromKeyboard(
                         Intent(this, DecryptGateActivity::class.java).apply {
                             putExtra(DecryptGateActivity.EXTRA_ENCODED_MESSAGE, result.encodedMessage)
                             putExtra(DecryptGateActivity.EXTRA_PROFILE_ID, result.profileId)
@@ -2810,14 +3046,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 }
 
                 is ClipboardDecryptResult.Success -> {
-                    setPreview(
-                        getString(
-                            R.string.keyboard_preview_decrypt_success,
-                            result.profileTitle,
-                            result.plaintext,
-                        ),
-                        PreviewTone.DECRYPTED,
-                    )
+                    setPreview(result.plaintext, PreviewTone.DECRYPTED)
                 }
             }
             render()
@@ -2828,6 +3057,7 @@ class EnigmaKeyboardService : InputMethodService() {
             dismissActiveKeyPopup()
             clearPendingCapsulesOnly()
             decryptService.clearPrimaryClip()
+            clearCurrentInputField()
             currentInputConnection?.finishComposingText()
             clearPreviewForTyping()
             mode = KeyboardMode.IDLE
@@ -2873,7 +3103,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 render()
                 return
             }
-            if (tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
+            if (!lastAudioCapsuleOpenedFromExternal && tryCommitCapsuleFile(capsule, MediaCapsuleType.AUDIO.capsuleMimeType)) {
                 clearPendingAudioCapsuleState()
                 lastAudioCapsuleNeedsManualSend = false
                 setPreview(getString(R.string.keyboard_voice_capsule_received_inline), PreviewTone.SUCCESS)
@@ -2966,6 +3196,10 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         playAudioCapsuleActionButton.setOnClickListener {
+            Log.d(
+                TAG,
+                "playAudioCapsuleActionButton clicked audio=${lastAudioCapsuleFile?.name} video=${lastVideoCapsuleFile?.name} photo=${lastPhotoCapsuleFile?.name}",
+            )
             when {
                 lastPhotoCapsuleFile != null ->
                     launchFromKeyboard(buildPhotoCapsulePreviewIntent(lastPhotoCapsuleFile!!)).onFailure {
@@ -2980,6 +3214,34 @@ class EnigmaKeyboardService : InputMethodService() {
                 else -> toggleInlineAudioPlayback()
             }
         }
+
+        fun handleAudioPanelTap() {
+            if (lastAudioCapsuleFile == null || lastVideoCapsuleFile != null || lastPhotoCapsuleFile != null) return
+            Log.d(TAG, "audio capsule panel clicked audio=${lastAudioCapsuleFile?.name}")
+            toggleInlineAudioPlayback()
+        }
+
+        audioCapsuleSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser || inlineAudioPlaybackDurationMs <= 0) return
+                val position = ((progress / 1000f) * inlineAudioPlaybackDurationMs).toInt()
+                runCatching { inlineAudioPlayer?.seekTo(position.coerceAtLeast(0)) }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                inlineAudioUserSeeking = true
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val progress = seekBar?.progress ?: 0
+                if (inlineAudioPlaybackDurationMs > 0) {
+                    val position = ((progress / 1000f) * inlineAudioPlaybackDurationMs).toInt()
+                    runCatching { inlineAudioPlayer?.seekTo(position.coerceAtLeast(0)) }
+                }
+                inlineAudioUserSeeking = false
+                refreshAudioPlaybackProgress()
+            }
+        })
 
         deleteCapsuleActionButton.setOnClickListener {
             clearPendingCapsulesOnly()
@@ -2998,8 +3260,8 @@ class EnigmaKeyboardService : InputMethodService() {
             }
         }
 
-        audioCapsuleActionText.setOnClickListener(null)
-        audioCapsuleActionPanel.setOnClickListener(null)
+        audioCapsuleActionText.setOnClickListener { handleAudioPanelTap() }
+        audioCapsuleActionPanel.setOnClickListener { handleAudioPanelTap() }
 
         photoCapsuleButton.setOnClickListener {
             if (inlineAudioRecorder != null) {
@@ -3148,6 +3410,7 @@ class EnigmaKeyboardService : InputMethodService() {
         if (pendingCapsuleStore.peek() != null) {
             refreshPendingVideoCapsuleState?.invoke()
             renderInputView?.invoke()
+            scheduleShowSelfForPendingCapsule()
         }
         if (characterMode != CharacterMode.LETTERS) {
             shiftEnabled = false
@@ -3465,6 +3728,7 @@ class EnigmaKeyboardService : InputMethodService() {
         const val SHIFT_UP_SYMBOL = "\u2191"
         const val SHIFT_LOCKED_SYMBOL = "\u21EA"
         val PENDING_CAPSULE_POLL_TOKEN = Any()
+        val PENDING_CAPSULE_SHOW_TOKEN = Any()
         val PREVIEW_CLEAR_TOKEN = Any()
         val WORD_AT_END = Regex("([\\p{L}]+)$")
         const val PREFS_NAME = "enigma_keyboard_prefs"
