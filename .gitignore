@@ -24,6 +24,8 @@ local.properties
 .env
 .env.*
 android/keystore.properties
+tools/license_private/
+licenses/
 
 # Generated vectors or local dumps
 tmp/

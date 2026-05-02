@@ -1,4 +1,4 @@
-package com.truelock.enigma.ime
+﻿package com.truelock.enigma.ime
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -57,6 +57,7 @@ import com.truelock.enigma.clipboard.ClipboardDecryptResult
 import com.truelock.enigma.clipboard.ClipboardDecryptService
 import com.truelock.enigma.crypto.Tl1MessageCodec
 import com.truelock.enigma.crypto.Tl1ShareEnvelope
+import com.truelock.enigma.license.LicenseStore
 import com.truelock.enigma.media.MediaCapsuleService
 import com.truelock.enigma.media.MediaCapsuleType
 import com.truelock.enigma.media.PendingCapsuleStore
@@ -76,6 +77,7 @@ import com.truelock.enigma.storage.SecureProfileStore
 import com.truelock.enigma.ui.AudioPermissionRequestActivity
 import com.truelock.enigma.ui.AudioCapsuleActivity
 import com.truelock.enigma.ui.DecryptGateActivity
+import com.truelock.enigma.ui.LicenseActivity
 import com.truelock.enigma.ui.MainActivity
 import com.truelock.enigma.ui.MediaBiometricGateActivity
 import com.truelock.enigma.ui.MediaCapsuleRouterActivity
@@ -94,13 +96,13 @@ class EnigmaKeyboardService : InputMethodService() {
         val localeTag: String,
         val displayName: String,
     ) {
-        RU("ru", "Русский"),
+        RU("ru", "Р СѓСЃСЃРєРёР№"),
         EN("en", "English"),
-        TR("tr", "Türkçe"),
-        ES("es", "Español"),
-        PT("pt", "Português"),
+        TR("tr", "TГјrkГ§e"),
+        ES("es", "EspaГ±ol"),
+        PT("pt", "PortuguГЄs"),
         DE("de", "Deutsch"),
-        FR("fr", "Français"),
+        FR("fr", "FranГ§ais"),
         IT("it", "Italiano"),
         ;
 
@@ -247,6 +249,7 @@ class EnigmaKeyboardService : InputMethodService() {
     private val shareInvitePreferences by lazy { ShareInvitePreferences(applicationContext) }
     private val keyboardLanguagePreferences by lazy { KeyboardLanguagePreferences(applicationContext) }
     private val keyboardAppearancePreferences by lazy { KeyboardAppearancePreferences(applicationContext) }
+    private val licenseStore by lazy { LicenseStore(applicationContext) }
 
     private fun scheduleShowSelfForPendingCapsule() {
         repeatHandler.removeCallbacksAndMessages(PENDING_CAPSULE_SHOW_TOKEN)
@@ -329,33 +332,33 @@ class EnigmaKeyboardService : InputMethodService() {
     )
 
     private val trRows = listOf(
-        listOf("q", "w", "e", "r", "t", "y", "u", "ı", "o", "p", "ğ", "ü"),
-        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l", "ş", "i"),
-        listOf("z", "x", "c", "v", "b", "n", "m", "ö", "ç"),
+        listOf("q", "w", "e", "r", "t", "y", "u", "Д±", "o", "p", "Дџ", "Гј"),
+        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l", "Еџ", "i"),
+        listOf("z", "x", "c", "v", "b", "n", "m", "Г¶", "Г§"),
     )
 
     private val esRows = listOf(
         listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
-        listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", "ñ"),
+        listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", "Г±"),
         listOf("z", "x", "c", "v", "b", "n", "m"),
     )
 
     private val ptRows = listOf(
         listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
-        listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", "ç"),
+        listOf("", "a", "s", "d", "f", "g", "h", "j", "k", "l", "Г§"),
         listOf("z", "x", "c", "v", "b", "n", "m"),
     )
 
     private val deRows = listOf(
-        listOf("q", "w", "e", "r", "t", "z", "u", "i", "o", "p", "ü", "ß"),
-        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l", "ö", "ä"),
+        listOf("q", "w", "e", "r", "t", "z", "u", "i", "o", "p", "Гј", "Гџ"),
+        listOf("a", "s", "d", "f", "g", "h", "j", "k", "l", "Г¶", "Г¤"),
         listOf("y", "x", "c", "v", "b", "n", "m"),
     )
 
     private val frRows = listOf(
         listOf("a", "z", "e", "r", "t", "y", "u", "i", "o", "p"),
         listOf("q", "s", "d", "f", "g", "h", "j", "k", "l", "m"),
-        listOf("w", "x", "c", "v", "b", "n", "ç", ""),
+        listOf("w", "x", "c", "v", "b", "n", "Г§", ""),
     )
 
     private val itRows = listOf(
@@ -377,9 +380,9 @@ class EnigmaKeyboardService : InputMethodService() {
     )
 
     private val symbolRowsAlt = listOf(
-        listOf("~", "`", "|", "•", "√", "π", "÷", "×", "{", "}", "\\", "§"),
-        listOf("^", "°", "€", "£", "¥", "©", "®", "<", ">", "№", "₽"),
-        listOf("…", "—", "–", "!", "?", "%", "&", "*", "="),
+        listOf("~", "`", "|", "вЂў", "в€љ", "ПЂ", "Г·", "Г—", "{", "}", "\\", "В§"),
+        listOf("^", "В°", "в‚¬", "ВЈ", "ВҐ", "В©", "В®", "<", ">", "в„–", "в‚Ѕ"),
+        listOf("вЂ¦", "вЂ”", "вЂ“", "!", "?", "%", "&", "*", "="),
     )
 
     private val numericRows = listOf(
@@ -1539,66 +1542,66 @@ class EnigmaKeyboardService : InputMethodService() {
 
             val alternatives = when (currentLanguage) {
                 KeyboardLanguage.RU -> mapOf(
-                    "е" to listOf("ё"),
-                    "ь" to listOf("ъ"),
+                    "Рµ" to listOf("С‘"),
+                    "СЊ" to listOf("СЉ"),
                 )
                 KeyboardLanguage.EN -> mapOf(
-                    "a" to listOf("á", "à", "ä", "â"),
-                    "c" to listOf("ç"),
-                    "e" to listOf("é", "è", "ë", "ê"),
-                    "i" to listOf("í", "ï", "î"),
-                    "n" to listOf("ñ"),
-                    "o" to listOf("ó", "ö", "ô"),
-                    "u" to listOf("ú", "ü", "û"),
+                    "a" to listOf("ГЎ", "Г ", "Г¤", "Гў"),
+                    "c" to listOf("Г§"),
+                    "e" to listOf("Г©", "ГЁ", "Г«", "ГЄ"),
+                    "i" to listOf("Г­", "ГЇ", "Г®"),
+                    "n" to listOf("Г±"),
+                    "o" to listOf("Гі", "Г¶", "Гґ"),
+                    "u" to listOf("Гє", "Гј", "Г»"),
                 )
                 KeyboardLanguage.TR -> mapOf(
-                    "a" to listOf("â"),
-                    "c" to listOf("ç"),
-                    "e" to listOf("ê"),
-                    "g" to listOf("ğ"),
-                    "i" to listOf("ı", "î"),
-                    "ı" to listOf("i", "İ"),
-                    "o" to listOf("ö", "ô"),
-                    "s" to listOf("ş"),
-                    "u" to listOf("ü", "û"),
+                    "a" to listOf("Гў"),
+                    "c" to listOf("Г§"),
+                    "e" to listOf("ГЄ"),
+                    "g" to listOf("Дџ"),
+                    "i" to listOf("Д±", "Г®"),
+                    "Д±" to listOf("i", "Д°"),
+                    "o" to listOf("Г¶", "Гґ"),
+                    "s" to listOf("Еџ"),
+                    "u" to listOf("Гј", "Г»"),
                 )
                 KeyboardLanguage.ES -> mapOf(
-                    "a" to listOf("á"),
-                    "e" to listOf("é"),
-                    "i" to listOf("í"),
-                    "n" to listOf("ñ"),
-                    "o" to listOf("ó"),
-                    "u" to listOf("ú", "ü"),
+                    "a" to listOf("ГЎ"),
+                    "e" to listOf("Г©"),
+                    "i" to listOf("Г­"),
+                    "n" to listOf("Г±"),
+                    "o" to listOf("Гі"),
+                    "u" to listOf("Гє", "Гј"),
                 )
                 KeyboardLanguage.PT -> mapOf(
-                    "a" to listOf("á", "à", "ã", "â"),
-                    "c" to listOf("ç"),
-                    "e" to listOf("é", "ê"),
-                    "i" to listOf("í"),
-                    "o" to listOf("ó", "ô", "õ"),
-                    "u" to listOf("ú"),
+                    "a" to listOf("ГЎ", "Г ", "ГЈ", "Гў"),
+                    "c" to listOf("Г§"),
+                    "e" to listOf("Г©", "ГЄ"),
+                    "i" to listOf("Г­"),
+                    "o" to listOf("Гі", "Гґ", "Гµ"),
+                    "u" to listOf("Гє"),
                 )
                 KeyboardLanguage.DE -> mapOf(
-                    "a" to listOf("ä"),
-                    "o" to listOf("ö"),
-                    "s" to listOf("ß"),
-                    "u" to listOf("ü"),
+                    "a" to listOf("Г¤"),
+                    "o" to listOf("Г¶"),
+                    "s" to listOf("Гџ"),
+                    "u" to listOf("Гј"),
                 )
                 KeyboardLanguage.FR -> mapOf(
-                    "a" to listOf("à", "â", "æ"),
-                    "c" to listOf("ç"),
-                    "e" to listOf("é", "è", "ê", "ë"),
-                    "i" to listOf("î", "ï"),
-                    "o" to listOf("ô", "œ"),
-                    "u" to listOf("ù", "û", "ü"),
-                    "y" to listOf("ÿ"),
+                    "a" to listOf("Г ", "Гў", "Г¦"),
+                    "c" to listOf("Г§"),
+                    "e" to listOf("Г©", "ГЁ", "ГЄ", "Г«"),
+                    "i" to listOf("Г®", "ГЇ"),
+                    "o" to listOf("Гґ", "Е“"),
+                    "u" to listOf("Г№", "Г»", "Гј"),
+                    "y" to listOf("Гї"),
                 )
                 KeyboardLanguage.IT -> mapOf(
-                    "a" to listOf("à"),
-                    "e" to listOf("è", "é"),
-                    "i" to listOf("ì", "í"),
-                    "o" to listOf("ò", "ó"),
-                    "u" to listOf("ù", "ú"),
+                    "a" to listOf("Г "),
+                    "e" to listOf("ГЁ", "Г©"),
+                    "i" to listOf("Г¬", "Г­"),
+                    "o" to listOf("ГІ", "Гі"),
+                    "u" to listOf("Г№", "Гє"),
                 )
             }
 
@@ -1613,16 +1616,16 @@ class EnigmaKeyboardService : InputMethodService() {
                 KeyboardLanguage.RU -> listOf(";", "?", "!")
                 KeyboardLanguage.EN -> listOf("?", "!", ";", ":")
                 KeyboardLanguage.TR -> listOf(";", "?", "!")
-                KeyboardLanguage.ES -> listOf(";", "¿", "?", "!")
+                KeyboardLanguage.ES -> listOf(";", "Вї", "?", "!")
                 KeyboardLanguage.PT -> listOf(";", "?", "!", ":")
                 KeyboardLanguage.DE -> listOf(";", "?", "!", ":")
                 KeyboardLanguage.FR -> listOf(";", "?", "!", ":")
                 KeyboardLanguage.IT -> listOf(";", "?", "!", ":")
             }
             characterMode == CharacterMode.LETTERS && primary == "." -> when (currentLanguage) {
-                KeyboardLanguage.ES -> listOf(":", "¡", "!", "?", "…")
-                KeyboardLanguage.FR -> listOf(":", "!", "?", "…", "«")
-                else -> listOf("!", "?", "…")
+                KeyboardLanguage.ES -> listOf(":", "ВЎ", "!", "?", "вЂ¦")
+                KeyboardLanguage.FR -> listOf(":", "!", "?", "вЂ¦", "В«")
+                else -> listOf("!", "?", "вЂ¦")
             }
             else -> emptyList()
         }
@@ -1662,6 +1665,16 @@ class EnigmaKeyboardService : InputMethodService() {
             previewTone = tone
         }
 
+        fun requireLicensedFeature(render: () -> Unit, action: () -> Unit) {
+            if (licenseStore.isActive()) {
+                action()
+                return
+            }
+            setPreview(getString(R.string.license_required_keyboard), PreviewTone.ERROR)
+            launchFromKeyboard(Intent(this@EnigmaKeyboardService, LicenseActivity::class.java))
+            render()
+        }
+
         fun setIconActive(button: ImageButton, active: Boolean) {
             button.imageTintList = ColorStateList.valueOf(
                 if (active) Color.WHITE else Color.parseColor("#9AA7B7"),
@@ -1681,7 +1694,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 val elapsed = (System.currentTimeMillis() - inlineAudioStartedAt).coerceAtLeast(0L)
                 setPreview(
                     "Voice capsule recording: ${formatDurationShort(elapsed)}" +
-                        (selectedProfile?.let { " • ${it.title}" } ?: ""),
+                        (selectedProfile?.let { " вЂў ${it.title}" } ?: ""),
                     PreviewTone.DEFAULT,
                 )
                 render()
@@ -1796,7 +1809,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 lastAudioCapsuleOpenedFromExternal = false
                 mode = KeyboardMode.IDLE
                 previewTone = PreviewTone.DEFAULT
-                previewMessage = "Voice capsule recording: 0:00 • ${profile.title}"
+                previewMessage = "Voice capsule recording: 0:00 вЂў ${profile.title}"
                 repeatHandler.removeCallbacks(inlineAudioTicker)
                 repeatHandler.post(inlineAudioTicker)
                 render()
@@ -2054,7 +2067,7 @@ class EnigmaKeyboardService : InputMethodService() {
             return before.endsWith(". ") ||
                 before.endsWith("! ") ||
                 before.endsWith("? ") ||
-                before.endsWith("… ")
+                before.endsWith("вЂ¦ ")
         }
 
         fun textBeforeCursor(maxChars: Int = 4): String =
@@ -2328,10 +2341,10 @@ class EnigmaKeyboardService : InputMethodService() {
         fun updateEnterKey() {
             val action = currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_MASK_ACTION)
             enterButton.text = when (action) {
-                EditorInfo.IME_ACTION_SEND -> "➤"
-                EditorInfo.IME_ACTION_SEARCH -> "⌕"
-                EditorInfo.IME_ACTION_GO -> "→"
-                EditorInfo.IME_ACTION_DONE -> "✓"
+                EditorInfo.IME_ACTION_SEND -> "вћ¤"
+                EditorInfo.IME_ACTION_SEARCH -> "вЊ•"
+                EditorInfo.IME_ACTION_GO -> "в†’"
+                EditorInfo.IME_ACTION_DONE -> "вњ“"
                 else -> keyboardString(R.string.keyboard_action_enter)
             }
         }
@@ -3006,50 +3019,54 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         enigmaToggleButton.setOnClickListener {
-            mode = KeyboardMode.ENIGMA
-            val result = encryptCurrentInput(secureProfileStore, codec)
-            setPreview(
-                result.message,
-                if (result.success) PreviewTone.SUCCESS else PreviewTone.ERROR,
-            )
-            render()
+            requireLicensedFeature({ render() }) {
+                mode = KeyboardMode.ENIGMA
+                val result = encryptCurrentInput(secureProfileStore, codec)
+                setPreview(
+                    result.message,
+                    if (result.success) PreviewTone.SUCCESS else PreviewTone.ERROR,
+                )
+                render()
+            }
         }
 
         decryptButton.setOnClickListener {
-            mode = KeyboardMode.DECRYPT
-            when (val result = decryptService.decryptPrimaryClip()) {
-                ClipboardDecryptResult.ClipboardEmpty -> {
-                    setPreview(getString(R.string.keyboard_decrypt_empty), PreviewTone.ERROR)
-                }
+            requireLicensedFeature({ render() }) {
+                mode = KeyboardMode.DECRYPT
+                when (val result = decryptService.decryptPrimaryClip()) {
+                    ClipboardDecryptResult.ClipboardEmpty -> {
+                        setPreview(getString(R.string.keyboard_decrypt_empty), PreviewTone.ERROR)
+                    }
 
-                ClipboardDecryptResult.MessageNotRecognized -> {
-                    setPreview(getString(R.string.keyboard_decrypt_unrecognized), PreviewTone.ERROR)
-                }
+                    ClipboardDecryptResult.MessageNotRecognized -> {
+                        setPreview(getString(R.string.keyboard_decrypt_unrecognized), PreviewTone.ERROR)
+                    }
 
-                ClipboardDecryptResult.WrongKeyOrInvalidMessage -> {
-                    setPreview(getString(R.string.keyboard_decrypt_invalid), PreviewTone.ERROR)
-                }
+                    ClipboardDecryptResult.WrongKeyOrInvalidMessage -> {
+                        setPreview(getString(R.string.keyboard_decrypt_invalid), PreviewTone.ERROR)
+                    }
 
-                is ClipboardDecryptResult.AlreadyConsumed -> {
-                    setPreview(getString(R.string.decrypt_one_time_consumed, result.profileTitle), PreviewTone.ERROR)
-                }
+                    is ClipboardDecryptResult.AlreadyConsumed -> {
+                        setPreview(getString(R.string.decrypt_one_time_consumed, result.profileTitle), PreviewTone.ERROR)
+                    }
 
-                is ClipboardDecryptResult.RequiresBiometric -> {
-                    launchGateFromKeyboard(
-                        Intent(this, DecryptGateActivity::class.java).apply {
-                            putExtra(DecryptGateActivity.EXTRA_ENCODED_MESSAGE, result.encodedMessage)
-                            putExtra(DecryptGateActivity.EXTRA_PROFILE_ID, result.profileId)
-                        },
-                    ).onFailure {
-                        setPreview(getString(R.string.biometric_unavailable), PreviewTone.ERROR)
+                    is ClipboardDecryptResult.RequiresBiometric -> {
+                        launchGateFromKeyboard(
+                            Intent(this, DecryptGateActivity::class.java).apply {
+                                putExtra(DecryptGateActivity.EXTRA_ENCODED_MESSAGE, result.encodedMessage)
+                                putExtra(DecryptGateActivity.EXTRA_PROFILE_ID, result.profileId)
+                            },
+                        ).onFailure {
+                            setPreview(getString(R.string.biometric_unavailable), PreviewTone.ERROR)
+                        }
+                    }
+
+                    is ClipboardDecryptResult.Success -> {
+                        setPreview(result.plaintext, PreviewTone.DECRYPTED)
                     }
                 }
-
-                is ClipboardDecryptResult.Success -> {
-                    setPreview(result.plaintext, PreviewTone.DECRYPTED)
-                }
+                render()
             }
-            render()
         }
 
         clearButton.setOnClickListener {
@@ -3172,16 +3189,18 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         audioCapsuleButton.setOnClickListener {
-            if (inlineAudioRecorder != null) {
-                stopInlineAudioRecording()
-            } else {
-                setAttachActionsExpanded(false)
-                startInlineAudioRecording()
+            requireLicensedFeature({ render() }) {
+                if (inlineAudioRecorder != null) {
+                    stopInlineAudioRecording()
+                } else {
+                    setAttachActionsExpanded(false)
+                    startInlineAudioRecording()
+                }
             }
         }
 
         audioCapsuleButton.setOnLongClickListener {
-            sendLastAudioCapsule()
+            requireLicensedFeature({ render() }) { sendLastAudioCapsule() }
             true
         }
 
@@ -3196,22 +3215,24 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         playAudioCapsuleActionButton.setOnClickListener {
-            Log.d(
-                TAG,
-                "playAudioCapsuleActionButton clicked audio=${lastAudioCapsuleFile?.name} video=${lastVideoCapsuleFile?.name} photo=${lastPhotoCapsuleFile?.name}",
-            )
-            when {
-                lastPhotoCapsuleFile != null ->
-                    launchFromKeyboard(buildPhotoCapsulePreviewIntent(lastPhotoCapsuleFile!!)).onFailure {
-                        setPreview(getString(R.string.keyboard_photo_message_open_failed), PreviewTone.ERROR)
-                        render()
-                    }
-                lastVideoCapsuleFile != null ->
-                    launchFromKeyboard(buildVideoCapsulePreviewIntent(lastVideoCapsuleFile!!)).onFailure {
-                        setPreview(getString(R.string.keyboard_video_capsule_open_failed), PreviewTone.ERROR)
-                        render()
-                    }
-                else -> toggleInlineAudioPlayback()
+            requireLicensedFeature({ render() }) {
+                Log.d(
+                    TAG,
+                    "playAudioCapsuleActionButton clicked audio=${lastAudioCapsuleFile?.name} video=${lastVideoCapsuleFile?.name} photo=${lastPhotoCapsuleFile?.name}",
+                )
+                when {
+                    lastPhotoCapsuleFile != null ->
+                        launchFromKeyboard(buildPhotoCapsulePreviewIntent(lastPhotoCapsuleFile!!)).onFailure {
+                            setPreview(getString(R.string.keyboard_photo_message_open_failed), PreviewTone.ERROR)
+                            render()
+                        }
+                    lastVideoCapsuleFile != null ->
+                        launchFromKeyboard(buildVideoCapsulePreviewIntent(lastVideoCapsuleFile!!)).onFailure {
+                            setPreview(getString(R.string.keyboard_video_capsule_open_failed), PreviewTone.ERROR)
+                            render()
+                        }
+                    else -> toggleInlineAudioPlayback()
+                }
             }
         }
 
@@ -3251,12 +3272,14 @@ class EnigmaKeyboardService : InputMethodService() {
         }
 
         sendAudioCapsuleActionButton.setOnClickListener {
-            if (lastPhotoCapsuleFile != null) {
-                handlePendingPhotoCapsuleAction()
-            } else if (lastVideoCapsuleFile != null) {
-                handlePendingVideoCapsuleAction()
-            } else {
-                sendLastAudioCapsule()
+            requireLicensedFeature({ render() }) {
+                if (lastPhotoCapsuleFile != null) {
+                    handlePendingPhotoCapsuleAction()
+                } else if (lastVideoCapsuleFile != null) {
+                    handlePendingVideoCapsuleAction()
+                } else {
+                    sendLastAudioCapsule()
+                }
             }
         }
 
@@ -3264,25 +3287,29 @@ class EnigmaKeyboardService : InputMethodService() {
         audioCapsuleActionPanel.setOnClickListener { handleAudioPanelTap() }
 
         photoCapsuleButton.setOnClickListener {
-            if (inlineAudioRecorder != null) {
-                setPreview(getString(R.string.keyboard_stop_recording_before_photo_message), PreviewTone.ERROR)
-                render()
-            } else {
-                setAttachActionsExpanded(false)
-                launchPhotoCapsuleActivity()
+            requireLicensedFeature({ render() }) {
+                if (inlineAudioRecorder != null) {
+                    setPreview(getString(R.string.keyboard_stop_recording_before_photo_message), PreviewTone.ERROR)
+                    render()
+                } else {
+                    setAttachActionsExpanded(false)
+                    launchPhotoCapsuleActivity()
+                }
             }
         }
 
         videoCapsuleButton.setOnClickListener {
-            if (inlineAudioRecorder != null) {
-                setPreview(
-                    getString(R.string.keyboard_stop_recording_before_video_capsule),
-                    PreviewTone.ERROR,
-                )
-                render()
-            } else {
-                setAttachActionsExpanded(false)
-                launchVideoCapsuleActivity()
+            requireLicensedFeature({ render() }) {
+                if (inlineAudioRecorder != null) {
+                    setPreview(
+                        getString(R.string.keyboard_stop_recording_before_video_capsule),
+                        PreviewTone.ERROR,
+                    )
+                    render()
+                } else {
+                    setAttachActionsExpanded(false)
+                    launchVideoCapsuleActivity()
+                }
             }
         }
 
@@ -3471,7 +3498,7 @@ class EnigmaKeyboardService : InputMethodService() {
         return before.endsWith(". ") ||
             before.endsWith("! ") ||
             before.endsWith("? ") ||
-            before.endsWith("… ")
+            before.endsWith("вЂ¦ ")
     }
 
     private fun handleBackspace() {
@@ -3737,13 +3764,13 @@ class EnigmaKeyboardService : InputMethodService() {
         const val LAST_KEYBOARD_LANGUAGE_KEY = "last_keyboard_language"
         const val MAX_RECENT_WORDS = 24
         val RU_AUTOCORRECT = mapOf(
-            "превет" to "привет",
-            "пивет" to "привет",
-            "спосибо" to "спасибо",
-            "щас" to "сейчас",
-            "незнаю" to "не знаю",
-            "вообщем" to "в общем",
-            "пожалуста" to "пожалуйста",
+            "РїСЂРµРІРµС‚" to "РїСЂРёРІРµС‚",
+            "РїРёРІРµС‚" to "РїСЂРёРІРµС‚",
+            "СЃРїРѕСЃРёР±Рѕ" to "СЃРїР°СЃРёР±Рѕ",
+            "С‰Р°СЃ" to "СЃРµР№С‡Р°СЃ",
+            "РЅРµР·РЅР°СЋ" to "РЅРµ Р·РЅР°СЋ",
+            "РІРѕРѕР±С‰РµРј" to "РІ РѕР±С‰РµРј",
+            "РїРѕР¶Р°Р»СѓСЃС‚Р°" to "РїРѕР¶Р°Р»СѓР№СЃС‚Р°",
         )
         val EN_AUTOCORRECT = mapOf(
             "teh" to "the",
@@ -3757,58 +3784,58 @@ class EnigmaKeyboardService : InputMethodService() {
         val TR_AUTOCORRECT = mapOf(
             "mrb" to "merhaba",
             "slm" to "selam",
-            "tesekkurler" to "teşekkürler",
-            "lutfen" to "lütfen",
-            "gunaydin" to "günaydın",
-            "iyiaksamlar" to "iyi akşamlar",
-            "gorusuruz" to "görüşürüz",
+            "tesekkurler" to "teЕџekkГјrler",
+            "lutfen" to "lГјtfen",
+            "gunaydin" to "gГјnaydД±n",
+            "iyiaksamlar" to "iyi akЕџamlar",
+            "gorusuruz" to "gГ¶rГјЕџГјrГјz",
         )
         val ES_AUTOCORRECT = mapOf(
             "qeu" to "que",
             "poruqe" to "porque",
             "gracais" to "gracias",
             "holaa" to "hola",
-            "manana" to "mañana",
-            "tambien" to "también",
-            "adioss" to "adiós",
+            "manana" to "maГ±ana",
+            "tambien" to "tambiГ©n",
+            "adioss" to "adiГіs",
         )
         val PT_AUTOCORRECT = mapOf(
             "obg" to "obrigado",
-            "ola" to "olá",
-            "voce" to "você",
-            "nao" to "não",
-            "tambem" to "também",
-            "ate" to "até",
-            "amanha" to "amanhã",
+            "ola" to "olГЎ",
+            "voce" to "vocГЄ",
+            "nao" to "nГЈo",
+            "tambem" to "tambГ©m",
+            "ate" to "atГ©",
+            "amanha" to "amanhГЈ",
         )
         val DE_AUTOCORRECT = mapOf(
             "dankeh" to "danke",
             "bitet" to "bitte",
             "heutte" to "heute",
-            "tschus" to "tschüss",
-            "gruse" to "grüße",
-            "uber" to "über",
+            "tschus" to "tschГјss",
+            "gruse" to "grГјГџe",
+            "uber" to "Гјber",
         )
         val FR_AUTOCORRECT = mapOf(
             "mercie" to "merci",
             "bonjor" to "bonjour",
-            "silvouplait" to "s'il vous plaît",
+            "silvouplait" to "s'il vous plaГ®t",
             "aujourdhui" to "aujourd'hui",
-            "tres" to "très",
-            "desole" to "désolé",
+            "tres" to "trГЁs",
+            "desole" to "dГ©solГ©",
         )
         val IT_AUTOCORRECT = mapOf(
             "grazzie" to "grazie",
-            "perche" to "perché",
-            "piu" to "più",
-            "caffe" to "caffè",
-            "lunedi" to "lunedì",
-            "cosi" to "così",
+            "perche" to "perchГ©",
+            "piu" to "piГ№",
+            "caffe" to "caffГЁ",
+            "lunedi" to "lunedГ¬",
+            "cosi" to "cosГ¬",
         )
         val RU_SUGGESTIONS = listOf(
-            "привет", "спасибо", "пожалуйста", "сейчас", "завтра", "сегодня",
-            "хорошо", "понятно", "давай", "вообще", "клавиатура", "шифрование",
-            "сообщение", "проект", "нормально", "отлично", "проверить", "попробовать",
+            "РїСЂРёРІРµС‚", "СЃРїР°СЃРёР±Рѕ", "РїРѕР¶Р°Р»СѓР№СЃС‚Р°", "СЃРµР№С‡Р°СЃ", "Р·Р°РІС‚СЂР°", "СЃРµРіРѕРґРЅСЏ",
+            "С…РѕСЂРѕС€Рѕ", "РїРѕРЅСЏС‚РЅРѕ", "РґР°РІР°Р№", "РІРѕРѕР±С‰Рµ", "РєР»Р°РІРёР°С‚СѓСЂР°", "С€РёС„СЂРѕРІР°РЅРёРµ",
+            "СЃРѕРѕР±С‰РµРЅРёРµ", "РїСЂРѕРµРєС‚", "РЅРѕСЂРјР°Р»СЊРЅРѕ", "РѕС‚Р»РёС‡РЅРѕ", "РїСЂРѕРІРµСЂРёС‚СЊ", "РїРѕРїСЂРѕР±РѕРІР°С‚СЊ",
         )
         val EN_SUGGESTIONS = listOf(
             "hello", "thanks", "please", "today", "tomorrow", "message",
@@ -4038,29 +4065,29 @@ class EnigmaKeyboardService : InputMethodService() {
             "support",
         )
         val TR_SUGGESTIONS = listOf(
-            "merhaba", "selam", "teşekkürler", "lütfen", "bugün", "yarın",
-            "mesaj", "klavye", "şifre", "şifreleme", "devam", "tamam",
-            "görüşürüz", "günaydın", "iyi", "çalışıyor", "proje", "kontrol",
+            "merhaba", "selam", "teЕџekkГјrler", "lГјtfen", "bugГјn", "yarД±n",
+            "mesaj", "klavye", "Еџifre", "Еџifreleme", "devam", "tamam",
+            "gГ¶rГјЕџГјrГјz", "gГјnaydД±n", "iyi", "Г§alД±ЕџД±yor", "proje", "kontrol",
         )
         val ES_SUGGESTIONS = listOf(
-            "hola", "gracias", "por favor", "hoy", "mañana", "mensaje",
+            "hola", "gracias", "por favor", "hoy", "maГ±ana", "mensaje",
             "teclado", "proyecto", "cifrar", "descifrar", "privado", "listo",
             "revisar", "seguir", "instalar", "seguridad", "clave", "chat",
         )
         val PT_SUGGESTIONS = listOf(
-            "olá", "obrigado", "por favor", "hoje", "amanhã", "mensagem",
+            "olГЎ", "obrigado", "por favor", "hoje", "amanhГЈ", "mensagem",
             "teclado", "projeto", "criptografar", "descriptografar", "privado", "pronto",
-            "verificar", "continuar", "instalar", "segurança", "chave", "chat",
+            "verificar", "continuar", "instalar", "seguranГ§a", "chave", "chat",
         )
         val DE_SUGGESTIONS = listOf(
             "hallo", "danke", "bitte", "heute", "morgen", "nachricht",
-            "tastatur", "projekt", "verschlüsseln", "entschlüsseln", "privat", "bereit",
-            "prüfen", "weiter", "sicherheit", "schlüssel", "chat", "funktioniert",
+            "tastatur", "projekt", "verschlГјsseln", "entschlГјsseln", "privat", "bereit",
+            "prГјfen", "weiter", "sicherheit", "schlГјssel", "chat", "funktioniert",
         )
         val FR_SUGGESTIONS = listOf(
-            "bonjour", "merci", "s'il vous plaît", "aujourd'hui", "demain", "message",
-            "clavier", "projet", "chiffrer", "déchiffrer", "privé", "prêt",
-            "vérifier", "continuer", "sécurité", "clé", "discussion", "installer",
+            "bonjour", "merci", "s'il vous plaГ®t", "aujourd'hui", "demain", "message",
+            "clavier", "projet", "chiffrer", "dГ©chiffrer", "privГ©", "prГЄt",
+            "vГ©rifier", "continuer", "sГ©curitГ©", "clГ©", "discussion", "installer",
         )
         val IT_SUGGESTIONS = listOf(
             "ciao", "grazie", "per favore", "oggi", "domani", "messaggio",

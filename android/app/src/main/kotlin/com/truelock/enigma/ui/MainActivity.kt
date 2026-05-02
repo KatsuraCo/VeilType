@@ -31,6 +31,7 @@ import com.truelock.enigma.R
 import com.truelock.enigma.crypto.Tl1MessageCodec
 import com.truelock.enigma.crypto.Tl1ShareEnvelope
 import com.truelock.enigma.databinding.ActivityMainBinding
+import com.truelock.enigma.license.LicenseStore
 import com.truelock.enigma.media.PendingCapsuleStore
 import com.truelock.enigma.settings.KeyboardAppearancePreferences
 import com.truelock.enigma.settings.KeyboardLanguagePreferences
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shareInvitePreferences: ShareInvitePreferences
     private lateinit var keyboardLanguagePreferences: KeyboardLanguagePreferences
     private lateinit var keyboardAppearancePreferences: KeyboardAppearancePreferences
+    private lateinit var licenseStore: LicenseStore
     private val codec = Tl1MessageCodec()
     private val permissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -93,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         shareInvitePreferences = ShareInvitePreferences(applicationContext)
         keyboardLanguagePreferences = KeyboardLanguagePreferences(applicationContext)
         keyboardAppearancePreferences = KeyboardAppearancePreferences(applicationContext)
+        licenseStore = LicenseStore(applicationContext)
 
         ensureDefaultAppLanguage()
 
@@ -130,13 +133,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
         }
         binding.openAudioCapsuleButton.setOnClickListener {
-            startActivity(Intent(this, AudioCapsuleActivity::class.java))
+            requireLicense { startActivity(Intent(this, AudioCapsuleActivity::class.java)) }
         }
         binding.openVideoCapsuleButton.setOnClickListener {
-            startActivity(Intent(this, VideoCapsuleActivity::class.java))
+            requireLicense { startActivity(Intent(this, VideoCapsuleActivity::class.java)) }
         }
         binding.openPhotoCapsuleButton.setOnClickListener {
-            startActivity(Intent(this, PhotoCapsuleActivity::class.java))
+            requireLicense { startActivity(Intent(this, PhotoCapsuleActivity::class.java)) }
         }
         binding.showInputMethodPickerButton.setOnClickListener {
             showKeyboardPicker()
@@ -152,6 +155,9 @@ class MainActivity : AppCompatActivity() {
         }
         binding.keyboardAppearanceButton.setOnClickListener {
             showKeyboardAppearancePicker()
+        }
+        binding.licenseButton.setOnClickListener {
+            startActivity(Intent(this, LicenseActivity::class.java))
         }
         binding.panicWipeButton.setOnClickListener {
             showPanicWipeDialog()
@@ -239,6 +245,15 @@ class MainActivity : AppCompatActivity() {
         renderMainState(getString(R.string.main_status_ready))
     }
 
+    private fun requireLicense(action: () -> Unit) {
+        if (licenseStore.isActive()) {
+            action()
+            return
+        }
+        startActivity(Intent(this, LicenseActivity::class.java))
+        renderMainState(getString(R.string.license_required_status))
+    }
+
     private fun handleIncomingAction(intent: Intent?) {
         if (intent?.getBooleanExtra(EXTRA_OPEN_VIDEO_FROM_KEYBOARD, false) != true) return
         intent.removeExtra(EXTRA_OPEN_VIDEO_FROM_KEYBOARD)
@@ -311,6 +326,12 @@ class MainActivity : AppCompatActivity() {
             keyboardShapeLabel(keyboardAppearancePreferences.getKeyShapePreset()),
             keyboardHeightLabel(keyboardAppearancePreferences.getHeightPreset()),
         )
+        val entitlement = licenseStore.current()
+        binding.licenseValueText.text = if (entitlement.active) {
+            getString(R.string.main_license_active_format, entitlement.payload?.licenseId.orEmpty())
+        } else {
+            getString(R.string.main_license_inactive)
+        }
         binding.shareInviteModeValueText.text = getString(
             R.string.main_share_mode_current_format,
             shareModeLabel(shareInvitePreferences.getMode()),
