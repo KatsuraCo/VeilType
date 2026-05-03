@@ -156,6 +156,9 @@ class MainActivity : AppCompatActivity() {
         binding.keyboardAppearanceButton.setOnClickListener {
             showKeyboardAppearancePicker()
         }
+        binding.heroLicenseButton.setOnClickListener {
+            startActivity(Intent(this, LicenseActivity::class.java))
+        }
         binding.licenseButton.setOnClickListener {
             startActivity(Intent(this, LicenseActivity::class.java))
         }
@@ -327,11 +330,13 @@ class MainActivity : AppCompatActivity() {
             keyboardHeightLabel(keyboardAppearancePreferences.getHeightPreset()),
         )
         val entitlement = licenseStore.current()
-        binding.licenseValueText.text = if (entitlement.active) {
+        val licenseLabel = if (entitlement.active) {
             getString(R.string.main_license_active_format, entitlement.payload?.licenseId.orEmpty())
         } else {
             getString(R.string.main_license_inactive)
         }
+        binding.licenseValueText.text = licenseLabel
+        binding.heroLicenseValueText.text = licenseLabel
         binding.shareInviteModeValueText.text = getString(
             R.string.main_share_mode_current_format,
             shareModeLabel(shareInvitePreferences.getMode()),

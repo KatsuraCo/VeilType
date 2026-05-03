@@ -1,6 +1,8 @@
 package com.truelock.enigma.license
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import java.time.Instant
 import java.util.UUID
 
 class LicenseStore(context: Context) {
@@ -32,6 +34,19 @@ class LicenseStore(context: Context) {
     }
 
     fun current(): Entitlement {
+        if (canUseTestLicense() && prefs.getBoolean(KEY_TEST_LICENSE, false)) {
+            return Entitlement(
+                active = true,
+                payload = LicensePayload(
+                    licenseId = TEST_LICENSE_ID,
+                    plan = "lifetime",
+                    issuedAt = Instant.now(),
+                    expiresAt = null,
+                    deviceId = deviceId(),
+                ),
+                reason = Entitlement.Reason.ACTIVE,
+            )
+        }
         val raw = prefs.getString(KEY_LICENSE, null)?.takeIf { it.isNotBlank() }
             ?: return Entitlement(false, null, Entitlement.Reason.MISSING)
         return parseAndValidate(raw)
@@ -49,7 +64,29 @@ class LicenseStore(context: Context) {
     }
 
     fun clear() {
-        prefs.edit().remove(KEY_LICENSE).apply()
+        prefs.edit()
+            .remove(KEY_LICENSE)
+            .remove(KEY_TEST_LICENSE)
+            .apply()
+    }
+
+    fun canUseTestLicense(): Boolean =
+        appContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+
+    fun isTestLicenseActive(): Boolean =
+        canUseTestLicense() && prefs.getBoolean(KEY_TEST_LICENSE, false)
+
+    fun activateTestLicense(): Boolean {
+        if (!canUseTestLicense()) return false
+        prefs.edit()
+            .putBoolean(KEY_TEST_LICENSE, true)
+            .remove(KEY_LICENSE)
+            .apply()
+        return true
+    }
+
+    fun deactivateTestLicense() {
+        prefs.edit().remove(KEY_TEST_LICENSE).apply()
     }
 
     private fun parseAndValidate(rawLicense: String): Entitlement {
@@ -74,5 +111,7 @@ class LicenseStore(context: Context) {
     companion object {
         private const val KEY_LICENSE = "signed_license"
         private const val KEY_DEVICE_ID = "device_id"
+        private const val KEY_TEST_LICENSE = "test_license_active"
+        private const val TEST_LICENSE_ID = "VEIL-DEBUG-TEST"
     }
 }
