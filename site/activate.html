@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Activate VeilType</title>
+    <meta name="description" content="Get your VeilType activation code after purchase.">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="./index.html" aria-label="VeilType home">
+            <span class="brand-mark"><span>V</span></span>
+            <span class="brand-word">VeilType</span>
+        </a>
+        <nav class="header-nav" aria-label="Activation navigation">
+            <a href="./index.html#pricing">Pricing</a>
+            <a href="./index.html#trust">Security</a>
+            <a href="./downloads/VeilType.apk">Download APK</a>
+        </nav>
+        <div class="header-actions">
+            <a class="btn btn-small btn-secondary" href="./index.html">Back to site</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="activation section-shell">
+            <div class="activation-card reveal">
+                <p class="pill">Lifetime access · $3</p>
+                <h1>Activate VeilType.</h1>
+                <p class="hero-subtitle">
+                    Enter the email and order ID from your purchase. If you want a device-bound license,
+                    paste the device ID shown inside the Android app.
+                </p>
+
+                <form class="activation-form" id="activationForm">
+                    <label>
+                        Email used for purchase
+                        <input id="emailInput" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+                    </label>
+                    <label>
+                        Order ID
+                        <input id="orderInput" name="orderId" type="text" required placeholder="ORDER-001">
+                    </label>
+                    <label>
+                        Device ID (optional)
+                        <input id="deviceInput" name="deviceId" type="text" placeholder="Paste from VeilType app">
+                    </label>
+                    <button class="btn btn-primary" type="submit">Get activation code</button>
+                </form>
+
+                <div class="activation-result" id="activationResult" hidden>
+                    <h2>Your activation code</h2>
+                    <textarea id="activationCode" readonly rows="7"></textarea>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" id="copyCodeButton" type="button">Copy code</button>
+                        <a class="btn btn-secondary" href="./downloads/VeilType.apk">Download APK</a>
+                    </div>
+                    <p class="muted">
+                        Open VeilType on Android, tap License / Activation, paste this code, and activate.
+                    </p>
+                </div>
+
+                <div class="activation-error" id="activationError" hidden></div>
+            </div>
+
+            <aside class="activation-help reveal">
+                <h2>How activation works</h2>
+                <p>
+                    VeilType receives a signed license code. The Android app verifies it offline with the public
+                    signature key built into the APK. Message content never touches this server.
+                </p>
+                <ul class="check-list">
+                    <li>No account required.</li>
+                    <li>No message server.</li>
+                    <li>License code only unlocks paid features.</li>
+                    <li>Keep your order ID private.</li>
+                </ul>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('activationForm');
+        const result = document.getElementById('activationResult');
+        const errorBox = document.getElementById('activationError');
+        const codeBox = document.getElementById('activationCode');
+        const copyButton = document.getElementById('copyCodeButton');
+        const params = new URLSearchParams(window.location.search);
+        const apiBase = params.get('api') || window.VEILTYPE_API_BASE || 'http://localhost:8787';
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            result.hidden = true;
+            errorBox.hidden = true;
+
+            const payload = {
+                email: document.getElementById('emailInput').value.trim(),
+                orderId: document.getElementById('orderInput').value.trim(),
+                deviceId: document.getElementById('deviceInput').value.trim(),
+            };
+
+            try {
+                const response = await fetch(`${apiBase}/api/licenses/redeem`, {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const data = await response.json();
+                if (!response.ok || !data.ok) {
+                    throw new Error(data.message || data.code || 'Activation failed.');
+                }
+                codeBox.value = data.activationCode;
+                result.hidden = false;
+            } catch (error) {
+                errorBox.textContent = error.message || 'Activation failed.';
+                errorBox.hidden = false;
+            }
+        });
+
+        copyButton.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(codeBox.value);
+            copyButton.textContent = 'Copied';
+            setTimeout(() => { copyButton.textContent = 'Copy code'; }, 1400);
+        });
+    </script>
+</body>
+</html>

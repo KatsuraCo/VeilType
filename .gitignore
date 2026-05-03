@@ -26,6 +26,7 @@ local.properties
 android/keystore.properties
 tools/license_private/
 licenses/
+backend/data/
 
 # Generated vectors or local dumps
 tmp/
