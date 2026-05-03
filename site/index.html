@@ -41,6 +41,7 @@
                 "AES-256-GCM encryption for private capsules",
                 "Text encryption from keyboard",
                 "Encrypted voice, photo, video, and file capsules",
+                "One-time read mode for messages and capsules",
                 "8-emoji shared keys",
                 "Biometric unlock",
                 "Panic wipe",
@@ -98,6 +99,7 @@
                     <span>No account</span>
                     <span>No content server</span>
                     <span>AES-256-GCM</span>
+                    <span>One-time read</span>
                     <span>Open-core trust</span>
                 </div>
             </div>
@@ -238,6 +240,11 @@
                     <p>Package private media and files into .veil capsules for app-to-app sharing.</p>
                 </article>
                 <article class="feature-card reveal">
+                    <span>1x</span>
+                    <h3>One-time read mode</h3>
+                    <p>Set selected messages or .veil capsules to open once on the recipient device, then become unavailable for repeat reading.</p>
+                </article>
+                <article class="feature-card reveal">
                     <span>KEY</span>
                     <h3>Emoji keys</h3>
                     <p>Use memorable 8-emoji shared keys instead of account-based identities.</p>
@@ -267,6 +274,10 @@
                 <p>
                     A .veil capsule is a protected package that can contain text, voice, photos, videos, or files.
                     It is designed to travel through the apps people already use.
+                </p>
+                <p>
+                    For extra-sensitive content, VeilType can mark a message or capsule as one-time read, so it opens once
+                    and then locks itself from normal repeat access.
                 </p>
             </div>
             <div class="capsule-stack reveal delay-1">
@@ -299,6 +310,10 @@
                     <p>Keys are stored on-device. If a key is lost, VeilType cannot recover it. That is intentional.</p>
                 </article>
                 <article class="trust-card reveal">
+                    <h3>One-time read policy</h3>
+                    <p>Per-key settings can make selected messages and capsules readable once, giving sensitive content a stricter local access policy.</p>
+                </article>
+                <article class="trust-card reveal">
                     <h3>No content server</h3>
                     <p>VeilType does not run a server that receives your message content. Messengers transport the encrypted output.</p>
                 </article>
@@ -320,6 +335,7 @@
                 <div class="row"><span>Works in existing messengers</span><span>Limited</span><span>Yes</span></div>
                 <div class="row"><span>Encrypts before sending</span><span>Inside that messenger</span><span>Inside the keyboard</span></div>
                 <div class="row"><span>Voice/photo/video/file capsules</span><span>Messenger-specific</span><span>.veil capsule layer</span></div>
+                <div class="row"><span>One-time read from keyboard</span><span>Messenger-dependent</span><span>Per-key VeilType policy</span></div>
             </div>
         </section>
 
@@ -372,6 +388,10 @@
                 <details class="reveal">
                     <summary>What can I encrypt?</summary>
                     <p>Text, voice messages, photos, videos, and files can be turned into encrypted output or .veil capsules.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Can a message or capsule be opened only once?</summary>
+                    <p>Yes. VeilType supports one-time read settings for sensitive messages and capsules, so normal repeat opening is blocked after the first successful read.</p>
                 </details>
                 <details class="reveal">
                     <summary>Is this DRM?</summary>
