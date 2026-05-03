@@ -1,4 +1,4 @@
-package com.truelock.enigma.ui
+﻿package com.truelock.enigma.ui
 
 import android.Manifest
 import android.content.ClipData
@@ -289,7 +289,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_status_decrypted, decrypted.profile.title, "photo"))
             syncControls()
         }
-        if (profile?.requireBiometricForDecrypt == true) {
+        if (mediaCapsuleService.requiresBiometricForCapsule(tempFile)) {
             biometricHelper.authenticate(
                 onSuccess = { decryptAction() },
                 onError = {

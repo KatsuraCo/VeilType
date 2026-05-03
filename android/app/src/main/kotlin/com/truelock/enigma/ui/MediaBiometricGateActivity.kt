@@ -20,7 +20,7 @@ class MediaBiometricGateActivity : AppCompatActivity() {
         val capsulePath = intent.getStringExtra(EXTRA_CAPSULE_PATH).orEmpty()
         if (capsulePath.isBlank()) {
             broadcastResult(success = false, capsulePath = capsulePath, errorMessage = "Missing capsule")
-            finish()
+            finishAndReturnToPreviousTask()
             return
         }
 
@@ -28,13 +28,18 @@ class MediaBiometricGateActivity : AppCompatActivity() {
         biometricHelper.authenticate(
             onSuccess = {
                 broadcastResult(success = true, capsulePath = capsulePath, errorMessage = null)
-                finish()
+                finishAndReturnToPreviousTask()
             },
             onError = {
                 broadcastResult(success = false, capsulePath = capsulePath, errorMessage = it)
-                finish()
+                finishAndReturnToPreviousTask()
             },
         )
+    }
+
+    private fun finishAndReturnToPreviousTask() {
+        moveTaskToBack(true)
+        finish()
     }
 
     private fun broadcastResult(success: Boolean, capsulePath: String, errorMessage: String?) {

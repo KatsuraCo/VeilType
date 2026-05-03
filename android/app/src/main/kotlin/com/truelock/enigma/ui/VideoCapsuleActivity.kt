@@ -1,4 +1,4 @@
-package com.truelock.enigma.ui
+﻿package com.truelock.enigma.ui
 
 import android.Manifest
 import android.content.ClipData
@@ -471,7 +471,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
                 playCurrentCapsule()
             }
         }
-        if (profile?.requireBiometricForDecrypt == true) {
+        if (mediaCapsuleService.requiresBiometricForCapsule(tempFile)) {
             biometricHelper.authenticate(
                 onSuccess = { decryptAction() },
                 onError = {
@@ -500,7 +500,7 @@ class VideoCapsuleActivity : AppCompatActivity() {
     private fun playCurrentCapsule() {
         val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let { capsuleFile ->
             val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsuleFile) }.getOrNull()
-            if (profile?.requireBiometricForDecrypt == true) {
+            if (mediaCapsuleService.requiresBiometricForCapsule(capsuleFile)) {
                 biometricHelper.authenticate(
                     onSuccess = { decryptCapsuleForPlayback(capsuleFile, autoPlay = true) },
                     onError = {

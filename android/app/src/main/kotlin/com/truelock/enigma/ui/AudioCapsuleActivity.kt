@@ -1,4 +1,4 @@
-package com.truelock.enigma.ui
+﻿package com.truelock.enigma.ui
 
 import android.Manifest
 import android.content.Intent
@@ -234,7 +234,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
             true
         }
 
-        return if (profile?.requireBiometricForDecrypt == true) {
+        return if (mediaCapsuleService.requiresBiometricForCapsule(tempFile)) {
             biometricHelper.authenticate(
                 onSuccess = { decryptAction() },
                 onError = {
@@ -273,7 +273,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
 
         val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let { capsuleFile ->
             val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsuleFile) }.getOrNull()
-            if (profile?.requireBiometricForDecrypt == true) {
+            if (mediaCapsuleService.requiresBiometricForCapsule(capsuleFile)) {
                 biometricHelper.authenticate(
                     onSuccess = {
                         runCatching {
@@ -506,9 +506,9 @@ class AudioCapsuleActivity : AppCompatActivity() {
         val isPlaying = player != null
 
         binding.recordButton.text = if (isRecording) {
-            "■"
+            "в– "
         } else {
-            "●"
+            "в—Џ"
         }
         binding.recordLabelText.text = if (isRecording) {
             getString(R.string.audio_capsule_stop)
@@ -525,7 +525,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
             binding.timerText.text = formatDuration(lastDurationMs)
         }
         binding.playButton.text = if (isPlaying) {
-            "■"
+            "в– "
         } else {
             getString(R.string.audio_capsule_play)
         }

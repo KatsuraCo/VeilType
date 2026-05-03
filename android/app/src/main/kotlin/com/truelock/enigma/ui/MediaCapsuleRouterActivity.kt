@@ -33,6 +33,7 @@ class MediaCapsuleRouterActivity : AppCompatActivity() {
         val detectedType = detectType(uri) ?: inferTypeFromIntent(intent, uri)
         if (detectedType == MediaCapsuleType.AUDIO) {
             routeAudioToKeyboard(uri)
+            moveTaskToBack(true)
             Log.d(TAG, "routeIncomingIntent audio routed to keyboard uri=$uri")
             return
         }

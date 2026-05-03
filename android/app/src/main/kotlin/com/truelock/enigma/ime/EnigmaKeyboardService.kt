@@ -203,7 +203,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 previewTone = PreviewTone.ERROR
             }
             renderInputView?.invoke()
-            scheduleShowSelfForPendingCapsule()
+            scheduleShowSelfAfterBiometricGate()
         }
     }
     private val audioPermissionResultReceiver = object : BroadcastReceiver() {
@@ -235,14 +235,14 @@ class EnigmaKeyboardService : InputMethodService() {
             if (intent.getBooleanExtra(MediaBiometricGateActivity.EXTRA_SUCCESS, false)) {
                 mediaBiometricApprovedCapsulePath = capsulePath
                 renderInputView?.invoke()
-                scheduleShowSelfForPendingCapsule()
+                scheduleShowSelfAfterBiometricGate()
                 repeatHandler.postDelayed({ playPendingAudioAfterBiometric?.invoke() }, 240L)
             } else {
                 previewMessage = intent.getStringExtra(MediaBiometricGateActivity.EXTRA_ERROR_MESSAGE)
                     ?: getString(R.string.biometric_failed)
                 previewTone = PreviewTone.ERROR
                 renderInputView?.invoke()
-                scheduleShowSelfForPendingCapsule()
+                scheduleShowSelfAfterBiometricGate()
             }
         }
     }
@@ -263,6 +263,21 @@ class EnigmaKeyboardService : InputMethodService() {
                     }
                 },
                 PENDING_CAPSULE_SHOW_TOKEN,
+                SystemClock.uptimeMillis() + delayMs,
+            )
+        }
+    }
+
+    private fun scheduleShowSelfAfterBiometricGate() {
+        repeatHandler.removeCallbacksAndMessages(BIOMETRIC_GATE_SHOW_TOKEN)
+        listOf(120L, 360L, 800L, 1300L).forEach { delayMs ->
+            repeatHandler.postAtTime(
+                {
+                    Log.d(TAG, "requestShowSelf after biometric delayMs=$delayMs")
+                    requestShowSelf(0)
+                    renderInputView?.invoke()
+                },
+                BIOMETRIC_GATE_SHOW_TOKEN,
                 SystemClock.uptimeMillis() + delayMs,
             )
         }
@@ -1895,10 +1910,10 @@ class EnigmaKeyboardService : InputMethodService() {
             }
             releaseInlineAudioPlayback()
             val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsule) }.getOrNull()
-            if (profile?.requireBiometricForDecrypt == true &&
+            if (mediaCapsuleService.requiresBiometricForCapsule(capsule) &&
                 mediaBiometricApprovedCapsulePath != capsule.absolutePath
             ) {
-                Log.w(TAG, "resolveLastAudioPlaybackFile biometricRequired profile=${profile.title} capsule=${capsule.name}:${capsule.length()}")
+                Log.w(TAG, "resolveLastAudioPlaybackFile biometricRequired profile=${profile?.title} capsule=${capsule.name}:${capsule.length()}")
                 setPreview(getString(R.string.biometric_prompt_subtitle), PreviewTone.DEFAULT)
                 render()
                 launchGateFromKeyboard(
@@ -3756,6 +3771,7 @@ class EnigmaKeyboardService : InputMethodService() {
         const val SHIFT_LOCKED_SYMBOL = "\u21EA"
         val PENDING_CAPSULE_POLL_TOKEN = Any()
         val PENDING_CAPSULE_SHOW_TOKEN = Any()
+        val BIOMETRIC_GATE_SHOW_TOKEN = Any()
         val PREVIEW_CLEAR_TOKEN = Any()
         val WORD_AT_END = Regex("([\\p{L}]+)$")
         const val PREFS_NAME = "enigma_keyboard_prefs"

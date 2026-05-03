@@ -40,7 +40,7 @@ class DecryptGateActivity : AppCompatActivity() {
         val profileId = intent.getStringExtra(EXTRA_PROFILE_ID).orEmpty()
         if (encodedMessage.isBlank() || profileId.isBlank()) {
             broadcastFailure(getString(R.string.keyboard_decrypt_invalid))
-            finish()
+            finishAndReturnToPreviousTask()
             return
         }
 
@@ -61,13 +61,18 @@ class DecryptGateActivity : AppCompatActivity() {
                         broadcastFailure(getString(R.string.decrypt_one_time_consumed, result.profileTitle))
                     else -> broadcastFailure(getString(R.string.keyboard_decrypt_invalid))
                 }
-                finish()
+                finishAndReturnToPreviousTask()
             },
             onError = {
                 broadcastFailure(it)
-                finish()
+                finishAndReturnToPreviousTask()
             },
         )
+    }
+
+    private fun finishAndReturnToPreviousTask() {
+        moveTaskToBack(true)
+        finish()
     }
 
     private fun broadcastFailure(message: String) {

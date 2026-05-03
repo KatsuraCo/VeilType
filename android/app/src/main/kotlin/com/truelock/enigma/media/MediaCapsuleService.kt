@@ -130,6 +130,22 @@ class MediaCapsuleService(
         return profiles.firstOrNull { it.profileHint.contentEquals(hint) } ?: profiles.firstOrNull()
     }
 
+    fun requiresBiometricForCapsule(
+        capsuleFile: File,
+        profiles: List<KeyProfile> = secureProfileStore.listProfiles(),
+    ): Boolean {
+        requireMediaSize(capsuleFile)
+        if (profiles.isEmpty()) return false
+        val bytes = capsuleStore.readCapsule(capsuleFile)
+        val hint = codec.extractProfileHint(bytes)
+        val exactMatches = profiles.filter { it.profileHint.contentEquals(hint) }
+        return if (exactMatches.isNotEmpty()) {
+            exactMatches.any { it.requireBiometricForDecrypt }
+        } else {
+            profiles.any { it.requireBiometricForDecrypt }
+        }
+    }
+
     private fun defaultPlaintextExtension(type: MediaCapsuleType): String =
         when (type) {
             MediaCapsuleType.AUDIO -> "m4a"
