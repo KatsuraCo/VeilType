@@ -38,7 +38,6 @@ class MediaBiometricGateActivity : AppCompatActivity() {
     }
 
     private fun finishAndReturnToPreviousTask() {
-        moveTaskToBack(true)
         finish()
     }
 

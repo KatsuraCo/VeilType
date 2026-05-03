@@ -289,9 +289,21 @@ class PhotoCapsuleActivity : AppCompatActivity() {
             renderStatus(getString(R.string.media_capsule_status_decrypted, decrypted.profile.title, "photo"))
             syncControls()
         }
-        if (mediaCapsuleService.requiresBiometricForCapsule(tempFile)) {
+        if (mediaCapsuleService.safeRequiresBiometricForCapsule(tempFile)) {
             biometricHelper.authenticate(
-                onSuccess = { decryptAction() },
+                onSuccess = {
+                    runCatching { decryptAction() }.onFailure {
+                        deleteQuietly(tempFile)
+                        renderStatus(
+                            if (it.message?.contains("already opened", ignoreCase = true) == true) {
+                                getString(R.string.decrypt_one_time_consumed, profile?.title ?: getString(R.string.clipboard_unknown_profile))
+                            } else {
+                                getString(R.string.media_capsule_error_decrypt)
+                            },
+                        )
+                        syncControls()
+                    }
+                },
                 onError = {
                     deleteQuietly(tempFile)
                     renderStatus(it)

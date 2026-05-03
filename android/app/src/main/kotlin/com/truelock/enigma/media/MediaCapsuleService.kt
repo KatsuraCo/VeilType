@@ -146,6 +146,13 @@ class MediaCapsuleService(
         }
     }
 
+    fun safeRequiresBiometricForCapsule(
+        capsuleFile: File,
+        profiles: List<KeyProfile> = secureProfileStore.listProfiles(),
+    ): Boolean = runCatching {
+        requiresBiometricForCapsule(capsuleFile, profiles)
+    }.getOrDefault(false)
+
     private fun defaultPlaintextExtension(type: MediaCapsuleType): String =
         when (type) {
             MediaCapsuleType.AUDIO -> "m4a"

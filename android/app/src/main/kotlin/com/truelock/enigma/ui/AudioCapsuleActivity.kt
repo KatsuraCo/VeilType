@@ -234,9 +234,22 @@ class AudioCapsuleActivity : AppCompatActivity() {
             true
         }
 
-        return if (mediaCapsuleService.requiresBiometricForCapsule(tempFile)) {
+        return if (mediaCapsuleService.safeRequiresBiometricForCapsule(tempFile)) {
             biometricHelper.authenticate(
-                onSuccess = { decryptAction() },
+                onSuccess = {
+                    runCatching { decryptAction() }
+                        .onFailure {
+                            deleteQuietly(tempFile)
+                            renderStatus(
+                                if (it.message?.contains("already opened", ignoreCase = true) == true) {
+                                    getString(R.string.decrypt_one_time_consumed, profile?.title ?: getString(R.string.clipboard_unknown_profile))
+                                } else {
+                                    getString(R.string.media_capsule_error_decrypt)
+                                },
+                            )
+                            syncControls()
+                        }
+                },
                 onError = {
                     deleteQuietly(tempFile)
                     renderStatus(it)
@@ -273,7 +286,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
 
         val playbackFile = currentPlaybackFile ?: currentCapsuleFile?.let { capsuleFile ->
             val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsuleFile) }.getOrNull()
-            if (mediaCapsuleService.requiresBiometricForCapsule(capsuleFile)) {
+            if (mediaCapsuleService.safeRequiresBiometricForCapsule(capsuleFile)) {
                 biometricHelper.authenticate(
                     onSuccess = {
                         runCatching {

@@ -148,6 +148,8 @@ class EnigmaKeyboardService : InputMethodService() {
     private var capsLockEnabled: Boolean = false
     private var previewMessage: String? = null
     private var previewTone: PreviewTone = PreviewTone.DEFAULT
+    private var pendingBiometricPreviewMessage: String? = null
+    private var pendingBiometricPreviewTone: PreviewTone = PreviewTone.DEFAULT
     private var selectedProfileId: String? = null
     private var decryptResultReceiverRegistered = false
     private val repeatHandler = Handler(Looper.getMainLooper())
@@ -195,12 +197,16 @@ class EnigmaKeyboardService : InputMethodService() {
                 mode = KeyboardMode.DECRYPT
                 previewMessage = plaintext
                 previewTone = PreviewTone.DECRYPTED
+                pendingBiometricPreviewMessage = plaintext
+                pendingBiometricPreviewTone = PreviewTone.DECRYPTED
             } else {
                 mode = KeyboardMode.DECRYPT
                 previewMessage =
                     intent.getStringExtra(DecryptGateActivity.EXTRA_ERROR_MESSAGE)
                         ?: getString(R.string.keyboard_decrypt_invalid)
                 previewTone = PreviewTone.ERROR
+                pendingBiometricPreviewMessage = previewMessage
+                pendingBiometricPreviewTone = PreviewTone.ERROR
             }
             renderInputView?.invoke()
             scheduleShowSelfAfterBiometricGate()
@@ -275,6 +281,7 @@ class EnigmaKeyboardService : InputMethodService() {
                 {
                     Log.d(TAG, "requestShowSelf after biometric delayMs=$delayMs")
                     requestShowSelf(0)
+                    applyPendingBiometricPreview()
                     renderInputView?.invoke()
                 },
                 BIOMETRIC_GATE_SHOW_TOKEN,
@@ -313,6 +320,21 @@ class EnigmaKeyboardService : InputMethodService() {
             resourcesForLocale.getString(resId)
         } else {
             resourcesForLocale.getString(resId, *args)
+        }
+    }
+
+    private fun applyPendingBiometricPreview(): Boolean {
+        val message = pendingBiometricPreviewMessage ?: return false
+        mode = KeyboardMode.DECRYPT
+        previewMessage = message
+        previewTone = pendingBiometricPreviewTone
+        return true
+    }
+
+    private fun clearPendingBiometricPreviewIfRendered() {
+        if (pendingBiometricPreviewMessage != null && previewMessage == pendingBiometricPreviewMessage) {
+            pendingBiometricPreviewMessage = null
+            pendingBiometricPreviewTone = PreviewTone.DEFAULT
         }
     }
 
@@ -1432,6 +1454,8 @@ class EnigmaKeyboardService : InputMethodService() {
                 startActivity(
                     intent.addFlags(
                         Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
+                            Intent.FLAG_ACTIVITY_NO_HISTORY or
                             Intent.FLAG_ACTIVITY_NO_ANIMATION or
                             Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
                     ),
@@ -1910,7 +1934,8 @@ class EnigmaKeyboardService : InputMethodService() {
             }
             releaseInlineAudioPlayback()
             val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(capsule) }.getOrNull()
-            if (mediaCapsuleService.requiresBiometricForCapsule(capsule) &&
+            val requiresBiometric = mediaCapsuleService.safeRequiresBiometricForCapsule(capsule)
+            if (requiresBiometric &&
                 mediaBiometricApprovedCapsulePath != capsule.absolutePath
             ) {
                 Log.w(TAG, "resolveLastAudioPlaybackFile biometricRequired profile=${profile?.title} capsule=${capsule.name}:${capsule.length()}")
@@ -3353,7 +3378,11 @@ class EnigmaKeyboardService : InputMethodService() {
             shiftEnabled = characterMode == CharacterMode.LETTERS && shouldAutoCapitalizeFor(info)
             refreshPendingVideoCapsuleState?.invoke()
             applyKeyboardAppearanceToInputView?.invoke()
+            val restoredBiometricPreview = applyPendingBiometricPreview()
             renderInputView?.invoke()
+            if (restoredBiometricPreview) {
+                clearPendingBiometricPreviewIfRendered()
+            }
         }.onFailure { error ->
             Log.e(TAG, "onStartInputView failed", error)
         }
@@ -3382,7 +3411,11 @@ class EnigmaKeyboardService : InputMethodService() {
             refreshEnabledKeyboardLanguageState()
             refreshPendingVideoCapsuleState?.invoke()
             applyKeyboardAppearanceToInputView?.invoke()
+            val restoredBiometricPreview = applyPendingBiometricPreview()
             renderInputView?.invoke()
+            if (restoredBiometricPreview) {
+                clearPendingBiometricPreviewIfRendered()
+            }
         }.onFailure { error ->
             Log.e(TAG, "onWindowShown failed", error)
         }
