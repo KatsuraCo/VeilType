@@ -23,6 +23,7 @@ import com.truelock.enigma.media.describeAudioSource
 import com.truelock.enigma.profiles.KeyProfile
 import com.truelock.enigma.profiles.KeyProfileStatus
 import com.truelock.enigma.security.BiometricDecryptHelper
+import com.truelock.enigma.sharing.CapsuleShareText
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
@@ -298,7 +299,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
                         }.onSuccess {
                             playCurrentCapsule()
                         }.onFailure {
-                            renderStatus(getString(R.string.media_capsule_error_decrypt))
+                            renderStatus(mediaDecryptErrorMessage(it, profile?.title))
                             syncControls()
                         }
                     },
@@ -309,11 +310,17 @@ class AudioCapsuleActivity : AppCompatActivity() {
                 )
                 return
             }
-            runCatching { mediaCapsuleService.decryptFile(capsuleFile) }.getOrNull()?.also { decrypted ->
-                currentDecrypted = decrypted
-                currentPlaybackFile = decrypted.plaintextFile
-                lastDurationMs = decrypted.metadata.durationMs
-            }?.plaintextFile
+            runCatching { mediaCapsuleService.decryptFile(capsuleFile) }
+                .onFailure {
+                    renderStatus(mediaDecryptErrorMessage(it, profile?.title))
+                    syncControls()
+                }
+                .getOrNull()
+                ?.also { decrypted ->
+                    currentDecrypted = decrypted
+                    currentPlaybackFile = decrypted.plaintextFile
+                    lastDurationMs = decrypted.metadata.durationMs
+                }?.plaintextFile
         }
         if (playbackFile == null) {
             renderStatus(getString(R.string.media_capsule_error_open_first))
@@ -373,6 +380,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/octet-stream"
             putExtra(Intent.EXTRA_STREAM, uri)
+            CapsuleShareText.build(this@AudioCapsuleActivity)?.let { putExtra(Intent.EXTRA_TEXT, it) }
             clipData = android.content.ClipData.newUri(contentResolver, shareFile.name, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -414,6 +422,13 @@ class AudioCapsuleActivity : AppCompatActivity() {
                 renderStatus(getString(R.string.media_capsule_error_missing_profile))
                 null
             }
+
+    private fun mediaDecryptErrorMessage(error: Throwable, profileTitle: String?): String =
+        if (error.message?.contains("already opened", ignoreCase = true) == true) {
+            getString(R.string.decrypt_one_time_consumed, profileTitle ?: getString(R.string.clipboard_unknown_profile))
+        } else {
+            getString(R.string.media_capsule_error_decrypt)
+        }
 
     private fun beginPlaybackRoute() {
         if (playbackRouteActive) return

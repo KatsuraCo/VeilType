@@ -38,6 +38,7 @@ class ProfileManagerActivity : AppCompatActivity() {
     private lateinit var clipboardManager: ClipboardManager
     private lateinit var biometricHelper: BiometricDecryptHelper
     private var focusImportMode: Boolean = false
+    private var hasResumedOnce: Boolean = false
 
     private val profileFactory = KeyProfileFactory()
     private val keyBundleCodec = EmojiKeyBundleCodec()
@@ -115,6 +116,14 @@ class ProfileManagerActivity : AppCompatActivity() {
             binding.importKeyInput.requestFocus()
             binding.statusText.text = getString(R.string.profile_status_key_missing)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (hasResumedOnce && !focusImportMode) {
+            generateRandomKey()
+        }
+        hasResumedOnce = true
     }
 
     private fun seedDefaults() {

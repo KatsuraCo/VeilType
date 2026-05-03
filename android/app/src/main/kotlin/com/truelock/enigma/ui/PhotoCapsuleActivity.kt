@@ -34,6 +34,7 @@ import com.truelock.enigma.media.PendingCapsuleStore
 import com.truelock.enigma.profiles.KeyProfile
 import com.truelock.enigma.profiles.KeyProfileStatus
 import com.truelock.enigma.security.BiometricDecryptHelper
+import com.truelock.enigma.sharing.CapsuleShareText
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
 import com.truelock.enigma.storage.SecureProfileStore
@@ -442,6 +443,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/octet-stream"
             putExtra(Intent.EXTRA_STREAM, uri)
+            CapsuleShareText.build(this@PhotoCapsuleActivity)?.let { putExtra(Intent.EXTRA_TEXT, it) }
             clipData = ClipData.newUri(contentResolver, shareFile.name, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }

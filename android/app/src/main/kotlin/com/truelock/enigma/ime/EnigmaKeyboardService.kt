@@ -70,6 +70,7 @@ import com.truelock.enigma.profiles.SecretSequenceKind
 import com.truelock.enigma.prediction.KeyboardPredictionEngine
 import com.truelock.enigma.settings.KeyboardAppearancePreferences
 import com.truelock.enigma.settings.KeyboardLanguagePreferences
+import com.truelock.enigma.sharing.CapsuleShareText
 import com.truelock.enigma.sharing.ShareInvitePreferences
 import com.truelock.enigma.storage.FileKeyProfileRepository
 import com.truelock.enigma.storage.ProfileKeyVault
@@ -96,13 +97,13 @@ class EnigmaKeyboardService : InputMethodService() {
         val localeTag: String,
         val displayName: String,
     ) {
-        RU("ru", "Р СѓСЃСЃРєРёР№"),
+        RU("ru", "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"),
         EN("en", "English"),
-        TR("tr", "TГјrkГ§e"),
-        ES("es", "EspaГ±ol"),
-        PT("pt", "PortuguГЄs"),
+        TR("tr", "T\u00fcrk\u00e7e"),
+        ES("es", "Espa\u00f1ol"),
+        PT("pt", "Portugu\u00eas"),
         DE("de", "Deutsch"),
-        FR("fr", "FranГ§ais"),
+        FR("fr", "Fran\u00e7ais"),
         IT("it", "Italiano"),
         ;
 
@@ -1517,6 +1518,7 @@ class EnigmaKeyboardService : InputMethodService() {
             val targetedIntent = Intent(Intent.ACTION_SEND).apply {
                 type = mimeType
                 putExtra(Intent.EXTRA_STREAM, uri)
+                CapsuleShareText.build(this@EnigmaKeyboardService)?.let { putExtra(Intent.EXTRA_TEXT, it) }
                 clipData = android.content.ClipData.newUri(contentResolver, shareFile.name, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 targetPackage?.let(::setPackage)
@@ -1537,6 +1539,7 @@ class EnigmaKeyboardService : InputMethodService() {
             return Intent(Intent.ACTION_SEND).apply {
                 type = mimeType
                 putExtra(Intent.EXTRA_STREAM, uri)
+                CapsuleShareText.build(this@EnigmaKeyboardService)?.let { putExtra(Intent.EXTRA_TEXT, it) }
                 clipData = android.content.ClipData.newUri(contentResolver, shareFile.name, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }.also { fallbackIntent ->
@@ -1581,8 +1584,8 @@ class EnigmaKeyboardService : InputMethodService() {
 
             val alternatives = when (currentLanguage) {
                 KeyboardLanguage.RU -> mapOf(
-                    "Рµ" to listOf("С‘"),
-                    "СЊ" to listOf("СЉ"),
+                    "\u0435" to listOf("\u0451"),
+                    "\u044c" to listOf("\u044a"),
                 )
                 KeyboardLanguage.EN -> mapOf(
                     "a" to listOf("ГЎ", "Г ", "Г¤", "Гў"),
@@ -2381,10 +2384,10 @@ class EnigmaKeyboardService : InputMethodService() {
         fun updateEnterKey() {
             val action = currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_MASK_ACTION)
             enterButton.text = when (action) {
-                EditorInfo.IME_ACTION_SEND -> "вћ¤"
-                EditorInfo.IME_ACTION_SEARCH -> "вЊ•"
-                EditorInfo.IME_ACTION_GO -> "в†’"
-                EditorInfo.IME_ACTION_DONE -> "вњ“"
+                EditorInfo.IME_ACTION_SEND -> "\u27a4"
+                EditorInfo.IME_ACTION_SEARCH -> "\u2315"
+                EditorInfo.IME_ACTION_GO -> "\u2192"
+                EditorInfo.IME_ACTION_DONE -> "\u2713"
                 else -> keyboardString(R.string.keyboard_action_enter)
             }
         }
