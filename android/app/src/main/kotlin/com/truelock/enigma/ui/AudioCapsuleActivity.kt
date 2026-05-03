@@ -201,6 +201,7 @@ class AudioCapsuleActivity : AppCompatActivity() {
         autoPlay: Boolean = false,
         saveForKeyboard: Boolean = false,
     ): Boolean {
+        clearOpenedCapsuleState()
         val tempFile = runCatching {
             mediaCapsuleService.createRecordingFile(MediaCapsuleType.AUDIO, MediaCapsuleType.AUDIO.fileExtension)
                 .also { copyUriToFileWithLimit(uri, it, MediaCapsuleService.MAX_MEDIA_BYTES) }
@@ -427,8 +428,16 @@ class AudioCapsuleActivity : AppCompatActivity() {
         if (error.message?.contains("already opened", ignoreCase = true) == true) {
             getString(R.string.decrypt_one_time_consumed, profileTitle ?: getString(R.string.clipboard_unknown_profile))
         } else {
-            getString(R.string.media_capsule_error_decrypt)
+                getString(R.string.media_capsule_error_decrypt)
         }
+
+    private fun clearOpenedCapsuleState() {
+        stopPlayback(deletePlaybackFile = true)
+        currentCapsuleFile = null
+        currentDecrypted = null
+        currentPlaybackFile = null
+        lastDurationMs = 0L
+    }
 
     private fun beginPlaybackRoute() {
         if (playbackRouteActive) return

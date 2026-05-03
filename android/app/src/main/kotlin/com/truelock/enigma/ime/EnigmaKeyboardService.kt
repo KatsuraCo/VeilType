@@ -1932,6 +1932,15 @@ class EnigmaKeyboardService : InputMethodService() {
 
         fun resolveLastAudioPlaybackFile(): java.io.File? {
             val capsule = lastAudioCapsuleFile ?: return null
+            mediaCapsuleService.safeConsumedOneTimeProfileForCapsule(capsule)?.let { consumedProfile ->
+                releaseInlineAudioPlayback()
+                setPreview(
+                    getString(R.string.decrypt_one_time_consumed, consumedProfile.title),
+                    PreviewTone.ERROR,
+                )
+                render()
+                return null
+            }
             if (lastAudioPlaybackCapsulePath == capsule.absolutePath && lastAudioPlaybackFile?.exists() == true) {
                 return lastAudioPlaybackFile
             }

@@ -14,7 +14,7 @@ class DecryptUsageStore(context: Context) {
         prefs.contains(storageKey(profileId, fingerprint))
 
     fun markConsumed(profileId: String, fingerprint: String) {
-        prefs.edit().putLong(storageKey(profileId, fingerprint), System.currentTimeMillis()).apply()
+        prefs.edit().putLong(storageKey(profileId, fingerprint), System.currentTimeMillis()).commit()
     }
 
     private fun storageKey(profileId: String, fingerprint: String): String = "$profileId:$fingerprint"

@@ -251,6 +251,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
     }
 
     private fun importCapsule(uri: Uri) {
+        clearOpenedCapsuleState()
         val tempFile = runCatching {
             mediaCapsuleService.createRecordingFile(
                 MediaCapsuleType.PHOTO,
@@ -324,6 +325,18 @@ class PhotoCapsuleActivity : AppCompatActivity() {
                 syncControls()
             }
         }
+    }
+
+    private fun clearOpenedCapsuleState() {
+        currentPhotoFile = null
+        currentCapsuleFile = null
+        currentDecrypted = null
+        currentPlaybackFile = null
+        photoDrafts.clear()
+        selectedDraftIndex = -1
+        binding.photoView.setImageDrawable(null)
+        binding.photoView.visibility = View.GONE
+        rebuildThumbnails()
     }
 
     private fun showPhoto(file: File) {

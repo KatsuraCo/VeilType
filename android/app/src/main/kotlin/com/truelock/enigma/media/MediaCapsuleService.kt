@@ -79,9 +79,8 @@ class MediaCapsuleService(
         val candidates = profiles.filter { it.profileHint.contentEquals(hint) }.ifEmpty { profiles }
         require(candidates.isNotEmpty()) { "No profiles available for media capsule" }
 
-        val profile = candidates.firstOrNull() ?: error("No matching profile")
         val fingerprint = usageStore.mediaFingerprint(bytes)
-        require(!profile.oneTimeRead || !usageStore.isConsumed(profile.id, fingerprint)) {
+        require(candidates.none { it.oneTimeRead && usageStore.isConsumed(it.id, fingerprint) }) {
             "Capsule already opened"
         }
 
@@ -119,6 +118,22 @@ class MediaCapsuleService(
             type = decoded.type,
         )
     }
+
+    fun consumedOneTimeProfileForCapsule(
+        capsuleFile: File,
+        profiles: List<KeyProfile> = secureProfileStore.listProfiles(),
+    ): KeyProfile? {
+        requireMediaSize(capsuleFile)
+        if (profiles.isEmpty()) return null
+        val bytes = capsuleStore.readCapsule(capsuleFile)
+        val hint = codec.extractProfileHint(bytes)
+        val candidates = profiles.filter { it.profileHint.contentEquals(hint) }.ifEmpty { profiles }
+        val fingerprint = usageStore.mediaFingerprint(bytes)
+        return candidates.firstOrNull { it.oneTimeRead && usageStore.isConsumed(it.id, fingerprint) }
+    }
+
+    fun safeConsumedOneTimeProfileForCapsule(capsuleFile: File): KeyProfile? =
+        runCatching { consumedOneTimeProfileForCapsule(capsuleFile) }.getOrNull()
 
     fun resolveProfileForCapsule(
         capsuleFile: File,
