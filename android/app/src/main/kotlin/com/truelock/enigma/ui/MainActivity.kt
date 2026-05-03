@@ -159,9 +159,6 @@ class MainActivity : AppCompatActivity() {
         binding.heroLicenseButton.setOnClickListener {
             startActivity(Intent(this, LicenseActivity::class.java))
         }
-        binding.licenseButton.setOnClickListener {
-            startActivity(Intent(this, LicenseActivity::class.java))
-        }
         binding.panicWipeButton.setOnClickListener {
             showPanicWipeDialog()
         }

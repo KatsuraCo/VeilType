@@ -302,18 +302,6 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/licenseButton"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_app_button_secondary"
-                android:backgroundTint="@null"
-                android:text="@string/main_license_button"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/licenseValueText"
                 android:layout_width="match_parent"
