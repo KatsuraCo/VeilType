@@ -154,6 +154,13 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (currentDecrypted?.profile?.oneTimeRead == true) {
+            clearOpenedCapsuleState()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraProvider?.unbindAll()

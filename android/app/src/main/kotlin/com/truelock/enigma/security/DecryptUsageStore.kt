@@ -17,7 +17,16 @@ class DecryptUsageStore(context: Context) {
         prefs.edit().putLong(storageKey(profileId, fingerprint), System.currentTimeMillis()).commit()
     }
 
+    fun isMediaConsumed(fingerprint: String): Boolean =
+        prefs.contains(mediaStorageKey(fingerprint))
+
+    fun markMediaConsumed(fingerprint: String) {
+        prefs.edit().putLong(mediaStorageKey(fingerprint), System.currentTimeMillis()).commit()
+    }
+
     private fun storageKey(profileId: String, fingerprint: String): String = "$profileId:$fingerprint"
+
+    private fun mediaStorageKey(fingerprint: String): String = "media:$fingerprint"
 
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256")

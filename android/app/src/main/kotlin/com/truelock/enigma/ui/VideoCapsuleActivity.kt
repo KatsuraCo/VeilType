@@ -256,6 +256,11 @@ class VideoCapsuleActivity : AppCompatActivity() {
         if (playbackPlayer?.isPlaying == true) {
             pausePlaybackPreview()
         }
+        if (currentDecrypted?.profile?.oneTimeRead == true) {
+            cleanupCurrentVideoState()
+            showCaptureMode()
+            syncControls()
+        }
     }
 
     override fun onDestroy() {

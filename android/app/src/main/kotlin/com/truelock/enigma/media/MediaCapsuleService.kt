@@ -81,6 +81,10 @@ class MediaCapsuleService(
         require(candidates.isNotEmpty()) { "No profiles available for media capsule" }
 
         val fingerprint = usageStore.mediaFingerprint(bytes)
+        val hasOneTimeCandidate = candidates.any { it.oneTimeRead }
+        require(!hasOneTimeCandidate || !usageStore.isMediaConsumed(fingerprint)) {
+            "Capsule already opened"
+        }
         require(candidates.none { it.oneTimeRead && usageStore.isConsumed(it.id, fingerprint) }) {
             "Capsule already opened"
         }
@@ -96,6 +100,11 @@ class MediaCapsuleService(
             .forEach { profile ->
                 usageStore.markConsumed(profile.id, fingerprint)
             }
+        if (candidates.any { it.oneTimeRead && it.profileHint.contentEquals(decoded.profileHint) } ||
+            decodedProfile.oneTimeRead
+        ) {
+            usageStore.markMediaConsumed(fingerprint)
+        }
 
         val extension = decoded.metadata.originalFileName
             ?.substringAfterLast('.', "")
@@ -133,6 +142,9 @@ class MediaCapsuleService(
         val hint = codec.extractProfileHint(bytes)
         val candidates = candidateProfilesForHint(profiles, hint)
         val fingerprint = usageStore.mediaFingerprint(bytes)
+        if (candidates.any { it.oneTimeRead } && usageStore.isMediaConsumed(fingerprint)) {
+            return candidates.firstOrNull { it.oneTimeRead }
+        }
         return candidates.firstOrNull { it.oneTimeRead && usageStore.isConsumed(it.id, fingerprint) }
     }
 
