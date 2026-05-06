@@ -457,6 +457,13 @@ class VideoCapsuleActivity : AppCompatActivity() {
             return
         }
         val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(tempFile) }.getOrNull()
+        mediaCapsuleService.safeConsumedOneTimeProfileForCapsule(tempFile)?.let { consumedProfile ->
+            deleteQuietly(tempFile)
+            renderStatus(getString(R.string.decrypt_one_time_consumed, consumedProfile.title))
+            showCaptureMode()
+            syncControls()
+            return
+        }
         val decryptAction = {
             val decrypted = mediaCapsuleService.decryptFile(tempFile)
             cleanupCurrentVideoState()

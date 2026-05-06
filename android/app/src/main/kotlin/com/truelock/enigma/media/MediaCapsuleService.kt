@@ -3,6 +3,7 @@ package com.truelock.enigma.media
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import com.truelock.enigma.profiles.KeyProfile
+import com.truelock.enigma.profiles.KeyProfileStatus
 import com.truelock.enigma.security.DecryptUsageStore
 import com.truelock.enigma.storage.SecureProfileStore
 import java.io.File
@@ -76,7 +77,7 @@ class MediaCapsuleService(
         requireMediaSize(capsuleFile)
         val bytes = capsuleStore.readCapsule(capsuleFile)
         val hint = codec.extractProfileHint(bytes)
-        val candidates = profiles.filter { it.profileHint.contentEquals(hint) }.ifEmpty { profiles }
+        val candidates = candidateProfilesForHint(profiles, hint)
         require(candidates.isNotEmpty()) { "No profiles available for media capsule" }
 
         val fingerprint = usageStore.mediaFingerprint(bytes)
@@ -89,9 +90,12 @@ class MediaCapsuleService(
         val decodedProfile = candidates.firstOrNull { it.profileHint.contentEquals(decoded.profileHint) }
             ?: candidates.first()
         secureProfileStore.touchProfile(decodedProfile.id)
-        if (decodedProfile.oneTimeRead) {
-            usageStore.markConsumed(decodedProfile.id, fingerprint)
-        }
+        candidates
+            .filter { it.oneTimeRead && it.profileHint.contentEquals(decoded.profileHint) }
+            .ifEmpty { listOf(decodedProfile).filter { it.oneTimeRead } }
+            .forEach { profile ->
+                usageStore.markConsumed(profile.id, fingerprint)
+            }
 
         val extension = decoded.metadata.originalFileName
             ?.substringAfterLast('.', "")
@@ -127,7 +131,7 @@ class MediaCapsuleService(
         if (profiles.isEmpty()) return null
         val bytes = capsuleStore.readCapsule(capsuleFile)
         val hint = codec.extractProfileHint(bytes)
-        val candidates = profiles.filter { it.profileHint.contentEquals(hint) }.ifEmpty { profiles }
+        val candidates = candidateProfilesForHint(profiles, hint)
         val fingerprint = usageStore.mediaFingerprint(bytes)
         return candidates.firstOrNull { it.oneTimeRead && usageStore.isConsumed(it.id, fingerprint) }
     }
@@ -142,7 +146,7 @@ class MediaCapsuleService(
         requireMediaSize(capsuleFile)
         val bytes = capsuleStore.readCapsule(capsuleFile)
         val hint = codec.extractProfileHint(bytes)
-        return profiles.firstOrNull { it.profileHint.contentEquals(hint) } ?: profiles.firstOrNull()
+        return candidateProfilesForHint(profiles, hint).firstOrNull()
     }
 
     fun requiresBiometricForCapsule(
@@ -153,7 +157,8 @@ class MediaCapsuleService(
         if (profiles.isEmpty()) return false
         val bytes = capsuleStore.readCapsule(capsuleFile)
         val hint = codec.extractProfileHint(bytes)
-        val exactMatches = profiles.filter { it.profileHint.contentEquals(hint) }
+        val exactMatches = candidateProfilesForHint(profiles, hint)
+            .filter { it.profileHint.contentEquals(hint) }
         return if (exactMatches.isNotEmpty()) {
             exactMatches.any { it.requireBiometricForDecrypt }
         } else {
@@ -174,6 +179,25 @@ class MediaCapsuleService(
             MediaCapsuleType.VIDEO -> "mp4"
             MediaCapsuleType.PHOTO -> "jpg"
         }
+
+    private fun candidateProfilesForHint(profiles: List<KeyProfile>, hint: ByteArray): List<KeyProfile> {
+        val exactMatches = profiles.filter { it.profileHint.contentEquals(hint) }
+        val candidates = exactMatches.ifEmpty { profiles }
+        return candidates.sortedWith(
+            compareBy<KeyProfile> {
+                when (it.status) {
+                    KeyProfileStatus.ACTIVE -> 0
+                    KeyProfileStatus.EXPIRING -> 1
+                    KeyProfileStatus.EXPIRED -> 2
+                    KeyProfileStatus.ARCHIVED -> 3
+                }
+            }
+                .thenByDescending { it.oneTimeRead }
+                .thenByDescending { it.requireBiometricForDecrypt }
+                .thenByDescending { it.lastUsedAt ?: it.createdAt }
+                .thenBy { it.title.lowercase() },
+        )
+    }
 
     private fun requireMediaSize(file: File) {
         require(file.exists()) { "Media file missing" }
