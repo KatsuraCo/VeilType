@@ -332,6 +332,7 @@
   <string name="profile_one_time_short">one-time</string>
   <string name="profile_biometric_short">biometric</string>
   <string name="decrypt_one_time_consumed">This message or capsule for key %1$s has already been opened once.</string>
+  <string name="media_capsule_already_opened_short">Capsule has already been opened</string>
   <string name="biometric_prompt_title">Confirm identity</string>
   <string name="biometric_prompt_subtitle">Use biometrics or device credentials to decrypt.</string>
   <string name="biometric_unavailable">Biometric or device credential unlock is not available on this phone.</string>

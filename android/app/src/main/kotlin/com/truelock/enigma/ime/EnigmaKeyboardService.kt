@@ -229,6 +229,14 @@ class EnigmaKeyboardService : InputMethodService() {
     private val pendingCapsuleReadyReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action != MediaCapsuleRouterActivity.ACTION_PENDING_CAPSULE_READY) return
+            val errorMessage = intent.getStringExtra(MediaCapsuleRouterActivity.EXTRA_PENDING_CAPSULE_ERROR_MESSAGE)
+            if (!errorMessage.isNullOrBlank()) {
+                previewMessage = errorMessage
+                previewTone = PreviewTone.ERROR
+                renderInputView?.invoke()
+                scheduleShowSelfAfterBiometricGate()
+                return
+            }
             refreshPendingVideoCapsuleState?.invoke()
             renderInputView?.invoke()
             scheduleShowSelfForPendingCapsule()

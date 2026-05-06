@@ -285,4 +285,5 @@
   <string name="video_capsule_resume">Riprendi</string>
   <string name="video_capsule_status_paused">Registrazione in pausa. Puoi riprendere o fermare il video.</string>
   <string name="keyboard_action_close">Chiudi</string>
+  <string name="media_capsule_already_opened_short">La capsula è già stata aperta</string>
 </resources>

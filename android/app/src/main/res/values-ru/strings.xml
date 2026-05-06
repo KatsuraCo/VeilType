@@ -278,6 +278,7 @@
   <string name="profile_one_time_short">одно чтение</string>
   <string name="profile_biometric_short">биометрия</string>
   <string name="decrypt_one_time_consumed">Это сообщение или капсула для ключа %1$s уже были открыты один раз.</string>
+  <string name="media_capsule_already_opened_short">Капсула уже была открыта</string>
   <string name="biometric_prompt_title">Подтвердите личность</string>
   <string name="biometric_prompt_subtitle">Используйте биометрию или код устройства для расшифровки.</string>
   <string name="biometric_unavailable">На этом телефоне недоступна биометрия или пароль устройства для расшифровки.</string>

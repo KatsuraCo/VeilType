@@ -285,4 +285,5 @@
   <string name="video_capsule_resume">Sürdür</string>
   <string name="video_capsule_status_paused">Kayıt duraklatıldı. Videoyu sürdürebilir veya durdurabilirsiniz.</string>
   <string name="keyboard_action_close">Kapat</string>
+  <string name="media_capsule_already_opened_short">Kapsül zaten açıldı</string>
 </resources>

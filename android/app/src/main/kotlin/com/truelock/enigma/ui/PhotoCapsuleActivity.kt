@@ -275,8 +275,7 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         val profile = runCatching { mediaCapsuleService.resolveProfileForCapsule(tempFile) }.getOrNull()
         mediaCapsuleService.safeConsumedOneTimeProfileForCapsule(tempFile)?.let { consumedProfile ->
             deleteQuietly(tempFile)
-            renderStatus(getString(R.string.decrypt_one_time_consumed, consumedProfile.title))
-            syncControls()
+            notifyCapsuleAlreadyOpenedAndFinish()
             return
         }
         val decryptAction = {
@@ -309,13 +308,11 @@ class PhotoCapsuleActivity : AppCompatActivity() {
                 onSuccess = {
                     runCatching { decryptAction() }.onFailure {
                         deleteQuietly(tempFile)
-                        renderStatus(
-                            if (it.message?.contains("already opened", ignoreCase = true) == true) {
-                                getString(R.string.decrypt_one_time_consumed, profile?.title ?: getString(R.string.clipboard_unknown_profile))
-                            } else {
-                                getString(R.string.media_capsule_error_decrypt)
-                            },
-                        )
+                        if (it.message?.contains("already opened", ignoreCase = true) == true) {
+                            notifyCapsuleAlreadyOpenedAndFinish()
+                            return@onFailure
+                        }
+                        renderStatus(getString(R.string.media_capsule_error_decrypt))
                         syncControls()
                     }
                 },
@@ -328,16 +325,28 @@ class PhotoCapsuleActivity : AppCompatActivity() {
         } else {
             runCatching { decryptAction() }.onFailure {
                 deleteQuietly(tempFile)
-                renderStatus(
-                    if (it.message?.contains("already opened", ignoreCase = true) == true) {
-                        getString(R.string.decrypt_one_time_consumed, profile?.title ?: getString(R.string.clipboard_unknown_profile))
-                    } else {
-                        getString(R.string.media_capsule_error_decrypt)
-                    },
-                )
+                if (it.message?.contains("already opened", ignoreCase = true) == true) {
+                    notifyCapsuleAlreadyOpenedAndFinish()
+                    return@onFailure
+                }
+                renderStatus(getString(R.string.media_capsule_error_decrypt))
                 syncControls()
             }
         }
+    }
+
+    private fun notifyCapsuleAlreadyOpenedAndFinish() {
+        sendBroadcast(
+            Intent(MediaCapsuleRouterActivity.ACTION_PENDING_CAPSULE_READY).apply {
+                setPackage(packageName)
+                addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+                putExtra(
+                    MediaCapsuleRouterActivity.EXTRA_PENDING_CAPSULE_ERROR_MESSAGE,
+                    getString(R.string.media_capsule_already_opened_short),
+                )
+            },
+        )
+        finish()
     }
 
     private fun clearOpenedCapsuleState() {

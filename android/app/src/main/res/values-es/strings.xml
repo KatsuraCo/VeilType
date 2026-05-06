@@ -285,4 +285,5 @@
   <string name="video_capsule_resume">Continuar</string>
   <string name="video_capsule_status_paused">La grabación está en pausa. Puedes continuar o detener el video.</string>
   <string name="keyboard_action_close">Cerrar</string>
+  <string name="media_capsule_already_opened_short">La cápsula ya fue abierta</string>
 </resources>

@@ -285,4 +285,5 @@
   <string name="video_capsule_resume">Retomar</string>
   <string name="video_capsule_status_paused">Gravação em pausa. Você pode retomar ou parar o vídeo.</string>
   <string name="keyboard_action_close">Fechar</string>
+  <string name="media_capsule_already_opened_short">A cápsula já foi aberta</string>
 </resources>

@@ -143,5 +143,6 @@ class MediaCapsuleRouterActivity : AppCompatActivity() {
         const val TAG = "MediaCapsuleRouter"
         const val ACTION_PENDING_CAPSULE_READY = "com.truelock.enigma.ACTION_PENDING_CAPSULE_READY"
         const val EXTRA_PENDING_CAPSULE_TYPE = "pending_capsule_type"
+        const val EXTRA_PENDING_CAPSULE_ERROR_MESSAGE = "pending_capsule_error_message"
     }
 }
