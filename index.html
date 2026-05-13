@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VeilType - Privacy on top of any messenger</title>
+    <meta
+        id="metaDescription"
+        name="description"
+        content="VeilType is an Android keyboard that lets you send encrypted text, voice, photo, video, and file capsules through Telegram, WhatsApp, SMS, email, and more."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="theme-color" content="#0D2340" />
+    <link rel="canonical" href="./" />
+    <link rel="alternate" hreflang="en" href="./index.html" />
+    <link rel="alternate" hreflang="ru" href="./ru.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="VeilType - Privacy on top of any messenger" />
+    <meta property="og:description" content="Send encrypted text, voice, photo, video, and file capsules through Telegram, WhatsApp, SMS, email, and more." />
+    <meta property="og:image" content="./media/product-hunt/01-hero-encrypt-before-send.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="VeilType - Privacy on top of any messenger" />
+    <meta name="twitter:description" content="Keep your chats. Add encrypted capsules from the keyboard." />
+    <meta name="twitter:image" content="./media/product-hunt/01-hero-encrypt-before-send.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "VeilType",
+            "applicationCategory": "SecurityApplication",
+            "operatingSystem": "Android",
+            "url": "./",
+            "downloadUrl": "./downloads/VeilType.apk",
+            "description": "VeilType is an Android keyboard that lets you send encrypted text, voice, photo, video, and file capsules through Telegram, WhatsApp, SMS, email, and more. It is a privacy layer for existing messengers, not a new messenger.",
+            "featureList": [
+                "Open-core privacy architecture",
+                "AES-256-GCM encryption for private capsules",
+                "Text encryption from keyboard",
+                "Encrypted voice, photo, video, and file capsules",
+                "One-time read mode for messages and capsules",
+                "8-emoji shared keys",
+                "Biometric unlock",
+                "Panic wipe",
+                "Offline-first, no VeilType server for message content"
+            ],
+            "offers": {
+                "@type": "Offer",
+                "price": "3.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/PreOrder"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "VeilType"
+            }
+        }
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="#top" aria-label="VeilType home">
+            <span class="typewriter-logo" aria-hidden="true">V</span>
+            <span class="brand-text">VeilType</span>
+        </a>
+        <nav class="header-nav" aria-label="Primary navigation">
+            <a href="#how">How it works</a>
+            <a href="#features">Features</a>
+            <a href="#trust">Trust</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+        <div class="header-actions">
+            <a class="btn btn-small btn-primary" href="./activate.html">Activate</a>
+            <nav class="locale-switch" aria-label="Language switch">
+                <a class="active" href="./index.html" lang="en">EN</a>
+                <a href="./ru.html" lang="ru">RU</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="top">
+        <section class="hero section-shell">
+            <div class="hero-copy reveal">
+                <p class="pill">Android launch &middot; $3 lifetime access</p>
+                <h1>Privacy on top of any messenger.</h1>
+                <p class="hero-subtitle">
+                    VeilType is an Android keyboard that lets you send encrypted text, voice, photo, video, and file
+                    capsules through Telegram, WhatsApp, SMS, email, and more — with optional one-time read mode for sensitive content.
+                </p>
+                <p class="hero-position">
+                    Keep your chats. Add encrypted capsules that can be opened once.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="./activate.html">Get lifetime access for $3</a>
+                    <a class="btn btn-secondary" href="#how">See how it works</a>
+                </div>
+                <div class="trust-metrics" aria-label="VeilType trust highlights">
+                    <span>No new messenger</span>
+                    <span>No account</span>
+                    <span>No content server</span>
+                    <span>AES-256-GCM</span>
+                    <span>One-time read</span>
+                    <span>Open-core trust</span>
+                </div>
+            </div>
+
+            <div class="hero-visual reveal delay-1" aria-label="VeilType keyboard and capsule mockup">
+                <div class="mock-phone">
+                    <div class="chat-area">
+                        <div class="chat-bubble muted">Can you send it privately?</div>
+                        <div class="chat-bubble encrypted">
+                            <span class="capsule-dot"></span>
+                            message_1777726990473.veil
+                        </div>
+                    </div>
+                    <div class="keyboard-mock">
+                        <div class="keybar" aria-hidden="true">
+                            <span class="icon-key lock">LOCK</span>
+                            <span class="icon-key">VIEW</span>
+                            <span class="icon-key">&times;</span>
+                            <span class="icon-key">MIC</span>
+                            <span class="icon-key">CAM</span>
+                            <span class="icon-key">VID</span>
+                        </div>
+                        <div class="capsule-panel real-audio-panel">
+                            <strong>Voice capsule ready. Send it from this panel.</strong>
+                            <div class="audio-playback-row">
+                                <div class="waveform" aria-hidden="true">
+                                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                                <button aria-label="Play voice capsule">&#9658;</button>
+                            </div>
+                            <div class="audio-actions-row">
+                                <span>Close</span>
+                                <span class="send-key">Send</span>
+                            </div>
+                        </div>
+                        <div class="real-keyboard" aria-hidden="true">
+                            <div class="keyboard-row number-row">
+                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span>
+                            </div>
+                            <div class="keyboard-row real-row row-10">
+                                <span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span>
+                            </div>
+                            <div class="keyboard-row real-row row-9">
+                                <span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span>
+                            </div>
+                            <div class="keyboard-row real-row row-9">
+                                <span class="utility-key">&#8679;</span><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span><span class="utility-key">&#9003;</span>
+                            </div>
+                            <div class="keyboard-row real-bottom-row">
+                                <span class="utility-key">#=</span><span class="utility-key">EN</span><span>,</span><span class="space-key">Space</span><span>.</span><span class="utility-key">&#10003;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-capsule capsule-one">
+                    <span class="label">Encrypted before sending</span>
+                    <strong>TL1:AQEDA...9Kp</strong>
+                </div>
+                <div class="floating-capsule capsule-two">
+                    <span class="label">Shared key</span>
+                    <strong>8-symbol local key</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="problem section-shell reveal">
+            <div class="section-kicker">The problem</div>
+            <h2>Private messaging should not require everyone to switch apps.</h2>
+            <p>
+                Secure messengers are useful, but real life is fragmented: family in WhatsApp, groups in Telegram,
+                documents in email, codes in SMS. VeilType adds privacy where people already talk.
+            </p>
+        </section>
+
+        <section class="how section-shell" id="how">
+            <div class="section-heading reveal">
+                <div class="section-kicker">How it works</div>
+                <h2>Four steps. No new chat app.</h2>
+            </div>
+            <div class="steps-grid">
+                <article class="step-card reveal">
+                    <span>01</span>
+                    <h3>Type where you already chat</h3>
+                    <p>Open Telegram, WhatsApp, SMS, email, or any app with a text field. VeilType appears as your keyboard.</p>
+                </article>
+                <article class="step-card reveal delay-1">
+                    <span>02</span>
+                    <h3>Encrypt into a capsule</h3>
+                    <p>Turn text, voice, photos, videos, or files into AES-256-GCM encrypted content before the messenger receives it.</p>
+                </article>
+                <article class="step-card reveal delay-2">
+                    <span>03</span>
+                    <h3>Send through any messenger</h3>
+                    <p>The messenger only sees ciphertext or a .veil capsule. Your private content stays inside the encrypted payload.</p>
+                </article>
+                <article class="step-card reveal delay-3">
+                    <span>04</span>
+                    <h3>Recipient opens with VeilType</h3>
+                    <p>The recipient uses the shared key and VeilType to decrypt locally on their Android device.</p>
+                </article>
+            </div>
+            <p class="section-note reveal">
+                Both sender and recipient need VeilType and the shared key to open encrypted capsules.
+            </p>
+        </section>
+
+        <section class="features section-shell" id="features">
+            <div class="section-heading reveal">
+                <div class="section-kicker">Features</div>
+                <h2>Encrypted capsules from the keyboard.</h2>
+            </div>
+            <div class="features-grid">
+                <article class="feature-card reveal">
+                    <span>&#9000;</span>
+                    <h3>Text encryption</h3>
+                    <p>Write normally, encrypt from the keyboard, and send ciphertext instead of plain text.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>AES</span>
+                    <h3>AES-256-GCM encryption</h3>
+                    <p>Private text and capsules are encrypted locally with AES-256-GCM before they leave the keyboard workflow.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>OC</span>
+                    <h3>Open-core model</h3>
+                    <p>The privacy-critical core is positioned for public review, while premium product features can remain commercial.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>&#9673;</span>
+                    <h3>Voice capsules</h3>
+                    <p>Record encrypted voice messages and unlock protected audio with biometrics when needed.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>&#9635;</span>
+                    <h3>Photo, video, file capsules</h3>
+                    <p>Package private media and files into .veil capsules for app-to-app sharing.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>1x</span>
+                    <h3>One-time read mode</h3>
+                    <p>Set selected messages or .veil capsules to open once on the recipient device, then become unavailable for repeat reading.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>KEY</span>
+                    <h3>Emoji keys</h3>
+                    <p>Use memorable 8-emoji shared keys instead of account-based identities.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>&#9670;</span>
+                    <h3>Biometric unlock</h3>
+                    <p>Require device biometric confirmation before decrypting selected keys and capsules.</p>
+                </article>
+                <article class="feature-card reveal">
+                    <span>!</span>
+                    <h3>Panic button</h3>
+                    <p>Quickly wipe local keys and temporary capsule data when you need the device clean.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="capsules section-shell">
+            <div class="capsule-copy reveal">
+                <div class="section-kicker">Capsule format</div>
+                <h2>One brandable container: .veil</h2>
+                <p>
+                    VeilType creates AES-256-GCM encrypted .veil capsules for private content. The same format can later become
+                    the bridge to a larger file-control product without changing the core promise: encrypt locally,
+                    send anywhere, keep the core auditable.
+                </p>
+                <p>
+                    A .veil capsule is a protected package that can contain text, voice, photos, videos, or files.
+                    It is designed to travel through the apps people already use.
+                </p>
+                <p>
+                    For extra-sensitive content, VeilType can mark a message or capsule as one-time read, so it opens once
+                    and then locks itself from normal repeat access.
+                </p>
+            </div>
+            <div class="capsule-stack reveal delay-1">
+                <article class="capsule-card"><span>Text</span><strong>message.veil</strong></article>
+                <article class="capsule-card"><span>Voice</span><strong>voice_capsule.veil</strong></article>
+                <article class="capsule-card"><span>Media</span><strong>photo_video_file.veil</strong></article>
+            </div>
+        </section>
+
+        <section class="trust section-shell" id="trust">
+            <div class="section-heading reveal">
+                <div class="section-kicker">Security and trust</div>
+                <h2>Open-core trust. AES-256-GCM encryption. Honest limits.</h2>
+            </div>
+            <div class="trust-grid">
+                <article class="trust-card reveal">
+                    <h3>Open-core trust model</h3>
+                    <p>The encryption core is prepared for public review. The Android app, premium UI, and commercial features remain proprietary.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>AES-256-GCM encryption</h3>
+                    <p>Messages and .veil capsules are encrypted locally with AES-256-GCM before they are handed to Telegram, WhatsApp, SMS, email, or another app.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>Offline-first</h3>
+                    <p>Message content is encrypted and decrypted locally. VeilType does not need a cloud account to protect a message.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>Local key management</h3>
+                    <p>Keys are stored on-device. If a key is lost, VeilType cannot recover it. That is intentional.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>One-time read policy</h3>
+                    <p>Per-key settings can make selected messages and capsules readable once, giving sensitive content a stricter local access policy.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>No content server</h3>
+                    <p>VeilType does not run a server that receives your message content. Messengers transport the encrypted output.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>App-layer enforcement</h3>
+                    <p>Self-destruct, one-time read, and biometric gates are app-layer protections. They help, but do not replace device security.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="comparison section-shell">
+            <div class="section-heading reveal">
+                <div class="section-kicker">Comparison</div>
+                <h2>Different from secure messengers by design.</h2>
+            </div>
+            <div class="comparison-table reveal">
+                <div class="row header"><span>Capability</span><span>Secure messenger</span><span>VeilType</span></div>
+                <div class="row"><span>Requires a new chat app</span><span>Usually yes</span><span>No</span></div>
+                <div class="row"><span>Works in existing messengers</span><span>Limited</span><span>Yes</span></div>
+                <div class="row"><span>Encrypts before sending</span><span>Inside that messenger</span><span>Inside the keyboard</span></div>
+                <div class="row"><span>Voice/photo/video/file capsules</span><span>Messenger-specific</span><span>.veil capsule layer</span></div>
+                <div class="row"><span>One-time read from keyboard</span><span>Messenger-dependent</span><span>Per-key VeilType policy</span></div>
+            </div>
+        </section>
+
+        <section class="pricing section-shell" id="pricing">
+            <article class="pricing-card reveal">
+                <div>
+                    <div class="section-kicker">Pricing</div>
+                    <h2>$3 lifetime access.</h2>
+                    <p>
+                        A simple launch offer for the Android build. No subscription. No recurring fee. Built for early
+                        users who want a privacy layer inside the keyboard, not another messenger.
+                    </p>
+                </div>
+                <div class="price-box">
+                    <span>Founder launch</span>
+                    <strong>$3</strong>
+                    <a class="btn btn-primary" href="./activate.html">Buy or activate lifetime access</a>
+                    <a class="btn btn-secondary" href="./downloads/VeilType.apk">Download APK</a>
+                    <small>Early Android build. Lifetime launch access for first users.</small>
+                </div>
+            </article>
+        </section>
+
+        <section class="faq section-shell" id="faq">
+            <div class="section-heading reveal">
+                <div class="section-kicker">FAQ</div>
+                <h2>Questions before installing.</h2>
+            </div>
+            <div class="faq-list">
+                <details open class="reveal">
+                    <summary>Is this a messenger?</summary>
+                    <p>No. VeilType is an Android keyboard and privacy layer for the messengers you already use.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Does VeilType store my messages?</summary>
+                    <p>No VeilType server stores your message content. Encryption and decryption happen locally on the device.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Does the recipient need VeilType?</summary>
+                    <p>Yes. The recipient needs VeilType and the correct shared key to decrypt messages or capsules.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Is VeilType open source?</summary>
+                    <p>VeilType uses an open-core trust model: the privacy-critical encryption core is prepared for public audit, while the full Android product can keep commercial features.</p>
+                </details>
+                <details class="reveal">
+                    <summary>What encryption does VeilType use?</summary>
+                    <p>VeilType uses AES-256-GCM encryption for message and capsule protection before content is sent through third-party messengers.</p>
+                </details>
+                <details class="reveal">
+                    <summary>What can I encrypt?</summary>
+                    <p>Text, voice messages, photos, videos, and files can be turned into encrypted output or .veil capsules.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Can a message or capsule be opened only once?</summary>
+                    <p>Yes. VeilType supports one-time read settings for sensitive messages and capsules, so normal repeat opening is blocked after the first successful read.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Is this DRM?</summary>
+                    <p>No. VeilType is not DRM. It is a local encryption layer. Once content is decrypted on a device, normal device risks still apply.</p>
+                </details>
+            </div>
+        </section>
+
+        <section class="final-cta section-shell reveal">
+            <div>
+                <div class="section-kicker">Final call</div>
+                <h2>Keep your chats. Add privacy.</h2>
+                <p>Install VeilType, create a shared key, and send private text or capsules without asking everyone to move to a new messenger.</p>
+            </div>
+            <a class="btn btn-primary" href="./activate.html">Get lifetime access</a>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <span>VeilType. Privacy on top of any messenger.</span>
+        <span id="footerYear"></span>
+    </footer>
+
+    <script src="./app.js"></script>
+</body>
+</html>

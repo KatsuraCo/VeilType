@@ -1,0 +1,32 @@
+# VeilType
+
+> VeilType is an Android-first privacy keyboard that encrypts text and media capsules locally before they leave a normal chat app. The core launch story is: encrypt before you send, one 8-emoji shared key, no server, no account, no cloud, and a $3 lifetime launch price.
+
+Important notes:
+- VeilType is not a new messenger. It is a keyboard layer for chat apps people already use.
+- The strongest launch story is encrypted text first. Voice, photo, and video capsules exist for cases where text is not enough.
+- Both people need VeilType and the same 8-emoji shared key.
+- The current public artifact is a direct Android APK.
+- The launch pricing being prepared is $3 lifetime founder access. Duo gifting can be added after the payment flow is ready.
+- The commercial model should use one APK plus license claims, not separate APK files for gifts.
+
+## Canonical
+
+- [/](./): Human-readable canonical page for launch traffic and product overview.
+- [/index.html.md](./index.html.md): LLM-friendly markdown version of the landing content.
+
+## Product
+
+- [/downloads/VeilType.apk](./downloads/VeilType.apk): Current Android launch build.
+- [/README.md](./README.md): Site-level summary of the landing package.
+
+## Trust model
+
+- [/trust-model.md](./trust-model.md): Human-readable trust summary for agents and search systems.
+- [/launch-package.md](./launch-package.md): Product Hunt positioning, tagline, and maker framing.
+- [/open-core.md](./open-core.md): Open-core boundary and what is planned to be public first.
+- [/licensing.md](./licensing.md): Planned solo/duo licensing model and anti-piracy direction.
+
+## Optional
+
+- [/PUBLISH.md](./PUBLISH.md): Deployment notes for the static site.
