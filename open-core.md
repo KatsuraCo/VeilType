@@ -11,17 +11,17 @@ VeilType should use an open-core model where the auditable technical layer is pu
 - minimal reference codec behavior
 - trust model and explicit non-claims
 
-## Prepared package
+## Published package
 
-The repository already contains a prepared public package at:
+The repository contains the published public module at:
 
 - `veiltype-core/`
 
-That package includes:
-- frozen specs
-- vectors
-- a minimal Python reference implementation
-- verification tests
+That module includes:
+- the Kotlin/JVM `TL1:` message codec extracted from the Android application
+- AES-256-GCM encryption and authenticated decryption
+- Argon2id profile-key derivation
+- unit tests and a stable message vector
 - Apache-2.0 license text
 
 ## Private for now
