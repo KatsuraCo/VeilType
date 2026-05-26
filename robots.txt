@@ -10,4 +10,11 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-Sitemap: /sitemap.xml
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://veiltype.tech/sitemap.xml
+Host: veiltype.tech

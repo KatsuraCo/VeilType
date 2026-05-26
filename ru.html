@@ -3,31 +3,33 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VeilType - приватность поверх любого мессенджера</title>
+    <title>VeilType - приватная Android-клавиатура для зашифрованных сообщений</title>
     <meta
         id="metaDescription"
         name="description"
-        content="VeilType - Android-клавиатура, которая позволяет отправлять зашифрованный текст, голос, фото, видео и файловые капсулы через Telegram, WhatsApp, SMS, email и другие приложения."
+        content="VeilType - легкая Android-клавиатура для зашифрованных сообщений. Шифруйте локально и отправляйте через Telegram, WhatsApp, SMS, email или любое приложение с полем ввода."
     />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="theme-color" content="#0D2340" />
-    <link rel="canonical" href="./ru.html" />
-    <link rel="alternate" hreflang="en" href="./index.html" />
-    <link rel="alternate" hreflang="ru" href="./ru.html" />
+    <link rel="canonical" href="https://veiltype.tech/ru.html" />
+    <link rel="alternate" hreflang="en" href="https://veiltype.tech/" />
+    <link rel="alternate" hreflang="ru" href="https://veiltype.tech/ru.html" />
+    <link rel="alternate" hreflang="x-default" href="https://veiltype.tech/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="VeilType - приватность поверх любого мессенджера" />
-    <meta property="og:description" content="Зашифрованные сообщения и .veil капсулы прямо из Android-клавиатуры." />
-    <meta property="og:image" content="./media/product-hunt/01-hero-encrypt-before-send.png" />
+    <meta property="og:title" content="VeilType - приватная Android-клавиатура для зашифрованных сообщений" />
+    <meta property="og:description" content="Печатайте приватные сообщения, шифруйте локально и отправляйте через любой мессенджер." />
+    <meta property="og:url" content="https://veiltype.tech/ru.html" />
+    <meta property="og:image" content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="VeilType - приватность поверх любого мессенджера" />
-    <meta name="twitter:description" content="Оставьте привычные чаты. Добавьте приватность из клавиатуры." />
-    <meta name="twitter:image" content="./media/product-hunt/01-hero-encrypt-before-send.png" />
+    <meta name="twitter:title" content="VeilType - приватная Android-клавиатура для зашифрованных сообщений" />
+    <meta name="twitter:description" content="Печатайте. Шифруйте локально. Отправляйте куда угодно." />
+    <meta name="twitter:image" content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="manifest" href="./site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=mobile-demo-3" />
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -35,13 +37,15 @@
             "name": "VeilType",
             "applicationCategory": "SecurityApplication",
             "operatingSystem": "Android",
-            "url": "./ru.html",
-            "downloadUrl": "./downloads/VeilType.apk",
-            "description": "VeilType - Android-клавиатура и слой приватности поверх существующих мессенджеров. Она шифрует текст, голос, фото, видео и файлы локально, до отправки.",
+            "url": "https://veiltype.tech/ru.html",
+            "downloadUrl": "https://veiltype.tech/downloads/VeilType.apk",
+            "description": "VeilType - легкая Android-клавиатура для зашифрованных сообщений. Она работает внутри существующих мессенджеров и шифрует локально до отправки.",
             "featureList": [
                 "Open-core privacy architecture",
                 "AES-256-GCM encryption",
                 "Text encryption from keyboard",
+                "Planned offline voice typing with optional language packs",
+                "Planned download-only-needed voice languages",
                 "Encrypted voice, photo, video, and file capsules",
                 "One-time read mode",
                 "Biometric unlock",
@@ -58,6 +62,54 @@
                 "@type": "Organization",
                 "name": "VeilType"
             }
+        }
+    </script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "VeilType - это мессенджер?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Нет. VeilType - это Android-клавиатура и слой приватности для мессенджеров, которыми пользователь уже пользуется."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Получателю нужен VeilType?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Да. Получателю нужен VeilType и правильный общий ключ, чтобы расшифровать сообщение или капсулу."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Офлайн-диктовка уже доступна?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Нет. Офлайн-диктовка планируется как будущий апгрейд. Целевой дизайн: локальное распознавание после загрузки выбранного языкового пакета."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Почему языковые пакеты будут отдельными?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Речевые модели могут занимать много места. Планируемая модель языковых пакетов сохраняет приложение легким и позволяет хранить только нужные языки."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "VeilType может запретить скриншоты?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Нет. Криптография не может помешать человеку сделать скриншот или сфотографировать экран после того, как содержимое стало видимым."
+                    }
+                }
+            ]
         }
     </script>
 </head>
@@ -87,87 +139,62 @@
         <section class="hero section-shell">
             <div class="hero-copy reveal">
                 <p class="pill">Android запуск &middot; $3 навсегда</p>
-                <h1>Приватность поверх любого мессенджера.</h1>
+                <h1>Шифруйте любой чат.</h1>
                 <p class="hero-subtitle">
-                    VeilType - Android-клавиатура, которая превращает текст, голос, фото, видео и файлы
-                    в зашифрованные .veil капсулы для Telegram, WhatsApp, SMS, email и других приложений.
+                    VeilType - легкая Android-клавиатура для приватного текста.
+                    Печатайте, шифруйте локально и отправляйте через Telegram, WhatsApp, SMS, email или любое приложение с полем ввода.
                 </p>
-                <p class="hero-position">
-                    Оставьте привычные чаты. Добавьте AES-256-GCM шифрование и режим открытия один раз.
-                </p>
+                <p class="hero-mobile-subtitle">Шифруйте сообщения прямо в Telegram, WhatsApp и других Android-приложениях.</p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" href="./activate.html">Получить доступ за $3</a>
+                    <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Получить founder-доступ за $3</a>
                     <a class="btn btn-secondary" href="#how">Посмотреть, как работает</a>
                 </div>
+                <p class="hero-position">
+                    Без нового мессенджера. Без облака VeilType. Офлайн-диктовка с языковыми пакетами запланирована следующим апгрейдом.
+                </p>
                 <div class="trust-metrics" aria-label="Ключевые преимущества VeilType">
                     <span>Не новый мессенджер</span>
                     <span>Без аккаунта</span>
                     <span>Без сервера контента</span>
+                    <span>Voice roadmap</span>
+                    <span>План языковых пакетов</span>
                     <span>AES-256-GCM</span>
-                    <span>Открытие один раз</span>
-                    <span>Open-core доверие</span>
                 </div>
             </div>
 
-            <div class="hero-visual reveal delay-1" aria-label="Макет клавиатуры VeilType и капсулы">
-                <div class="mock-phone">
-                    <div class="chat-area">
-                        <div class="chat-bubble muted">Можешь отправить это приватно?</div>
-                        <div class="chat-bubble encrypted">
-                            <span class="capsule-dot"></span>
-                            message_1777726990473.veil
+            <div class="hero-visual reveal delay-1" aria-label="Интерактивная демонстрация клавиатуры VeilType">
+                <div class="keyboard-demo" data-keyboard-demo data-language="ru">
+                    <div class="demo-phone">
+                        <div class="demo-chat-head">
+                            <span class="demo-avatar">A</span>
+                            <span><strong>Alex</strong><small>Telegram</small></span>
+                            <span class="demo-private">PRIVATE LAYER</span>
                         </div>
-                    </div>
-                    <div class="keyboard-mock">
-                        <div class="keybar" aria-hidden="true">
-                            <span class="icon-key lock">LOCK</span>
-                            <span class="icon-key">VIEW</span>
-                            <span class="icon-key">&times;</span>
-                            <span class="icon-key">MIC</span>
-                            <span class="icon-key">CAM</span>
-                            <span class="icon-key">VID</span>
+                        <div class="demo-chat-stream" aria-live="polite">
+                            <p class="demo-message incoming">Свободен сегодня вечером?</p>
+                            <p class="demo-message outgoing" data-demo-output>Встретимся в 19:00</p>
                         </div>
-                        <div class="capsule-panel real-audio-panel">
-                            <strong>Голосовая капсула готова. Отправьте ее из этой панели.</strong>
-                            <div class="audio-playback-row">
-                                <div class="waveform" aria-hidden="true">
-                                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                                    <span></span><span></span><span></span><span></span>
-                                </div>
-                                <button aria-label="Проиграть голосовую капсулу">&#9658;</button>
+                        <div class="demo-keyboard">
+                            <div class="demo-compose" data-demo-compose>Встретимся в 19:00</div>
+                            <div class="demo-hint" data-demo-hint><span data-demo-hint-text>Нажмите замок, чтобы зашифровать</span></div>
+                            <div class="demo-toolbar" aria-label="Инструменты клавиатуры VeilType">
+                                <button class="demo-tool active" type="button" data-demo-encrypt aria-label="Зашифровать сообщение" title="Шифровать"><img src="./assets/keyboard/ic_lock_lock_alpha.png" alt=""></button>
+                                <button class="demo-tool" type="button" data-demo-decrypt aria-label="Прочитать зашифрованное сообщение" title="Читать"><img src="./assets/keyboard/ic_menu_view.png" alt=""></button>
+                                <button class="demo-tool" type="button" aria-label="Очистить ввод" title="Очистить"><img src="./assets/keyboard/ic_menu_close_clear_cancel.png" alt=""></button>
+                                <button class="demo-tool" type="button" aria-label="Открыть вложения" title="Вложения"><img src="./assets/keyboard/ic_keyboard_paperclip.svg" alt=""></button>
                             </div>
-                            <div class="audio-actions-row">
-                                <span>Закрыть</span>
-                                <span class="send-key">Отправить</span>
+                            <div class="demo-number-row" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div>
+                            <div class="demo-keys" aria-hidden="true">
+                                <div class="demo-key-row"><span>Й</span><span>Ц</span><span>У</span><span>К</span><span>Е</span><span>Н</span><span>Г</span><span>Ш</span><span>Щ</span><span>З</span><span>Х</span><span>Ъ</span></div>
+                                <div class="demo-key-row middle"><span>Ф</span><span>Ы</span><span>В</span><span>А</span><span>П</span><span>Р</span><span>О</span><span>Л</span><span>Д</span><span>Ж</span><span>Э</span></div>
+                                <div class="demo-key-row"><span class="utility">&#8593;</span><span>Я</span><span>Ч</span><span>С</span><span>М</span><span>И</span><span>Т</span><span>Ь</span><span>Б</span><span>Ю</span><span class="utility">&#9003;</span></div>
                             </div>
-                        </div>
-                        <div class="real-keyboard" aria-hidden="true">
-                            <div class="keyboard-row number-row">
-                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span>
-                            </div>
-                            <div class="keyboard-row real-row row-10">
-                                <span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span>
-                            </div>
-                            <div class="keyboard-row real-row row-9">
-                                <span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span>
-                            </div>
-                            <div class="keyboard-row real-row row-9">
-                                <span class="utility-key">&#8679;</span><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span><span class="utility-key">&#9003;</span>
-                            </div>
-                            <div class="keyboard-row real-bottom-row">
-                                <span class="utility-key">#=</span><span class="utility-key">EN</span><span>,</span><span class="space-key">Пробел</span><span>.</span><span class="utility-key">&#10003;</span>
+                            <div class="demo-bottom-row" aria-hidden="true">
+                                <span>123</span><span>RU</span><span>,</span><span class="space">Пробел</span><span>.</span><span>Ввод</span>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="floating-capsule capsule-one">
-                    <span class="label">Шифруется до отправки</span>
-                    <strong>TL1:AQEDA...9Kp</strong>
-                </div>
-                <div class="floating-capsule capsule-two">
-                    <span class="label">Общий ключ</span>
-                    <strong>8-символьный локальный ключ</strong>
+                    <p class="demo-hint">Нажмите «Зашифровать» и посмотрите, что получит мессенджер.</p>
                 </div>
             </div>
         </section>
@@ -211,6 +238,53 @@
             <p class="section-note reveal">
                 Отправителю и получателю нужны VeilType и общий ключ, чтобы открывать зашифрованные сообщения и капсулы.
             </p>
+        </section>
+
+        <section class="product-tour section-shell" id="demo" data-tour>
+            <div class="section-heading reveal">
+                <div class="section-kicker">Демо продукта</div>
+                <h2>Поймите VeilType за четыре нажатия.</h2>
+                <p>Тот же понятный сценарий, который встречает пользователя в Android-приложении. Всё приватное остаётся на устройстве.</p>
+            </div>
+            <div class="tour-layout reveal">
+                <div class="tour-controls" role="tablist" aria-label="Демонстрация VeilType">
+                    <button class="tour-tab is-active" type="button" role="tab" aria-selected="true" data-tour-step="0">
+                        <strong>01</strong><span>Пишите обычно<small>В любом мессенджере</small></span>
+                    </button>
+                    <button class="tour-tab" type="button" role="tab" aria-selected="false" data-tour-step="1">
+                        <strong>02</strong><span>Шифруйте локально<small>До отправки</small></span>
+                    </button>
+                    <button class="tour-tab" type="button" role="tab" aria-selected="false" data-tour-step="2">
+                        <strong>03</strong><span>Передайте ключ<small>Emoji-последовательность</small></span>
+                    </button>
+                    <button class="tour-tab" type="button" role="tab" aria-selected="false" data-tour-step="3">
+                        <strong>04</strong><span>Откройте приватно<small>На устройстве получателя</small></span>
+                    </button>
+                </div>
+                <div class="tour-stage" aria-live="polite">
+                    <div class="tour-lock" aria-hidden="true">&#128274;</div>
+                    <div class="tour-panel is-active" data-tour-panel="0">
+                        <p class="tour-label">СООБЩЕНИЕ</p>
+                        <strong>Встретимся в 19:00</strong>
+                        <p>VeilType работает как Android-клавиатура внутри привычного чата.</p>
+                    </div>
+                    <div class="tour-panel" data-tour-panel="1">
+                        <p class="tour-label">ЗАШИФРОВАННЫЙ ВЫВОД</p>
+                        <strong class="cipher">TL1:Q8bz...kP2</strong>
+                        <p>Мессенджер получает шифротекст, а не читаемое сообщение.</p>
+                    </div>
+                    <div class="tour-panel" data-tour-panel="2">
+                        <p class="tour-label">ОБЩИЙ КЛЮЧ</p>
+                        <strong class="emoji-key">&#128274; &#127769; &#129418; &#9889; &#129504; &#128293; &#129513; &#127754;</strong>
+                        <p>Ключ создаётся и остаётся локально внутри VeilType.</p>
+                    </div>
+                    <div class="tour-panel" data-tour-panel="3">
+                        <p class="tour-label">ОТКРЫТО ЛОКАЛЬНО</p>
+                        <strong>Встретимся в 19:00</strong>
+                        <p>Получатель открывает сообщение через VeilType и общий ключ.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="features section-shell" id="features">
@@ -263,6 +337,31 @@
                     <span>!</span>
                     <h3>Тревожная кнопка</h3>
                     <p>Быстро удаляйте локальные ключи и временные данные, когда устройство нужно очистить.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="trust section-shell" id="offline-voice">
+            <div class="section-heading reveal">
+                <div class="section-kicker">Roadmap</div>
+                <h2>Офлайн-диктовка запланирована следующим апгрейдом.</h2>
+                <p>
+                    Текущий запуск сфокусирован на зашифрованном тексте и капсулах. Следующий запланированный апгрейд -
+                    офлайн-диктовка с отдельными языковыми пакетами, чтобы пользователь скачивал только нужные языки.
+                </p>
+            </div>
+            <div class="trust-grid">
+                <article class="trust-card reveal">
+                    <h3>Легкое ядро приложения</h3>
+                    <p>Цель - оставить основное приложение сфокусированным на клавиатуре и шифровании, не упаковывая все будущие голосовые модели сразу.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>Опциональные языковые пакеты</h3>
+                    <p>В планируемом voice-апгрейде пользователь будет сам выбирать, какие офлайн-языки скачать, обновить или удалить.</p>
+                </article>
+                <article class="trust-card reveal">
+                    <h3>Офлайн после загрузки</h3>
+                    <p>Целевой дизайн: интернет нужен для загрузки или обновления языкового пакета, а распознавание работает локально после установки.</p>
                 </article>
             </div>
         </section>
@@ -352,8 +451,8 @@
                 <div class="price-box">
                     <span>Founder launch</span>
                     <strong>$3</strong>
-                    <a class="btn btn-primary" href="./activate.html">Купить или активировать</a>
-                    <a class="btn btn-secondary" href="./downloads/VeilType.apk">Скачать APK</a>
+                    <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Запросить founder-доступ за $3</a>
+                    <a class="btn btn-secondary" href="./install-ru.html">Скачать и настроить</a>
                     <small>Ранняя Android-сборка. Пожизненный доступ для первых пользователей.</small>
                 </div>
             </article>
@@ -378,6 +477,18 @@
                     <p>Да. Получателю нужен VeilType и правильный общий ключ, чтобы расшифровать сообщение или капсулу.</p>
                 </details>
                 <details class="reveal">
+                    <summary>Можно ли доверять Android-клавиатуре?</summary>
+                    <p>Клавиатура должна заслужить доверие, потому что она работает с вводимым текстом. VeilType строится вокруг локального шифрования, отсутствия сервера контента, понятных разрешений и open-core модели для критически важного ядра.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Офлайн-диктовка уже доступна?</summary>
+                    <p>Нет. Офлайн-диктовка планируется как будущий апгрейд. Целевой дизайн - локальное распознавание после загрузки выбранного языкового пакета.</p>
+                </details>
+                <details class="reveal">
+                    <summary>Почему языковые пакеты будут отдельными?</summary>
+                    <p>Речевые модели могут занимать много места. Планируемая модель языковых пакетов сохраняет приложение легким и позволит хранить только нужные языки.</p>
+                </details>
+                <details class="reveal">
                     <summary>VeilType open source?</summary>
                     <p>VeilType использует open-core модель: критически важное ядро приватности готовится для публичного аудита, а полный Android-продукт может сохранять коммерческие функции.</p>
                 </details>
@@ -393,6 +504,10 @@
                     <summary>Это DRM?</summary>
                     <p>Нет. VeilType - локальный слой шифрования. После расшифровки на устройстве обычные риски устройства все еще остаются.</p>
                 </details>
+                <details class="reveal">
+                    <summary>VeilType может запретить скриншоты?</summary>
+                    <p>Нет. Криптография не может помешать человеку сделать скриншот или сфотографировать экран после того, как содержимое стало видимым.</p>
+                </details>
             </div>
         </section>
 
@@ -402,15 +517,17 @@
                 <h2>Оставьте свои чаты. Добавьте приватность.</h2>
                 <p>Установите VeilType, создайте общий ключ и отправляйте приватный текст или капсулы без перехода в новый мессенджер.</p>
             </div>
-            <a class="btn btn-primary" href="./activate.html">Получить доступ навсегда</a>
+            <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Получить founder-доступ</a>
         </section>
     </main>
 
     <footer class="site-footer">
-        <span>VeilType. Приватность поверх любого мессенджера.</span>
+        <span>VeilType. Печатайте. Шифруйте локально. Отправляйте куда угодно.</span>
         <span id="footerYear"></span>
     </footer>
 
+    <script src="./attribution.js"></script>
+    <script src="./landing-demo.js?v=mobile-demo-3"></script>
     <script src="./app.js"></script>
 </body>
 </html>

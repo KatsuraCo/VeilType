@@ -1,12 +1,17 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Activate VeilType</title>
-    <meta name="description" content="Get your VeilType activation code after purchase.">
+    <title>Activate VeilType Lifetime Access</title>
+    <meta name="description" content="Activate VeilType lifetime access, download the Android APK, and keep message content outside the licensing server.">
+    <meta name="robots" content="index,follow,max-snippet:-1">
+    <link rel="canonical" href="https://veiltype.tech/activate.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Activate VeilType Lifetime Access">
+    <meta property="og:description" content="Get lifetime access for VeilType, the private Android keyboard for encrypted messages.">
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css?v=real-captures-1">
 </head>
 <body>
     <header class="site-header">
@@ -27,11 +32,14 @@
     <main>
         <section class="activation section-shell">
             <div class="activation-card reveal">
-                <p class="pill">Lifetime access · $3</p>
+                <p class="pill">Lifetime access &middot; $3</p>
                 <h1>Activate VeilType.</h1>
                 <p class="hero-subtitle">
                     Enter the email and order ID from your purchase. If you want a device-bound license,
                     paste the device ID shown inside the Android app.
+                </p>
+                <p class="hero-position">
+                    Licensing unlocks paid features only. Message content is encrypted locally and never sent to the activation server.
                 </p>
 
                 <form class="activation-form" id="activationForm">
@@ -63,6 +71,18 @@
                 </div>
 
                 <div class="activation-error" id="activationError" hidden></div>
+
+                <div class="activation-result" id="manualActivation" hidden>
+                    <h2>Manual activation</h2>
+                    <p class="muted">
+                        The automatic activation service is not configured for this page yet. Send your purchase email,
+                        order ID, and optional device ID to support, then paste the signed activation code inside the Android app.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="mailto:support@veiltype.tech?subject=VeilType%20activation">Email support</a>
+                        <a class="btn btn-secondary" href="./downloads/VeilType.apk">Download APK</a>
+                    </div>
+                </div>
             </div>
 
             <aside class="activation-help reveal">
@@ -87,13 +107,20 @@
         const errorBox = document.getElementById('activationError');
         const codeBox = document.getElementById('activationCode');
         const copyButton = document.getElementById('copyCodeButton');
+        const manualActivation = document.getElementById('manualActivation');
         const params = new URLSearchParams(window.location.search);
-        const apiBase = params.get('api') || window.VEILTYPE_API_BASE || 'http://localhost:8787';
+        const apiBase = params.get('api') || window.VEILTYPE_API_BASE || '';
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             result.hidden = true;
             errorBox.hidden = true;
+            manualActivation.hidden = true;
+
+            if (!apiBase) {
+                manualActivation.hidden = false;
+                return;
+            }
 
             const payload = {
                 email: document.getElementById('emailInput').value.trim(),

@@ -1,7 +1,7 @@
 {
   "name": "VeilType",
   "short_name": "VeilType",
-  "description": "Private messages in any chat.",
+  "description": "Private Android keyboard for encrypted messages.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#F5F1E8",

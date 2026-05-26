@@ -1,19 +1,28 @@
 # VeilType
 
-> VeilType is an Android-first privacy keyboard that encrypts text and media capsules locally before they leave a normal chat app. The core launch story is: encrypt before you send, one 8-emoji shared key, no server, no account, no cloud, and a $3 lifetime launch price.
+> VeilType is a lightweight Android privacy keyboard for encrypted messages. The current launch story is: type, encrypt locally before sending, use the messengers people already have, no VeilType cloud, no account, and a $3 lifetime launch price.
 
 Important notes:
 - VeilType is not a new messenger. It is a keyboard layer for chat apps people already use.
-- The strongest launch story is encrypted text first. Voice, photo, and video capsules exist for cases where text is not enough.
+- Offline voice typing is not available yet. It is planned as the next commercial upgrade.
+- The planned voice upgrade should use optional downloadable language packs so users install only the languages they use.
 - Both people need VeilType and the same 8-emoji shared key.
 - The current public artifact is a direct Android APK.
 - The launch pricing being prepared is $3 lifetime founder access. Duo gifting can be added after the payment flow is ready.
+- Until a live checkout URL is configured, the public founder-access page collects purchase requests by email and does not charge the user.
 - The commercial model should use one APK plus license claims, not separate APK files for gifts.
 
 ## Canonical
 
 - [/](./): Human-readable canonical page for launch traffic and product overview.
 - [/index.html.md](./index.html.md): LLM-friendly markdown version of the landing content.
+- [/offline-voice-typing.html](./offline-voice-typing.html): Concise roadmap page for planned offline voice typing.
+- [/language-packs.html](./language-packs.html): Concise roadmap page for planned optional offline language packs.
+- [/security-model.html](./security-model.html): Concise answer page for security limits and local encryption.
+- [/founder-access.html](./founder-access.html): Honest $3 founder-access request path while checkout is being connected.
+- [/install.html](./install.html): Android installation and first encrypted-message setup guide.
+- [/install-ru.html](./install-ru.html): Russian Android installation and first encrypted-message setup guide.
+- [/trust-model.md](./trust-model.md): Trust model and honest limits.
 
 ## Product
 
@@ -24,6 +33,9 @@ Important notes:
 
 - [/trust-model.md](./trust-model.md): Human-readable trust summary for agents and search systems.
 - [/launch-package.md](./launch-package.md): Product Hunt positioning, tagline, and maker framing.
+- [/distribution-kit.md](./distribution-kit.md): Draft launch posts and real-device short-video scripts.
+- [/tracking-links.md](./tracking-links.md): Campaign link and measurement plan.
+- [/launch-checklist.md](./launch-checklist.md): Launch-day and first-week execution checklist.
 - [/open-core.md](./open-core.md): Open-core boundary and what is planned to be public first.
 - [/licensing.md](./licensing.md): Planned solo/duo licensing model and anti-piracy direction.
 
