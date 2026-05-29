@@ -5,5 +5,6 @@ window.VEILTYPE_COMMERCE = window.VEILTYPE_COMMERCE || {
     creatorDiscountUsd: 1.00,
     creatorCommissionUsd: 1.00,
     paymentFeeReserveUsd: 0.50,
+    friendReferralRequiredSales: 5,
     currency: "USD",
 };

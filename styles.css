@@ -978,6 +978,39 @@ p {
     color: var(--brass);
 }
 
+.invite-program {
+    display: grid;
+    gap: 22px;
+}
+
+.invite-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.invite-link-box {
+    display: grid;
+    gap: 10px;
+    margin: 22px 0 8px;
+}
+
+.invite-link-box span {
+    color: rgba(255, 250, 240, 0.72);
+    font-size: 0.92rem;
+}
+
+.invite-link-box input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid rgba(201, 163, 90, 0.42);
+    border-radius: 12px;
+    background: rgba(5, 10, 18, 0.68);
+    color: var(--paper);
+    font: inherit;
+}
+
 .faq-list {
     display: grid;
     gap: 12px;
@@ -1405,6 +1438,7 @@ p {
     .steps-grid,
     .features-grid,
     .trust-grid,
+    .invite-grid,
     .partner-economics,
     .row {
         grid-template-columns: 1fr;
