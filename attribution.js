@@ -1,7 +1,7 @@
 (function () {
     const storageKey = "veiltype-first-touch-attribution";
     const maxAgeMs = 30 * 24 * 60 * 60 * 1000;
-    const allowedKeys = ["ref", "utm_source", "utm_medium", "utm_campaign", "utm_content"];
+    const allowedKeys = ["ref", "promo", "utm_source", "utm_medium", "utm_campaign", "utm_content"];
     const safeValue = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
     function readStored() {
@@ -27,7 +27,7 @@
                 values[key] = value;
             }
         });
-        return values.ref ? values : null;
+        return values.ref || values.promo ? values : null;
     }
 
     function appendToUrl(rawUrl, values) {
@@ -59,12 +59,13 @@
     });
 
     document.querySelectorAll("[data-attribution-email]").forEach(function (link) {
-        if (!values || !values.ref || !link.href.startsWith("mailto:")) {
+        const source = values && (values.ref || values.promo);
+        if (!source || !link.href.startsWith("mailto:")) {
             return;
         }
         const emailUrl = new URL(link.href);
         const body = emailUrl.searchParams.get("body") || "";
-        emailUrl.searchParams.set("body", body + "\n\nReferral source: " + values.ref);
+        emailUrl.searchParams.set("body", body + "\n\nReferral source: " + source);
         link.href = emailUrl.toString();
     });
 

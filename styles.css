@@ -962,6 +962,22 @@ p {
     margin-top: 12px;
 }
 
+.creator-price-note,
+.offer-summary {
+    margin: 0 0 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(201, 163, 90, 0.38);
+    border-radius: 14px;
+    background: rgba(201, 163, 90, 0.10);
+    color: rgba(255, 250, 240, 0.82);
+    font-size: 0.95rem;
+}
+
+.creator-price-note strong,
+.offer-summary strong {
+    color: var(--brass);
+}
+
 .faq-list {
     display: grid;
     gap: 12px;
@@ -1046,6 +1062,33 @@ p {
 
 .founder-page .hero-actions {
     margin-top: 16px;
+}
+
+.partner-economics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 22px 0 8px;
+}
+
+.partner-economics div {
+    padding: 16px;
+    border: 1px solid rgba(255, 250, 240, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 250, 240, 0.06);
+}
+
+.partner-economics span {
+    display: block;
+    color: rgba(255, 250, 240, 0.68);
+    font-size: 0.86rem;
+}
+
+.partner-economics strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--brass);
+    font-size: 1.55rem;
 }
 
 .install-page .activation {
@@ -1362,6 +1405,7 @@ p {
     .steps-grid,
     .features-grid,
     .trust-grid,
+    .partner-economics,
     .row {
         grid-template-columns: 1fr;
     }

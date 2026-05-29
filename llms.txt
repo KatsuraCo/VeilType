@@ -1,6 +1,6 @@
 # VeilType
 
-> VeilType is a lightweight Android privacy keyboard for encrypted messages. The current launch story is: type, encrypt locally before sending, use the messengers people already have, no VeilType cloud, no account, and a $3 lifetime launch price.
+> VeilType is a lightweight Android privacy keyboard for encrypted messages. The current launch story is: type, encrypt locally before sending, use the messengers people already have, no VeilType cloud, no account, and a $4.49 lifetime launch price.
 
 Important notes:
 - VeilType is not a new messenger. It is a keyboard layer for chat apps people already use.
@@ -8,7 +8,8 @@ Important notes:
 - The planned voice upgrade should use optional downloadable language packs so users install only the languages they use.
 - Both people need VeilType and the same 8-emoji shared key.
 - The current public artifact is a direct Android APK.
-- The launch pricing being prepared is $3 lifetime founder access. Duo gifting can be added after the payment flow is ready.
+- The launch pricing being prepared is $4.49 lifetime founder access, with a $1 creator discount to $3.49 when a valid ref or promo source is present.
+- The creator program offer is: audience saves $1, approved creator earns $1 per confirmed VeilType sale, with hold and payout rules.
 - Until a live checkout URL is configured, the public founder-access page collects purchase requests by email and does not charge the user.
 - The commercial model should use one APK plus license claims, not separate APK files for gifts.
 
@@ -19,7 +20,9 @@ Important notes:
 - [/offline-voice-typing.html](./offline-voice-typing.html): Concise roadmap page for planned offline voice typing.
 - [/language-packs.html](./language-packs.html): Concise roadmap page for planned optional offline language packs.
 - [/security-model.html](./security-model.html): Concise answer page for security limits and local encryption.
-- [/founder-access.html](./founder-access.html): Honest $3 founder-access request path while checkout is being connected.
+- [/founder-access.html](./founder-access.html): Honest $4.49 founder-access request path while checkout is being connected.
+- [/partners.html](./partners.html): English partner program page for creator applications.
+- [/partners-ru.html](./partners-ru.html): Russian partner program page for creator applications.
 - [/install.html](./install.html): Android installation and first encrypted-message setup guide.
 - [/install-ru.html](./install-ru.html): Russian Android installation and first encrypted-message setup guide.
 - [/trust-model.md](./trust-model.md): Trust model and honest limits.

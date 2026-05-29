@@ -55,7 +55,7 @@
             ],
             "offers": {
                 "@type": "Offer",
-                "price": "3.00",
+                "price": "4.49",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/PreOrder"
             },
@@ -139,7 +139,7 @@
     <main id="top">
         <section class="hero section-shell">
             <div class="hero-copy reveal">
-                <p class="pill">Android launch &middot; $3 lifetime access</p>
+                <p class="pill">Android launch &middot; <span data-final-price>$4.49</span> lifetime access</p>
                 <h1>Encrypt any chat.</h1>
                 <p class="hero-subtitle">
                     VeilType is a lightweight Android keyboard for private text. Type, encrypt locally, and send
@@ -147,7 +147,7 @@
                 </p>
                 <p class="hero-mobile-subtitle">Encrypt messages directly inside Telegram, WhatsApp and other Android apps.</p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Get founder access for $3</a>
+                    <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Get founder access for <span data-final-price>$4.49</span></a>
                     <a class="btn btn-secondary" href="#how">See how it works</a>
                 </div>
                 <p class="hero-position">
@@ -448,7 +448,7 @@
             <article class="pricing-card reveal">
                 <div>
                     <div class="section-kicker">Pricing</div>
-                    <h2>$3 lifetime access.</h2>
+                    <h2><span data-final-price>$4.49</span> lifetime access.</h2>
                     <p>
                         A simple launch offer for the Android build. No subscription. No recurring fee. Built for early
                         users who want a privacy layer inside the keyboard, not another messenger.
@@ -456,9 +456,13 @@
                 </div>
                 <div class="price-box">
                     <span>Founder launch</span>
-                    <strong>$3</strong>
-                    <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Request founder access for $3</a>
+                    <strong data-final-price>$4.49</strong>
+                    <div class="creator-price-note" data-creator-offer hidden>
+                        Creator discount applied: <span data-regular-price>$4.49</span> - <span data-discount-value>$1.00</span>. Code: <strong data-creator-ref></strong>
+                    </div>
+                    <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Request founder access for <span data-final-price>$4.49</span></a>
                     <a class="btn btn-secondary" href="./install.html">Download and setup guide</a>
+                    <a class="btn btn-secondary" data-carry-attribution href="./partners.html">Partner program</a>
                     <small>Early Android build. Lifetime launch access for first users.</small>
                 </div>
             </article>
@@ -527,7 +531,10 @@
                 <h2>Keep your chats. Add privacy.</h2>
                 <p>Install VeilType, create a shared key, and send private text or capsules without asking everyone to move to a new messenger.</p>
             </div>
-            <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Get founder access</a>
+            <div class="hero-actions">
+                <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Get founder access</a>
+                <a class="btn btn-secondary" data-carry-attribution href="./partners.html">Partner program</a>
+            </div>
         </section>
     </main>
 
@@ -537,6 +544,8 @@
     </footer>
 
     <script src="./attribution.js"></script>
+    <script src="./commerce-config.js"></script>
+    <script src="./commerce.js"></script>
     <script src="./landing-demo.js?v=mobile-demo-3"></script>
     <script src="./app.js"></script>
 </body>

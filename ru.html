@@ -54,7 +54,7 @@
             ],
             "offers": {
                 "@type": "Offer",
-                "price": "3.00",
+                "price": "4.49",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/PreOrder"
             },
@@ -138,7 +138,7 @@
     <main id="top">
         <section class="hero section-shell">
             <div class="hero-copy reveal">
-                <p class="pill">Android запуск &middot; $3 навсегда</p>
+                <p class="pill">Android запуск &middot; <span data-final-price>$4.49</span> навсегда</p>
                 <h1>Шифруйте любой чат.</h1>
                 <p class="hero-subtitle">
                     VeilType - легкая Android-клавиатура для приватного текста.
@@ -146,7 +146,7 @@
                 </p>
                 <p class="hero-mobile-subtitle">Шифруйте сообщения прямо в Telegram, WhatsApp и других Android-приложениях.</p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Получить founder-доступ за $3</a>
+                    <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Получить founder-доступ за <span data-final-price>$4.49</span></a>
                     <a class="btn btn-secondary" href="#how">Посмотреть, как работает</a>
                 </div>
                 <p class="hero-position">
@@ -442,7 +442,7 @@
             <article class="pricing-card reveal">
                 <div>
                     <div class="section-kicker">Цена</div>
-                    <h2>$3 доступ навсегда.</h2>
+                    <h2><span data-final-price>$4.49</span> доступ навсегда.</h2>
                     <p>
                         Простое стартовое предложение для Android-сборки. Без подписки. Без регулярных платежей.
                         Для ранних пользователей, которым нужен слой приватности в клавиатуре.
@@ -450,9 +450,13 @@
                 </div>
                 <div class="price-box">
                     <span>Founder launch</span>
-                    <strong>$3</strong>
-                    <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Запросить founder-доступ за $3</a>
+                    <strong data-final-price>$4.49</strong>
+                    <div class="creator-price-note" data-creator-offer hidden>
+                        Скидка блогера применена: <span data-regular-price>$4.49</span> - <span data-discount-value>$1.00</span>. Код: <strong data-creator-ref></strong>
+                    </div>
+                    <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Запросить founder-доступ за <span data-final-price>$4.49</span></a>
                     <a class="btn btn-secondary" href="./install-ru.html">Скачать и настроить</a>
+                    <a class="btn btn-secondary" data-carry-attribution href="./partners-ru.html">Партнёрская программа</a>
                     <small>Ранняя Android-сборка. Пожизненный доступ для первых пользователей.</small>
                 </div>
             </article>
@@ -517,7 +521,10 @@
                 <h2>Оставьте свои чаты. Добавьте приватность.</h2>
                 <p>Установите VeilType, создайте общий ключ и отправляйте приватный текст или капсулы без перехода в новый мессенджер.</p>
             </div>
-            <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Получить founder-доступ</a>
+            <div class="hero-actions">
+                <a class="btn btn-primary" data-carry-attribution href="./founder-access-ru.html">Получить founder-доступ</a>
+                <a class="btn btn-secondary" data-carry-attribution href="./partners-ru.html">Партнёрская программа</a>
+            </div>
         </section>
     </main>
 
@@ -527,6 +534,8 @@
     </footer>
 
     <script src="./attribution.js"></script>
+    <script src="./commerce-config.js"></script>
+    <script src="./commerce.js"></script>
     <script src="./landing-demo.js?v=mobile-demo-3"></script>
     <script src="./app.js"></script>
 </body>
