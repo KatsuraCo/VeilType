@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VeilType Partner Dashboard</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css?v=affiliate-backend-1">
+</head>
+<body class="founder-page partner-page">
+    <header class="site-header">
+        <a class="brand" href="./index.html"><span class="typewriter-logo" aria-hidden="true">V</span><span class="brand-text">VeilType</span></a>
+        <nav class="header-nav"><a href="./partner-login.html">Partner login</a><a href="./partners.html">Program</a></nav>
+    </header>
+    <main>
+        <section class="activation section-shell">
+            <div class="activation-card">
+                <p class="pill" data-dashboard-status>Loading...</p>
+                <h1><span data-partner-name>Partner</span></h1>
+                <p class="hero-subtitle">Ref code: <strong data-ref-code></strong></p>
+                <div class="partner-economics">
+                    <div><span>Clicks</span><strong data-clicks>0</strong></div>
+                    <div><span>Confirmed purchases</span><strong data-purchases>0</strong></div>
+                    <div><span>Pending</span><strong data-pending>$0.00</strong></div>
+                    <div><span>Available</span><strong data-available>$0.00</strong></div>
+                    <div><span>Paid</span><strong data-paid>$0.00</strong></div>
+                </div>
+                <div class="invite-link-box">
+                    <span>Landing link</span>
+                    <a data-veiltype-link href="#"></a>
+                    <span>Purchase link</span>
+                    <a data-founder-link href="#"></a>
+                </div>
+                <p class="muted">$1 is created as pending after each manually confirmed sale. Hold: 21 days. Minimum payout target: $20.</p>
+            </div>
+        </section>
+    </main>
+    <script src="./backend-config.js"></script>
+    <script src="./partner-dashboard.js"></script>
+</body>
+</html>

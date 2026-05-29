@@ -69,6 +69,22 @@
         link.href = emailUrl.toString();
     });
 
+    if (values && (values.ref || values.promo)) {
+        try {
+            fetch("/api/ref/click", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    ref_code: values.ref || values.promo,
+                    landing_path: window.location.pathname,
+                }),
+                keepalive: true,
+            }).catch(function () {});
+        } catch (error) {
+            // Static hosting without backend is expected until deployment.
+        }
+    }
+
     window.VEILTYPE_ATTRIBUTION = {
         current: values,
         appendToUrl: function (url) {

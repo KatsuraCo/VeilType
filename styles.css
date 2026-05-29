@@ -1011,6 +1011,30 @@ p {
     font: inherit;
 }
 
+.partner-form {
+    display: grid;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.partner-form label,
+.activation-card label {
+    display: grid;
+    gap: 7px;
+    color: rgba(255, 250, 240, 0.72);
+}
+
+.partner-form input,
+.activation-card input {
+    min-height: 46px;
+    padding: 11px 13px;
+    border: 1px solid rgba(201, 163, 90, 0.36);
+    border-radius: 12px;
+    background: rgba(5, 10, 18, 0.68);
+    color: var(--paper);
+    font: inherit;
+}
+
 .faq-list {
     display: grid;
     gap: 12px;

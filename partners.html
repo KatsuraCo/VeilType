@@ -45,9 +45,21 @@
                 </div>
                 <div class="hero-actions">
                     <a class="btn btn-primary" data-attribution-email href="mailto:support@veiltype.tech?subject=VeilType%20partner%20application&amp;body=I%20want%20to%20apply%20for%20the%20VeilType%20Partner%20Program.%0A%0AName%2Fchannel%3A%20%0ACountry%3A%20%0APlatform%20links%3A%20%0AAudience%20size%3A%20%0APayout%20method%3A%20">Apply by email</a>
+                    <a class="btn btn-secondary" href="./partner-login.html">Partner login</a>
                     <a class="btn btn-secondary" href="./founder-access.html">See buyer offer</a>
                 </div>
                 <p class="muted">Cash commissions require manual approval, confirmed sales, a hold period, and a payout threshold.</p>
+                <form class="partner-form" data-partner-apply-form>
+                    <h2>Apply for a ref code</h2>
+                    <label>Name or channel<input name="display_name" required></label>
+                    <label>Email<input name="email" type="email" required></label>
+                    <label>Country<input name="country"></label>
+                    <label>Platform<input name="platform" placeholder="TikTok, Instagram, YouTube, Telegram"></label>
+                    <label>Profile URL<input name="profile_url" type="url"></label>
+                    <label>Payout method<input name="payout_method" placeholder="USDT, bank, PayPal, other"></label>
+                    <button class="btn btn-primary" type="submit">Submit application</button>
+                    <p class="muted" data-partner-apply-status>Applications are reviewed manually.</p>
+                </form>
             </div>
 
             <aside class="activation-help reveal">
@@ -69,5 +81,7 @@
         <span>&copy; 2026 VeilType</span>
     </footer>
     <script src="./attribution.js"></script>
+    <script src="./backend-config.js"></script>
+    <script src="./partner-apply.js"></script>
 </body>
 </html>

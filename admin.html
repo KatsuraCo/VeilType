@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VeilType Admin MVP</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css?v=affiliate-backend-1">
+</head>
+<body class="founder-page partner-page">
+    <header class="site-header">
+        <a class="brand" href="./index.html"><span class="typewriter-logo" aria-hidden="true">V</span><span class="brand-text">VeilType</span></a>
+    </header>
+    <main>
+        <section class="activation section-shell">
+            <div class="activation-card">
+                <p class="pill">Admin MVP</p>
+                <h1>Manual sales control.</h1>
+                <label>Admin token<input data-admin-token type="password" placeholder="dev-admin-token"></label>
+                <form class="partner-form" data-approve-form>
+                    <h2>Approve partner</h2>
+                    <label>Ref code<input name="ref_code" required></label>
+                    <button class="btn btn-secondary" type="submit">Approve</button>
+                </form>
+                <form class="partner-form" data-confirm-purchase-form>
+                    <h2>Confirm manual purchase</h2>
+                    <label>Buyer email<input name="buyer_email" type="email"></label>
+                    <label>Ref code<input name="ref_code" placeholder="optional creator ref"></label>
+                    <label>Amount USD<input name="amount_usd" value="3.49"></label>
+                    <label>Discount USD<input name="discount_usd" value="1.00"></label>
+                    <button class="btn btn-primary" type="submit">Confirm purchase</button>
+                </form>
+                <p class="muted" data-admin-status>Ready.</p>
+            </div>
+        </section>
+    </main>
+    <script src="./backend-config.js"></script>
+    <script src="./admin.js"></script>
+</body>
+</html>

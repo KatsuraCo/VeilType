@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VeilType Partner Login</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css?v=affiliate-backend-1">
+</head>
+<body class="founder-page partner-page">
+    <header class="site-header">
+        <a class="brand" href="./index.html"><span class="typewriter-logo" aria-hidden="true">V</span><span class="brand-text">VeilType</span></a>
+        <nav class="header-nav"><a href="./partners.html">Partner program</a><a href="./index.html">Site</a></nav>
+    </header>
+    <main>
+        <section class="activation section-shell">
+            <div class="activation-card">
+                <p class="pill">Partner login</p>
+                <h1>Open your dashboard.</h1>
+                <form class="partner-form" onsubmit="event.preventDefault(); location.href='./partner-dashboard.html?ref=' + encodeURIComponent(this.ref.value.trim());">
+                    <label>Ref code<input name="ref" placeholder="kayla_sa" required></label>
+                    <button class="btn btn-primary" type="submit">Open dashboard</button>
+                </form>
+                <p class="muted">For MVP, dashboard access is by ref code. Full email login can be added after payment automation.</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

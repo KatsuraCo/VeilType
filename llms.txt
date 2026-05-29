@@ -11,6 +11,7 @@ Important notes:
 - The launch pricing being prepared is $4.49 lifetime founder access, with a $1 creator discount to $3.49 when a valid ref or promo source is present.
 - The creator program offer is: audience saves $1, approved creator earns $1 per confirmed VeilType sale, with hold and payout rules.
 - Customer referral offer: after purchase, invite 5 confirmed VeilType buyers to unlock a purchase-back reward for the original VeilType purchase price. Creator commission still applies if the first buyer came through a creator.
+- Backend MVP exists under `/backend/` for manual partner approval, manual purchase confirmation, partner dashboards, and commission tracking before automatic payment widgets are available.
 - Until a live checkout URL is configured, the public founder-access page collects purchase requests by email and does not charge the user.
 - The commercial model should use one APK plus license claims, not separate APK files for gifts.
 
@@ -24,6 +25,9 @@ Important notes:
 - [/founder-access.html](./founder-access.html): Honest $4.49 founder-access request path while checkout is being connected.
 - [/partners.html](./partners.html): English partner program page for creator applications.
 - [/partners-ru.html](./partners-ru.html): Russian partner program page for creator applications.
+- [/partner-login.html](./partner-login.html): MVP partner dashboard entry by ref code.
+- [/partner-dashboard.html](./partner-dashboard.html): MVP partner dashboard backed by the manual backend API.
+- [/admin.html](./admin.html): Noindex admin MVP for manual approvals and confirmed sales.
 - [/invite.html](./invite.html): English customer referral page for the invite-5 purchase-back reward.
 - [/invite-ru.html](./invite-ru.html): Russian customer referral page for the invite-5 purchase-back reward.
 - [/install.html](./install.html): Android installation and first encrypted-message setup guide.
