@@ -101,6 +101,7 @@
         </section>
     </main>
 
+    <script src="./backend-config.js"></script>
     <script>
         const form = document.getElementById('activationForm');
         const result = document.getElementById('activationResult');
@@ -109,7 +110,8 @@
         const copyButton = document.getElementById('copyCodeButton');
         const manualActivation = document.getElementById('manualActivation');
         const params = new URLSearchParams(window.location.search);
-        const apiBase = params.get('api') || window.VEILTYPE_API_BASE || '';
+        const backendConfig = window.VEILTYPE_BACKEND || {};
+        const apiBase = (params.get('api') || window.VEILTYPE_API_BASE || backendConfig.apiBaseUrl || '').replace(/\/$/, '');
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
