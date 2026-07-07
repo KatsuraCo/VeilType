@@ -3,6 +3,7 @@ const languageSelect = document.getElementById("languageSelect");
 const translatableNodes = document.querySelectorAll("[data-i18n]");
 const metaDescription = document.getElementById("metaDescription");
 const dictionaries = window.VEILTYPE_LOCALES || {};
+const localeLinks = document.querySelectorAll(".locale-switch a[lang]");
 
 function detectLanguage() {
     const stored = localStorage.getItem("veiltype-site-language");
@@ -44,8 +45,19 @@ function switchLanguage(language) {
 if (languageSelect) {
     languageSelect.addEventListener("change", (event) => {
         switchLanguage(event.target.value);
+        localStorage.setItem("veiltype-site-language-manual", "1");
     });
 }
+
+localeLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+        const language = link.getAttribute("lang");
+        if (supportedLanguages.includes(language)) {
+            localStorage.setItem("veiltype-site-language", language);
+            localStorage.setItem("veiltype-site-language-manual", "1");
+        }
+    });
+});
 
 document.getElementById("footerYear").textContent = `\u00A9 ${new Date().getFullYear()} VeilType`;
 switchLanguage(detectLanguage());

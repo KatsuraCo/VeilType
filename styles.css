@@ -939,13 +939,13 @@ p {
     background: rgba(255, 250, 240, 0.08);
 }
 
-.price-box span,
+.price-box > span,
 .price-box small {
     display: block;
     color: rgba(255, 250, 240, 0.72);
 }
 
-.price-box strong {
+.price-box > strong {
     display: block;
     margin: 6px 0 20px;
     color: var(--brass);
@@ -974,8 +974,16 @@ p {
 }
 
 .creator-price-note strong,
+.creator-price-note span,
 .offer-summary strong {
     color: var(--brass);
+    display: inline;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .invite-program {

@@ -37,6 +37,41 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=mobile-demo-3" />
+    <script>
+        (function () {
+            var key = "veiltype-site-language";
+            var manualKey = "veiltype-site-language-manual";
+            var supported = ["en", "ru"];
+            var file = (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
+            if (file !== "index.html" && file !== "ru.html") return;
+
+            var stored = "";
+            var manual = false;
+            try {
+                stored = localStorage.getItem(key) || "";
+                manual = localStorage.getItem(manualKey) === "1";
+            } catch (error) {
+                stored = "";
+                manual = false;
+            }
+
+            var browserLanguages = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+            var browserLang = "en";
+            for (var i = 0; i < browserLanguages.length; i += 1) {
+                var code = String(browserLanguages[i] || "").slice(0, 2).toLowerCase();
+                if (supported.indexOf(code) !== -1) {
+                    browserLang = code;
+                    break;
+                }
+            }
+
+            var preferred = manual && supported.indexOf(stored) !== -1 ? stored : browserLang;
+            var target = preferred === "ru" ? "ru.html" : "index.html";
+            if (file !== target) {
+                window.location.replace("./" + target + window.location.search + window.location.hash);
+            }
+        }());
+    </script>
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
