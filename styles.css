@@ -347,7 +347,6 @@ button.btn-primary::after {
 .permissions-table span { color: var(--antique); font-size: 0.76rem; font-weight: 900; text-transform: uppercase; }
 .permissions-table .permission-good { color: #0a6b4b; }
 .permissions-table p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
-
 .hero-copy,
 .hero-visual,
 .section-heading,
