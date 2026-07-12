@@ -237,6 +237,86 @@ button.btn-primary::after {
     padding: 34px 0 54px;
 }
 
+.hero .reveal {
+    opacity: 1;
+    transform: none;
+}
+
+.audience-paths {
+    padding: 72px 0;
+}
+
+.audience-paths .section-heading {
+    max-width: 820px;
+}
+
+.audience-paths .section-heading p {
+    max-width: 720px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.audience-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 32px;
+}
+
+.audience-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255,250,240,0.78);
+}
+
+.audience-label {
+    color: var(--antique);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.audience-card h3 {
+    margin: 24px 0 12px;
+    color: var(--midnight);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.audience-card p {
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.audience-card a {
+    margin-top: auto;
+    padding-top: 22px;
+    color: var(--deep);
+    font-weight: 900;
+}
+
+.team-proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    align-items: center;
+    margin-top: 14px;
+    padding: 18px 22px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    background: rgba(13,35,64,0.04);
+    font-size: 0.82rem;
+}
+
+.team-proof strong { color: var(--midnight); }
+.team-proof span::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 7px; background: var(--brass); }
+
 .hero-copy,
 .hero-visual,
 .section-heading,
@@ -1290,6 +1370,8 @@ p {
 }
 
 @media (max-width: 1040px) {
+    .audience-grid { grid-template-columns: 1fr; }
+    .audience-card { min-height: 0; }
     .site-header,
     .hero,
     .capsules,
@@ -1325,6 +1407,7 @@ p {
 }
 
 @media (max-width: 720px) {
+    .audience-paths { padding: 48px 0; }
     html,
     body {
         width: 100%;
