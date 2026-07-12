@@ -330,6 +330,24 @@ button.btn-primary::after {
 .pilot-links { display: flex; flex-wrap: wrap; gap: 10px 18px; padding-top: 18px; }
 .pilot-links a { color: var(--deep); font-size: 0.8rem; font-weight: 900; text-decoration: underline; }
 
+.real-demo { display: grid; grid-template-columns: 0.72fr 1.28fr; gap: 40px; align-items: center; padding: 64px 0; }
+.real-demo h2 { margin-top: 12px; font-size: clamp(2.8rem, 6vw, 5rem); }
+.real-demo p { color: var(--muted); line-height: 1.65; }
+.real-demo video { width: 100%; max-height: 520px; border: 1px solid var(--line); border-radius: 8px; background: var(--midnight); box-shadow: var(--shadow); }
+.release-truth { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-bottom: 56px; padding: 1px; background: var(--line); }
+.release-truth > div { display: flex; flex-direction: column; gap: 10px; padding: 22px; background: var(--paper); }
+.release-truth strong { color: var(--midnight); font-size: 0.9rem; }
+.status-chip { width: fit-content; padding: 5px 8px; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.status-chip.available { color: #0a5a41; background: #dff5eb; }
+.status-chip.planned { color: #79560d; background: #f7ebc9; }
+.permissions { padding: 70px 0; }
+.permissions-table { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 30px; padding: 1px; background: var(--line); }
+.permissions-table > div { display: grid; grid-template-columns: 1fr auto; gap: 10px 18px; padding: 24px; background: rgba(255,250,240,0.9); }
+.permissions-table strong { color: var(--midnight); }
+.permissions-table span { color: var(--antique); font-size: 0.76rem; font-weight: 900; text-transform: uppercase; }
+.permissions-table .permission-good { color: #0a6b4b; }
+.permissions-table p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
+
 .hero-copy,
 .hero-visual,
 .section-heading,
@@ -1383,6 +1401,8 @@ p {
 }
 
 @media (max-width: 1040px) {
+    .real-demo { grid-template-columns: 1fr; }
+    .release-truth, .permissions-table { grid-template-columns: 1fr; }
     .team-offer { grid-template-columns: 1fr; gap: 32px; }
     .audience-grid { grid-template-columns: 1fr; }
     .audience-card { min-height: 0; }
