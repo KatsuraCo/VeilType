@@ -3,9 +3,15 @@
     const attribution = window.VEILTYPE_ATTRIBUTION;
     const attributionValues = attribution ? attribution.current : null;
     const refCode = attributionValues && (attributionValues.ref || attributionValues.promo);
-    const hasCreatorDiscount = Boolean(refCode);
     const regularPrice = Number(config.regularPriceUsd || 4.49);
-    const discount = hasCreatorDiscount ? Number(config.creatorDiscountUsd || 1) : 0;
+    const launchCode = String(config.launchCode || "").trim();
+    const launchEndsAt = Date.parse(config.launchEndsAt || "");
+    const hasLaunchOffer = Boolean(launchCode) && Number.isFinite(launchEndsAt) && Date.now() < launchEndsAt;
+    const hasCreatorDiscount = Boolean(refCode) && !hasLaunchOffer;
+    const launchPrice = Number(config.launchPriceUsd || 2.99);
+    const discount = hasLaunchOffer
+        ? Math.max(0, regularPrice - launchPrice)
+        : (hasCreatorDiscount ? Number(config.creatorDiscountUsd || 1) : 0);
     const finalPrice = Math.max(0, regularPrice - discount);
     const currency = config.currency || "USD";
     const productCode = config.productCode || "veiltype_early_access";
@@ -28,7 +34,7 @@
         url.searchParams.set("discount_usd", discount.toFixed(2));
         url.searchParams.set("final_price_usd", finalPrice.toFixed(2));
         url.searchParams.set("currency", currency);
-        url.searchParams.set("campaign", hasCreatorDiscount ? "creator" : "direct");
+        url.searchParams.set("campaign", hasLaunchOffer ? "product_hunt_launch" : (hasCreatorDiscount ? "creator" : "direct"));
         if (refCode && !url.searchParams.has("ref")) {
             url.searchParams.set("ref", refCode);
         }
@@ -45,7 +51,13 @@
         node.hidden = !hasCreatorDiscount;
     });
     document.querySelectorAll("[data-direct-offer]").forEach(function (node) {
-        node.hidden = hasCreatorDiscount;
+        node.hidden = hasCreatorDiscount || hasLaunchOffer;
+    });
+    document.querySelectorAll("[data-launch-offer]").forEach(function (node) {
+        node.hidden = !hasLaunchOffer;
+    });
+    document.querySelectorAll("[data-launch-code]").forEach(function (node) {
+        node.textContent = launchCode;
     });
     document.documentElement.dataset.creatorDiscount = hasCreatorDiscount ? "active" : "inactive";
 
@@ -62,6 +74,7 @@
             + "\nRegular price: " + money(regularPrice)
             + "\nDiscount: " + money(discount)
             + "\nFinal price: " + money(finalPrice)
+            + (hasLaunchOffer ? "\nProduct Hunt code: " + launchCode : "")
             + (refCode ? "\nReferral code: " + refCode : ""));
         link.href = emailUrl.toString();
     });
