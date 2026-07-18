@@ -1211,6 +1211,11 @@ p {
 
 .activation-card h1 {
     margin-bottom: 18px;
+    max-width: 100%;
+    font-size: clamp(2.45rem, 6vw, 4.8rem);
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
 }
 
 .founder-page .activation {
