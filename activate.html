@@ -46,53 +46,47 @@
                 <p class="pill">Lifetime access &middot; $3</p>
                 <h1>Activate VeilType.</h1>
                 <p class="hero-subtitle">
-                    Enter the email and order ID from your purchase. If you want a device-bound license,
-                    paste the device ID shown inside the Android app.
+                    To receive a VeilType license, open the request form below and submit your email, product, and Android device ID.
                 </p>
                 <p class="hero-position">
-                    Licensing unlocks paid features only. Message content is encrypted locally and never sent to the activation server.
+                    After we receive your request, we prepare a staff invoice and send you a secure payment link.
+                    The invoice is handled through <a href="https://easystaff.io/invoice" target="_blank" rel="noopener">EasyStaff</a>,
+                    where you can pay using the available payment method that is most convenient for you.
+                </p>
+                <p class="hero-position">
+                    You can also pay <strong>$2.99 in USDT</strong> before sending the form. Send USDT to
+                    <code>0x31359b2fc0cf826a1d23b2e3e91b40ad713c1ae3</code>, then include your
+                    <a href="https://www.binance.com/en/academy/glossary/transaction-id" target="_blank" rel="noopener">Transaction ID (TXID)</a>
+                    in the request form. If you are not sure which network your wallet will use, choose the EasyStaff invoice instead.
                 </p>
 
-                <form class="activation-form" id="activationForm">
-                    <label>
-                        Email used for purchase
-                        <input id="emailInput" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
-                    </label>
-                    <label>
-                        Order ID
-                        <input id="orderInput" name="orderId" type="text" required placeholder="ORDER-001">
-                    </label>
-                    <label>
-                        Device ID (optional)
-                        <input id="deviceInput" name="deviceId" type="text" placeholder="Paste from VeilType app">
-                    </label>
-                    <button class="btn btn-primary" type="submit">Get activation code</button>
-                </form>
-
-                <div class="activation-result" id="activationResult" hidden>
-                    <h2>Your activation code</h2>
-                    <textarea id="activationCode" readonly rows="7"></textarea>
+                <div class="activation-result">
+                    <h2>How payment and activation work</h2>
+                    <ol class="check-list">
+                        <li>Open the license request form.</li>
+                        <li>Enter your email, product name, and VeilType device ID from the Android app.</li>
+                        <li>If you paid by crypto, enter your USDT TXID in the form.</li>
+                        <li>Send the form.</li>
+                        <li>We create an <a href="https://easystaff.io/invoice" target="_blank" rel="noopener">EasyStaff</a> invoice and send you a secure payment link.</li>
+                        <li>After payment is confirmed, we send your signed offline license code to the email address from the form.</li>
+                    </ol>
                     <div class="hero-actions">
-                        <button class="btn btn-primary" id="copyCodeButton" type="button">Copy code</button>
+                        <a class="btn btn-primary" href="https://forms.gle/uNyPn6pwB39N1wpD7" target="_blank" rel="noopener">Open license request form</a>
                         <a class="btn btn-secondary" href="./downloads/VeilType.apk">Download APK</a>
                     </div>
                     <p class="muted">
-                        Open VeilType on Android, tap License / Activation, paste this code, and activate.
+                        Licensing unlocks paid features only. Message content is encrypted locally and never sent to a VeilType message server.
                     </p>
                 </div>
 
-                <div class="activation-error" id="activationError" hidden></div>
-
-                <div class="activation-result" id="manualActivation" hidden>
-                    <h2>Manual activation</h2>
-                    <p class="muted">
-                        The automatic activation service is not configured for this page yet. Send your purchase email,
-                        order ID, and optional device ID to support, then paste the signed activation code inside the Android app.
-                    </p>
-                    <div class="hero-actions">
-                        <a class="btn btn-primary" href="mailto:support@truelock.pro?subject=VeilType%20activation">Email support</a>
-                        <a class="btn btn-secondary" href="./downloads/VeilType.apk">Download APK</a>
-                    </div>
+                <div class="activation-error">
+                    <strong>Refund policy:</strong>
+                    after the offline license key is issued, the purchase cannot be refunded because the key cannot be revoked remotely.
+                    If something goes wrong, contact
+                    <a href="mailto:support@truelock.pro">support@truelock.pro</a>
+                    or
+                    <a href="mailto:dkatsura1@gmail.com">dkatsura1@gmail.com</a>
+                    and include the product name plus a clear description of the problem.
                 </div>
             </div>
 
@@ -106,64 +100,11 @@
                     <li>No account required.</li>
                     <li>No message server.</li>
                     <li>License code only unlocks paid features.</li>
-                    <li>Keep your order ID private.</li>
+                    <li>Device ID is required for activation.</li>
+                    <li>Support can help if the license does not activate correctly.</li>
                 </ul>
             </aside>
         </section>
     </main>
-
-    <script src="./backend-config.js"></script>
-    <script>
-        const form = document.getElementById('activationForm');
-        const result = document.getElementById('activationResult');
-        const errorBox = document.getElementById('activationError');
-        const codeBox = document.getElementById('activationCode');
-        const copyButton = document.getElementById('copyCodeButton');
-        const manualActivation = document.getElementById('manualActivation');
-        const params = new URLSearchParams(window.location.search);
-        const backendConfig = window.VEILTYPE_BACKEND || {};
-        const apiBase = (params.get('api') || window.VEILTYPE_API_BASE || backendConfig.apiBaseUrl || '').replace(/\/$/, '');
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            result.hidden = true;
-            errorBox.hidden = true;
-            manualActivation.hidden = true;
-
-            if (!apiBase) {
-                manualActivation.hidden = false;
-                return;
-            }
-
-            const payload = {
-                email: document.getElementById('emailInput').value.trim(),
-                orderId: document.getElementById('orderInput').value.trim(),
-                deviceId: document.getElementById('deviceInput').value.trim(),
-            };
-
-            try {
-                const response = await fetch(`${apiBase}/api/licenses/redeem`, {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const data = await response.json();
-                if (!response.ok || !data.ok) {
-                    throw new Error(data.message || data.code || 'Activation failed.');
-                }
-                codeBox.value = data.activationCode;
-                result.hidden = false;
-            } catch (error) {
-                errorBox.textContent = error.message || 'Activation failed.';
-                errorBox.hidden = false;
-            }
-        });
-
-        copyButton.addEventListener('click', async () => {
-            await navigator.clipboard.writeText(codeBox.value);
-            copyButton.textContent = 'Copied';
-            setTimeout(() => { copyButton.textContent = 'Copy code'; }, 1400);
-        });
-    </script>
 </body>
 </html>
