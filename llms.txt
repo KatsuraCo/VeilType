@@ -1,6 +1,6 @@
 # VeilType
 
-> VeilType is a lightweight Android privacy keyboard for encrypted messages. The current launch story is: type, encrypt locally before sending, use the messengers people already have, no VeilType cloud, no account, and a $2.99 lifetime Product Hunt launch price through July 23.
+> VeilType is a verifiable Android privacy keyboard for encrypted messages. The current story is: no Android INTERNET permission in the production APK, encrypt locally before the messenger receives plaintext, use the messengers people already have, no VeilType content cloud, no account, and a $2.99 lifetime launch price.
 
 Important notes:
 - VeilType is not a new messenger. It is a keyboard layer for chat apps people already use.
@@ -8,6 +8,7 @@ Important notes:
 - The planned voice upgrade should use optional downloadable language packs so users install only the languages they use.
 - Both people need VeilType and the same 8-emoji shared key.
 - The current public artifact is a direct Android APK.
+- The public proof page is `/break-veiltype.html`: five checks in ten minutes, including Android permission inspection, offline opening, and tamper rejection.
 - The Product Hunt launch price is $2.99 lifetime through July 23 with code `iron_veil`. The regular founder price is $4.49 after the launch offer ends; a valid creator referral then applies the documented $1 discount.
 - The creator program offer is: audience saves $1, approved creator earns $1 per confirmed VeilType sale, with hold and payout rules.
 - Customer referral offer: after purchase, invite 5 confirmed VeilType buyers to unlock a purchase-back reward for the original VeilType purchase price. Creator commission still applies if the first buyer came through a creator.
@@ -32,6 +33,7 @@ Important notes:
 - [/invite-ru.html](./invite-ru.html): Russian customer referral page for the invite-5 purchase-back reward.
 - [/install.html](./install.html): Android installation and first encrypted-message setup guide.
 - [/install-ru.html](./install-ru.html): Russian Android installation and first encrypted-message setup guide.
+- [/break-veiltype.html](./break-veiltype.html): Public 10-minute challenge for reviewers and Android privacy testers.
 - [/trust-model.md](./trust-model.md): Trust model and honest limits.
 
 ## Product

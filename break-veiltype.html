@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Break VeilType - 5 Tests in 10 Minutes</title>
+    <meta name="description" content="A public 10-minute challenge for testing VeilType: inspect Android permissions, encrypt before the messenger, open offline, tamper with a capsule, and report failures." />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="theme-color" content="#0D2340" />
+    <link rel="canonical" href="https://veiltype.tech/break-veiltype.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Break VeilType - 5 Tests in 10 Minutes" />
+    <meta property="og:description" content="Do not trust the claim. Verify the Android APK permissions, send an encrypted capsule, open it offline, and tamper with the payload." />
+    <meta property="og:url" content="https://veiltype.tech/break-veiltype.html" />
+    <meta property="og:image" content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Break VeilType - 5 Tests in 10 Minutes" />
+    <meta name="twitter:description" content="A public challenge for testing Android keyboard-layer encryption before the messenger receives plaintext." />
+    <meta name="twitter:image" content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=break-veiltype-1" />
+</head>
+<body class="founder-page">
+    <header class="site-header">
+        <a class="brand" href="./index.html" aria-label="VeilType home">
+            <span class="typewriter-logo" aria-hidden="true">V</span>
+            <span class="brand-text">VeilType</span>
+        </a>
+        <nav class="header-nav" aria-label="Challenge navigation">
+            <a href="./index.html">Product</a>
+            <a href="./install.html">Install</a>
+            <a href="./security-model.html">Security model</a>
+            <a href="https://truelock.pro/technology-package.html">B2B package</a>
+        </nav>
+        <div class="header-actions">
+            <a class="btn btn-small btn-primary" href="./activate.html">Activate</a>
+        </div>
+    </header>
+
+    <main class="activation-page">
+        <section class="activation-card section-shell">
+            <div class="activation-copy">
+                <p class="pill">Public challenge &middot; 10 minutes</p>
+                <h1>Break VeilType.</h1>
+                <p class="hero-subtitle">Do not trust a privacy claim because it sounds good. Run five concrete checks and send the first failure, confusing step, or compatibility issue.</p>
+                <p class="hero-position">Goal: verify whether VeilType can encrypt before the messenger receives plaintext while keeping the claim testable and honest.</p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="./downloads/VeilType.apk">Download APK</a>
+                    <a class="btn btn-secondary" href="./install.html">Setup guide</a>
+                </div>
+            </div>
+            <aside class="activation-side">
+                <h2>What to report</h2>
+                <p>Phone model, Android version, messenger used, test number, and the exact step that failed or felt unclear.</p>
+                <p>Email: <a href="mailto:support@truelock.pro">support@truelock.pro</a><br>Backup: <a href="mailto:dkatsura1@gmail.com">dkatsura1@gmail.com</a></p>
+            </aside>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <div class="section-kicker">5 checks</div>
+                <h2>Run the proof, then try to break it.</h2>
+            </div>
+            <div class="challenge-grid">
+                <article class="trust-card">
+                    <h3>1. Inspect permissions</h3>
+                    <p>Install the APK and confirm Android does not show an INTERNET permission request for the production keyboard.</p>
+                </article>
+                <article class="trust-card">
+                    <h3>2. Encrypt before chat</h3>
+                    <p>Type a short message in VeilType, press Encrypt, and send the encrypted output through Telegram, WhatsApp, SMS, email, or another app.</p>
+                </article>
+                <article class="trust-card">
+                    <h3>3. Open offline</h3>
+                    <p>On another Android device with the same key, enable airplane mode and open the encrypted message or capsule without a VeilType cloud account.</p>
+                </article>
+                <article class="trust-card">
+                    <h3>4. Tamper rejection</h3>
+                    <p>Copy the encrypted payload, change one character, and confirm that VeilType refuses to open the modified content.</p>
+                </article>
+                <article class="trust-card">
+                    <h3>5. Usability failure</h3>
+                    <p>Try a real workflow: long text, photo, video, file, or voice capsule. Report the first compatibility or UX problem instead of only saying whether it worked.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="permissions section-shell">
+            <div class="section-heading">
+                <div class="section-kicker">Honest limits</div>
+                <h2>What this challenge does not prove.</h2>
+            </div>
+            <div class="permissions-table">
+                <div><strong>No independent audit yet</strong><span>Limit</span><p>This is a public product test, not a formal crypto audit, certification, or pentest report.</p></div>
+                <div><strong>Metadata still exists</strong><span>Limit</span><p>The messenger can still see that something was sent, when it was sent, and who participated.</p></div>
+                <div><strong>Compromised device risk</strong><span>Limit</span><p>No Android keyboard can protect plaintext on a fully compromised device or stop screenshots after reveal.</p></div>
+                <div><strong>Compatibility matters</strong><span>Limit</span><p>Keyboard behavior varies by app, Android version, OEM skin, and messenger attachment rules.</p></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <span>VeilType. Encrypt before the messenger receives plaintext.</span>
+        <a href="./index.html">Back to product</a>
+    </footer>
+</body>
+</html>

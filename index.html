@@ -10,11 +10,11 @@
     <!-- End Google Tag Manager -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VeilType - Private Android Keyboard for Encrypted Messages</title>
+    <title>VeilType - Verifiable Android Keyboard Encryption Before the Messenger</title>
     <meta
         id="metaDescription"
         name="description"
-        content="VeilType is a lightweight Android keyboard for encrypted messages. Encrypt locally and send through Telegram, WhatsApp, SMS, email, or any app with a text field."
+        content="VeilType is a verifiable Android keyboard without INTERNET permission that encrypts locally before text or media reaches Telegram, WhatsApp, SMS, email, or any app with a text field."
     />
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="theme-color" content="#0D2340" />
@@ -23,13 +23,13 @@
     <link rel="alternate" hreflang="ru" href="https://veiltype.tech/ru.html" />
     <link rel="alternate" hreflang="x-default" href="https://veiltype.tech/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="VeilType - Private Android Keyboard for Encrypted Messages" />
-    <meta property="og:description" content="Type private messages, encrypt locally, and send through any messenger. Offline voice typing with optional language packs is planned next." />
+    <meta property="og:title" content="VeilType - Verifiable Android Keyboard Encryption" />
+    <meta property="og:description" content="A testable Android keyboard privacy layer: no INTERNET permission, local encryption before the messenger receives plaintext, no account, no proprietary cloud." />
     <meta property="og:url" content="https://veiltype.tech/" />
     <meta property="og:image" content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="VeilType - Private Android Keyboard for Encrypted Messages" />
-    <meta name="twitter:description" content="Type. Encrypt locally. Send anywhere." />
+    <meta name="twitter:title" content="VeilType - Verifiable Android Keyboard Encryption" />
+    <meta name="twitter:description" content="No INTERNET permission. Encrypt before the messenger receives plaintext." />
     <meta name="twitter:image" content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="manifest" href="./site.webmanifest" />
@@ -81,7 +81,7 @@
             "operatingSystem": "Android",
             "url": "https://veiltype.tech/",
             "downloadUrl": "https://veiltype.tech/downloads/VeilType.apk",
-            "description": "VeilType is a lightweight Android keyboard for encrypted messages. It works inside existing messengers and encrypts locally before sending.",
+            "description": "VeilType is a verifiable Android keyboard without INTERNET permission. It works inside existing messengers and encrypts locally before plaintext reaches another app.",
             "featureList": [
                 "Open-core privacy architecture",
                 "AES-256-GCM encryption for private capsules",
@@ -172,6 +172,8 @@
             <a href="#trust">Trust</a>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
+            <a href="./break-veiltype.html">Break test</a>
+            <a href="https://truelock.pro/technology-package.html">B2B package</a>
         </nav>
         <div class="header-actions">
             <a class="btn btn-small btn-primary" href="./activate.html">Activate</a>
@@ -185,19 +187,21 @@
     <main id="top">
         <section class="hero section-shell">
             <div class="hero-copy reveal">
-                <p class="pill">Product Hunt &middot; July 16 &middot; Android</p>
-                <h1>Encrypt before you send. In any chat.</h1>
+                <p class="pill">Verifiable Android keyboard &middot; No INTERNET permission</p>
+                <h1>Encrypt before the messenger receives plaintext.</h1>
                 <p class="hero-subtitle">
-                    VeilType is a lightweight Android keyboard for private text. Type, encrypt locally, and send
-                    through Telegram, WhatsApp, SMS, email, or any app with a text field.
+                    VeilType is a testable Android privacy layer: the production APK does not request INTERNET permission,
+                    and selected text, voice, photos, videos, and files are encrypted locally before they enter Telegram,
+                    WhatsApp, SMS, email, or any other app.
                 </p>
                 <p class="hero-mobile-subtitle">Encrypt messages directly inside Telegram, WhatsApp and other Android apps.</p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" data-carry-attribution href="./founder-access.html">Buy VeilType · <span data-final-price>$2.99</span></a>
-                    <a class="btn btn-secondary" href="https://truelock.pro/enterprise.html">For teams and technology buyers</a>
+                    <a class="btn btn-secondary" href="./break-veiltype.html">Break VeilType: 5 tests</a>
+                    <a class="btn btn-secondary" href="https://truelock.pro/technology-package.html">For buyers and partners</a>
                 </div>
                 <p class="hero-position">
-                    No new messenger. No VeilType cloud. Teams can request a focused B2B technology evaluation. Offline voice typing with optional language packs is planned next.
+                    Not another messenger. A verifiable layer before the messenger. No VeilType content cloud. No account required for the encrypted-message workflow.
                 </p>
                 <div class="trust-metrics" aria-label="VeilType trust highlights">
                     <span>No new messenger</span>
@@ -506,6 +510,25 @@
                 <div><strong>Internet permission</strong><span class="permission-good">Not requested</span><p>The production manifest does not declare Android INTERNET permission.</p></div>
                 <div><strong>Contacts, location, microphone</strong><span class="permission-good">Not requested</span><p>Not declared by the current production keyboard manifest.</p></div>
                 <div><strong>Process text query</strong><span>Declared</span><p>Allows Android to discover apps that support standard text processing.</p></div>
+            </div>
+        </section>
+
+        <section class="challenge-strip section-shell" id="break-test">
+            <div class="section-heading reveal">
+                <div class="section-kicker">Public test challenge</div>
+                <h2>Break VeilType: 5 tests, 10 minutes.</h2>
+                <p>Do not trust the headline. Verify the APK permissions, exchange a capsule offline, alter one character, and report the first step that fails or feels unclear.</p>
+            </div>
+            <div class="challenge-grid">
+                <article class="trust-card"><h3>1. Inspect permissions</h3><p>Confirm the production APK does not request Android <code>INTERNET</code> permission.</p></article>
+                <article class="trust-card"><h3>2. Send through your chat</h3><p>Encrypt text or media and pass the output through Telegram, WhatsApp, SMS, email, or another app.</p></article>
+                <article class="trust-card"><h3>3. Go offline</h3><p>Open the encrypted output on another device in airplane mode.</p></article>
+                <article class="trust-card"><h3>4. Tamper with it</h3><p>Change one character in the payload and confirm that opening fails closed.</p></article>
+                <article class="trust-card"><h3>5. Report friction</h3><p>Send phone model, messenger, Android version, and the first confusing or broken step.</p></article>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="./break-veiltype.html">Open the 10-minute test</a>
+                <a class="btn btn-secondary" href="./install.html">Install and setup guide</a>
             </div>
         </section>
 
