@@ -1,0 +1,46 @@
+name: Bug or compatibility report
+description: Report a reproducible VeilType problem using synthetic content only.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Never attach passwords, private keys, contacts, plaintext, personal media, or real encrypted capsules."
+  - type: input
+    id: version
+    attributes:
+      label: VeilType version
+      placeholder: "0.4.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Phone and Android version
+      placeholder: "Samsung S23 / Android 15"
+    validations:
+      required: true
+  - type: input
+    id: messenger
+    attributes:
+      label: Messenger or target app and version
+      placeholder: "Telegram 12.1"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use synthetic content only.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+

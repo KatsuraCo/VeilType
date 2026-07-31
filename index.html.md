@@ -35,12 +35,12 @@ VeilType is an Android keyboard that encrypts text and media capsules locally be
 - Not a recovery-based key system
 - Not a protection layer for already compromised phones
 
-## Launch positioning
+## Distribution
 
-- Founder launch price: $3 lifetime
+- Free forever for personal use
+- Complete feature set with no activation, account, ads, or subscription
 - Main call to action: direct Android APK download
-- Main acquisition page: the root landing page
-- Main launch channel: Product Hunt
+- Google Play release preparation is in progress
 
 ## FAQ summary
 

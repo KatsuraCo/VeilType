@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest a concrete VeilType workflow improvement.
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the typing, encryption, sharing, or opening workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: "Do not include passwords, keys, contacts, plaintext, or confidential files."
+

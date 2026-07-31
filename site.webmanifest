@@ -1,11 +1,11 @@
 {
   "name": "VeilType",
   "short_name": "VeilType",
-  "description": "Private Android keyboard for encrypted messages.",
+  "description": "Free forever Android keyboard with local encryption, no account and no INTERNET permission.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#F5F1E8",
-  "theme_color": "#0D2340",
+  "background_color": "#07121D",
+  "theme_color": "#07121D",
   "icons": [
     {
       "src": "./favicon.svg",

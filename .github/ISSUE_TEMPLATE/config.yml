@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security or privacy report
+    url: mailto:support@truelock.pro?subject=VeilType%20private%20report
+    about: Use email for non-public details. Never send real secrets, contacts, or private keys.

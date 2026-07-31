@@ -1,6 +1,6 @@
 # VeilType Open Core
 
-VeilType should use an open-core model where the auditable technical layer is public and the product shell stays closed.
+VeilType uses an open-core model where the auditable technical layer is public and the complete personal Android application is distributed free forever.
 
 ## Public first
 
@@ -24,13 +24,13 @@ That module includes:
 - unit tests and a stable message vector
 - Apache-2.0 license text
 
-## Private for now
+## Product shell
 
 - Android IME shell
-- premium UX and onboarding
+- Android UX and onboarding
 - release automation and signing
-- payment and activation flows
+- store publishing and device-specific integration
 
 ## Why this boundary
 
-This creates real trust because engineers can verify how the format and crypto work, while the commercial product can still stay differentiated.
+This creates a reviewable trust boundary while allowing the complete personal product to spread without payment, registration, or activation friction. Enterprise integration, SDK work, support, and strategic licensing remain separate from access to the free application.

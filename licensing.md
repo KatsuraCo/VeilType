@@ -1,23 +1,14 @@
-# VeilType Licensing Model
+# VeilType distribution
 
-VeilType should use one public APK plus paid entitlements.
+VeilType is free forever for personal use. The complete Android application is distributed without payment, activation, registration, advertising, analytics SDKs, or a subscription.
 
-Recommended launch offers:
-- `Solo Founder`: one paid claim for one user
-- `Duo Gift Pack`: two paid claims so one user can gift the second claim
+## Consumer application
 
-Why this is better than two APK files:
-- cleaner distribution
-- easier gifting
-- less casual piracy
-- simpler Product Hunt story
+- One public APK with the complete personal feature set
+- No license key or entitlement service
+- No time limit and no feature expiry
+- Direct distribution and future Google Play distribution
 
-Recommended anti-piracy approach:
-- one APK
-- checkout issues claim links
-- app verifies signed entitlements
-- limited offline grace
-- no separate gift APK
+## Separate business work
 
-This keeps the trust model intact because licensing can be verified without
-storing or processing message content on the server.
+Enterprise integration, white-label packaging, SDK work, support agreements, and strategic licensing are separate commercial services. They do not limit access to the free personal application.
