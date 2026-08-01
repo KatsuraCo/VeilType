@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://veiltype.tech/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://veiltype.tech/?lang=ru</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/ru.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/es.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/pt.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/de.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/fr.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/it.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://veiltype.tech/tr.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://veiltype.tech/privacy-policy.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://veiltype.tech/security-model.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://veiltype.tech/open-core.md</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>

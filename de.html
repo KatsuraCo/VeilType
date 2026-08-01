@@ -1,0 +1,629 @@
+html
+<html lang="de">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-M65XFRZR');</script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>VeilType – Überprüfbare Android-Tastaturverschlüsselung vor dem Messenger</title>
+<meta content="VeilType ist eine verifizierbare Android-Tastatur ohne INTERNET-Berechtigung, die lokal verschlüsselt, bevor Text oder Medien Telegram, WhatsApp, SMS, E-Mail oder eine beliebige App mit einem Textfeld erreichen." id="metaDescription" name="description"/>
+<meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<meta content="#0D2340" name="theme-color"/>
+<link href="https://veiltype.tech/de.html" rel="canonical"/><link href="https://veiltype.tech/" hreflang="en" rel="alternate"/><link href="https://veiltype.tech/ru.html" hreflang="ru" rel="alternate"/><link href="https://veiltype.tech/es.html" hreflang="es" rel="alternate"/><link href="https://veiltype.tech/pt.html" hreflang="pt" rel="alternate"/><link href="https://veiltype.tech/de.html" hreflang="de" rel="alternate"/><link href="https://veiltype.tech/fr.html" hreflang="fr" rel="alternate"/><link href="https://veiltype.tech/it.html" hreflang="it" rel="alternate"/><link href="https://veiltype.tech/tr.html" hreflang="tr" rel="alternate"/><link href="https://veiltype.tech/" hreflang="x-default" rel="alternate"/>
+<meta content="website" property="og:type"/>
+<meta content="VeilType – Überprüfbare Android Tastaturverschlüsselung" property="og:title"/>
+<meta content="Eine testbare Android-Tastatur-Datenschutzschicht: keine INTERNET-Berechtigung, lokale Verschlüsselung, bevor der Messenger Klartext empfängt, kein Konto, keine proprietäre Cloud." property="og:description"/>
+<meta content="https://veiltype.tech/" property="og:url"/>
+<meta content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="VeilType – Überprüfbare Android Tastaturverschlüsselung" name="twitter:title"/>
+<meta content="Keine INTERNET-Berechtigung. Verschlüsseln, bevor der Messenger Klartext empfängt." name="twitter:description"/>
+<meta content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" name="twitter:image"/>
+<link href="./favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="./site.webmanifest" rel="manifest"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="./styles.css?v=product-hunt-final-1" rel="stylesheet"/>
+<script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "VeilType",
+            "applicationCategory": "SecurityApplication",
+            "operatingSystem": "Android",
+            "url": "https://veiltype.tech/",
+            "downloadUrl": "https://veiltype.tech/downloads/VeilType.apk",
+            "description": "VeilType is a verifiable Android keyboard without INTERNET permission. It works inside existing messengers and encrypts locally before plaintext reaches another app.",
+            "featureList": [
+                "Open-core privacy architecture",
+                "AES-256-GCM encryption for private capsules",
+                "Text encryption from keyboard",
+                "Planned offline voice typing with optional language packs",
+                "Planned download-only-needed voice languages",
+                "Encrypted voice, photo, video, and file capsules",
+                "One-time read mode for messages and capsules",
+                "8-emoji shared keys",
+                "Biometric unlock",
+                "Panic wipe",
+                "Offline-first, no VeilType server for message content"
+            ],
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "VeilType"
+            }
+        }
+    </script>
+<script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Is VeilType a Messenger?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. VeilType is an Android keyboard and privacy layer for the messengers people already use."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does the recipient need VeilType?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The recipient needs VeilType and the correct shared key to decrypt messages or capsules."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is offline voice typing available now?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Offline voice typing is planned as a future upgrade. The intended design is local recognition after the selected language pack is downloaded."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Why will language packs be separate?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Speech models can be large. The planned language pack model keeps the app lighter and lets users store only the languages they actually use."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can VeilType prevent screenshots?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Cryptography cannot stop someone from taking a screenshot or photographing the screen after content is visible."
+                    }
+                }
+            ]
+        }
+    </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-M65XFRZR" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<header class="site-header">
+<a aria-label="VeilType Startseite" class="brand" href="#top">
+<span aria-hidden="true" class="typewriter-logo">V</span>
+<span class="brand-text">VeilType</span>
+</a>
+<nav aria-label="Primäre Navigation" class="header-nav">
+<a href="#how">Wie es funktioniert</a>
+<a href="#features">Merkmale</a>
+<a href="#trust">Vertrauen</a>
+<a href="#pricing">Für immer kostenlos</a>
+<a href="#faq">FAQ</a>
+<a href="./break-veiltype.html">Bruchtest</a>
+<a href="https://truelock.pro/technology-package.html">B2B-Paket</a>
+</nav>
+<div class="header-actions">
+<a aria-label="Unterstützen Sie VeilType auf Boosty" class="btn btn-small btn-support" href="https://boosty.to/daniil_katsura/donate" rel="noopener noreferrer" target="_blank">Unterstützung</a>
+<a class="btn btn-small btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">Kostenlos herunterladen</a>
+<select aria-label="Sprache" class="locale-select" id="localeSelect"><option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="pt">Português</option><option selected="selected" value="de">Deutsch</option><option value="fr">Français</option><option value="it">Italiano</option><option value="tr">Türkçe</option></select>
+</div>
+</header>
+<main id="top">
+<section class="hero section-shell">
+<div class="hero-copy reveal">
+<p class="pill">Für immer kostenlos · Android-Tastatur · Keine INTERNET-Berechtigung</p>
+<h1>Verschlüsseln Sie, bevor der Messenger Klartext erhält.</h1>
+<p class="hero-subtitle">
+                    VeilType ist eine testbare Android-Datenschutzschicht: Die Produktion APK fordert keine INTERNET-Berechtigung an.
+                    und ausgewählte Texte, Stimmen, Fotos, Videos und Dateien werden lokal verschlüsselt, bevor sie in Telegram gelangen.
+                    WhatsApp, SMS, E-Mail oder jede andere App.
+                </p>
+<p class="hero-mobile-subtitle">Verschlüsseln Sie Nachrichten direkt in Telegram, WhatsApp und anderen Android-Apps.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">Laden Sie VeilType kostenlos herunter</a>
+<a class="btn btn-secondary" href="./break-veiltype.html">Pause VeilType: 5 Tests</a>
+<a class="btn btn-secondary" href="https://truelock.pro/technology-package.html">Für Käufer und Partner</a>
+</div>
+<p class="hero-position">
+                    Kein weiterer Messenger. Eine überprüfbare Schicht vor dem Messenger. Keine VeilType Content Cloud. Für den Workflow für verschlüsselte Nachrichten ist kein Konto erforderlich.
+                </p>
+<div aria-label="VeilType Vertrauens-Highlights" class="trust-metrics">
+<span>Kein neues Messenger</span>
+<span>Kein Konto</span>
+<span>Kein Content-Server</span>
+<span>Für immer kostenlos</span>
+<span>Offline-Stimme: geplant</span>
+<span>AES-256-GCM</span>
+</div>
+</div>
+<div aria-label="Interaktive VeilType-Tastaturdemonstration" class="hero-visual reveal delay-1">
+<div class="keyboard-demo" data-keyboard-demo="" data-language="en">
+<div class="demo-phone">
+<div class="demo-chat-head">
+<span class="demo-avatar">A</span>
+<span><strong>Alex</strong><small>Telegram</small></span>
+<span class="demo-private">PRIVATE SCHICHT</span>
+</div>
+<div aria-live="polite" class="demo-chat-stream">
+<p class="demo-message incoming">Hast du heute Abend Zeit?</p>
+<p class="demo-message outgoing" data-demo-output="">Treffen Sie mich um 19 Uhr</p>
+</div>
+<div class="demo-keyboard">
+<div class="demo-compose" data-demo-compose="">Treffen Sie mich um 19 Uhr</div>
+<div class="demo-hint" data-demo-hint=""><span data-demo-hint-text="">Tippen Sie zum Verschlüsseln auf das Schloss</span></div>
+<div aria-label="VeilType Tastatur-Tools" class="demo-toolbar">
+<button aria-label="Nachricht verschlüsseln" class="demo-tool active" data-demo-encrypt="" title="Verschlüsseln" type="button"><img alt="" src="./assets/keyboard/ic_lock_lock_alpha.png"/></button>
+<button aria-label="Verschlüsselte Nachricht lesen" class="demo-tool" data-demo-decrypt="" title="Lesen" type="button"><img alt="" src="./assets/keyboard/ic_menu_view.png"/></button>
+<button aria-label="Klare Eingabe" class="demo-tool" title="Klar" type="button"><img alt="" src="./assets/keyboard/ic_menu_close_clear_cancel.png"/></button>
+<button aria-label="Anhänge öffnen" class="demo-tool" title="Anhänge" type="button"><img alt="" src="./assets/keyboard/ic_keyboard_paperclip.svg"/></button>
+</div>
+<div aria-hidden="true" class="demo-number-row"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div>
+<div aria-hidden="true" class="demo-keys">
+<div class="demo-key-row"><span>Q</span><span>W</span><span>E</span><span>R</span><span>T</span><span>Y</span><span>U</span><span>I</span><span>O</span><span>P</span></div>
+<div class="demo-key-row middle"><span>A</span><span>S</span><span>D</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span></div>
+<div class="demo-key-row"><span class="utility">↑</span><span>Z</span><span>X</span><span>C</span><span>V</span><span>B</span><span>N</span><span>M</span><span class="utility">⌫</span></div>
+</div>
+<div aria-hidden="true" class="demo-bottom-row">
+<span>123</span><span>EN</span><span>,</span><span class="space">Raum</span><span>.</span><span>Eingeben</span>
+</div>
+</div>
+</div>
+<p class="demo-hint">Tippen Sie auf „Verschlüsseln“, um zu sehen, was den Messenger verlässt.</p>
+</div>
+</div>
+</section>
+<section aria-label="Echte VeilType Android-Demonstration" class="real-demo section-shell">
+<div class="real-demo-copy"><div class="section-kicker">Endgültige Demo · Real Android</div><h2>Typ. Sperren. Geheimtext senden.</h2><p>Sehen Sie sich in Sekundenschnelle den gesamten VeilType-Ablauf an: ein normaler Chat, lokale Verschlüsselung und sichere Zustellung.</p></div>
+<video controls="" playsinline="" poster="./media/product-hunt/01-hero-encrypt-before-send.png" preload="metadata" src="./media/video/veiltype-final-sales-v9.mp4">Ihr Browser unterstützt keine Videos.</video>
+</section>
+<section class="release-truth section-shell">
+<div><span class="status-chip available">Jetzt verfügbar</span><strong>Verschlüsselter Text · lokale Schlüssel · Android-Tastatur · .veil-Kapseln</strong></div>
+<div><span class="status-chip planned">Geplant</span><strong>Offline-Spracheingabe · optionale Sprachpakete</strong></div>
+</section>
+<section class="problem section-shell reveal">
+<div class="section-kicker">Das Problem</div>
+<h2>Private Nachrichten sollten nicht dazu führen, dass jeder die App wechseln muss.</h2>
+<p>
+                Sichere messengers sind nützlich, aber das wirkliche Leben ist fragmentiert: Familie in WhatsApp, Gruppen in Telegram,
+                Dokumente in E-Mail, Codes in SMS. VeilType sorgt für Privatsphäre dort, wo bereits gesprochen wird.
+            </p>
+</section>
+<section class="how section-shell" id="how">
+<div class="section-heading reveal">
+<div class="section-kicker">Wie es funktioniert</div>
+<h2>Vier Schritte. Keine neue Chat-App.</h2>
+</div>
+<div class="steps-grid">
+<article class="step-card reveal">
+<span>01</span>
+<h3>Geben Sie dort ein, wo Sie bereits chatten</h3>
+<p>Öffnen Sie Telegram, WhatsApp, SMS, E-Mail oder eine beliebige App mit einem Textfeld. VeilType erscheint als Ihre Tastatur.</p>
+</article>
+<article class="step-card reveal delay-1">
+<span>02</span>
+<h3>In eine Kapsel verschlüsseln</h3>
+<p>Wandeln Sie Text, Sprache, Fotos, Videos oder Dateien in AES-256-GCM-verschlüsselte Inhalte um, bevor der Messenger sie empfängt.</p>
+</article>
+<article class="step-card reveal delay-2">
+<span>03</span>
+<h3>Senden Sie über ein beliebiges Messenger</h3>
+<p>Der Messenger erkennt nur Chiffretext oder eine .veil-Kapsel. Ihre privaten Inhalte bleiben innerhalb der verschlüsselten Nutzlast.</p>
+</article>
+<article class="step-card reveal delay-3">
+<span>04</span>
+<h3>Der Empfänger wird mit VeilType geöffnet</h3>
+<p>Der Empfänger verwendet den gemeinsamen Schlüssel und VeilType, um lokal auf seinem Android-Gerät zu entschlüsseln.</p>
+</article>
+</div>
+<p class="section-note reveal">
+                Sowohl Absender als auch Empfänger benötigen VeilType und den gemeinsamen Schlüssel, um verschlüsselte Kapseln zu öffnen.
+            </p>
+</section>
+<section class="product-tour section-shell" data-tour="" id="demo">
+<div class="section-heading reveal">
+<div class="section-kicker">Produkttour</div>
+<h2>Verstehen Sie VeilType in vier Schritten.</h2>
+<p>Entdecken Sie den gleichen Onboarding-Ablauf, der in der Android-App verwendet wird. Alles Private bleibt auf dem Gerät.</p>
+</div>
+<div class="tour-layout reveal">
+<div aria-label="VeilType Produkttour" class="tour-controls" role="tablist">
+<button aria-selected="true" class="tour-tab is-active" data-tour-step="0" role="tab" type="button">
+<strong>01</strong><span>Geben Sie normal ein<small>In jedem Messenger</small></span>
+</button>
+<button aria-selected="false" class="tour-tab" data-tour-step="1" role="tab" type="button">
+<strong>02</strong><span>Lokal verschlüsseln<small>Vor dem Versand</small></span>
+</button>
+<button aria-selected="false" class="tour-tab" data-tour-step="2" role="tab" type="button">
+<strong>03</strong><span>Teilen Sie einen Schlüssel<small>Emoji-Sequenz</small></span>
+</button>
+<button aria-selected="false" class="tour-tab" data-tour-step="3" role="tab" type="button">
+<strong>04</strong><span>Privat entsperren<small>Auf dem Empfängergerät</small></span>
+</button>
+</div>
+<div aria-live="polite" class="tour-stage">
+<div aria-hidden="true" class="tour-lock">🔒</div>
+<div class="tour-panel is-active" data-tour-panel="0">
+<p class="tour-label">NACHRICHT</p>
+<strong>Treffen Sie mich um 19 Uhr</strong>
+<p>VeilType erscheint als Ihre Android-Tastatur in dem Chat, den Sie bereits verwenden.</p>
+</div>
+<div class="tour-panel" data-tour-panel="1">
+<p class="tour-label">VERSCHLÜSSELTE AUSGABE</p>
+<strong class="cipher">TL1:Q8bz...kP2</strong>
+<p>Der Messenger empfängt Chiffretext, nicht Ihre lesbare Nachricht.</p>
+</div>
+<div class="tour-panel" data-tour-panel="2">
+<p class="tour-label">GETEILTER SCHLÜSSEL</p>
+<strong class="emoji-key">🔒 🌙 🦊 ⚡ 🧠 🔥 🧩 🌊</strong>
+<p>Schlüssel werden lokal in VeilType erstellt und aufbewahrt.</p>
+</div>
+<div class="tour-panel" data-tour-panel="3">
+<p class="tour-label">VOR ORT GEÖFFNET</p>
+<strong>Treffen Sie mich um 19 Uhr</strong>
+<p>Der Empfänger öffnet die Nachricht mit VeilType und dem gemeinsamen Schlüssel.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="features section-shell" id="features">
+<div class="section-heading reveal">
+<div class="section-kicker">Merkmale</div>
+<h2>Verschlüsselte Kapseln von der Tastatur.</h2>
+</div>
+<div class="features-grid">
+<article class="feature-card reveal">
+<span>⌨</span>
+<h3>Textverschlüsselung</h3>
+<p>Schreiben Sie normal, verschlüsseln Sie über die Tastatur und senden Sie Chiffretext anstelle von Klartext.</p>
+</article>
+<article class="feature-card reveal">
+<span>AES</span>
+<h3>AES-256-GCM-Verschlüsselung</h3>
+<p>Private Texte und Kapseln werden lokal mit AES-256-GCM verschlüsselt, bevor sie den Tastatur-Workflow verlassen.</p>
+</article>
+<article class="feature-card reveal">
+<span>OK</span>
+<h3>Open-Core-Modell</h3>
+<p>Der datenschutzkritische Kern wird zur öffentlichen Überprüfung positioniert, während Premium-Produktfunktionen kommerziell bleiben können.</p>
+</article>
+<article class="feature-card reveal">
+<span>◉</span>
+<h3>Sprachkapseln</h3>
+<p>Zeichnen Sie verschlüsselte Sprachnachrichten auf und entsperren Sie bei Bedarf geschützte Audiodaten mit biometrischen Daten.</p>
+</article>
+<article class="feature-card reveal">
+<span>▣</span>
+<h3>Foto-, Video- und Aktenkapseln</h3>
+<p>Verpacken Sie private Medien und Dateien in .veil-Kapseln für die App-zu-App-Freigabe.</p>
+</article>
+<article class="feature-card reveal">
+<span>1x</span>
+<h3>Einmaliger Lesemodus</h3>
+<p>Legen Sie fest, dass ausgewählte Nachrichten oder .veil-Kapseln einmal auf dem Empfängergerät geöffnet werden und dann nicht mehr zum erneuten Lesen verfügbar sind.</p>
+</article>
+<article class="feature-card reveal">
+<span>SCHLÜSSEL</span>
+<h3>Emoji-Tasten</h3>
+<p>Verwenden Sie einprägsame gemeinsame 8-Emoji-Schlüssel anstelle kontobasierter Identitäten.</p>
+</article>
+<article class="feature-card reveal">
+<span>◆</span>
+<h3>Biometrische Entsperrung</h3>
+<p>Erfordern eine biometrische Bestätigung des Geräts, bevor ausgewählte Schlüssel und Kapseln entschlüsselt werden können.</p>
+</article>
+<article class="feature-card reveal">
+<span>!</span>
+<h3>Panikknopf</h3>
+<p>Löschen Sie schnell lokale Schlüssel und temporäre Kapseldaten, wenn Sie das Gerät reinigen müssen.</p>
+</article>
+</div>
+</section>
+<section class="trust section-shell" id="offline-voice">
+<div class="section-heading reveal">
+<div class="section-kicker">Roadmap</div>
+<h2>Als nächstes ist die Offline-Spracheingabe geplant.</h2>
+<p>
+                    Der aktuelle Start konzentriert sich auf verschlüsselten Text und Kapseln. Das nächste geplante Upgrade ist offline
+                    Spracheingabe mit optionalen Sprachpaketen, sodass Benutzer nur die Sprachsprachen herunterladen, die sie benötigen.
+                </p>
+</div>
+<div class="trust-grid">
+<article class="trust-card reveal">
+<h3>Kleiner App-Kern</h3>
+<p>Das Ziel besteht darin, den Schwerpunkt der Haupt-App auf den Tastatur- und Verschlüsselungsworkflow zu belassen, anstatt alle zukünftigen Sprachmodelle zu bündeln.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Optionale Sprachpakete</h3>
+<p>Mit dem geplanten Sprach-Upgrade können Benutzer auswählen, welche Offline-Sprachsprachen heruntergeladen, aktualisiert oder gelöscht werden sollen.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Offline nach dem Download</h3>
+<p>Das beabsichtigte Design ist einfach: Internet zum Herunterladen oder Aktualisieren von Sprachen, lokale Erkennung nach der Installation.</p>
+</article>
+</div>
+</section>
+<section class="capsules section-shell">
+<div class="capsule-copy reveal">
+<div class="section-kicker">Kapselformat</div>
+<h2>Ein beschriftbarer Behälter: .veil</h2>
+<p>
+                    VeilType erstellt AES-256-GCM-verschlüsselte .veil-Kapseln für private Inhalte. Das gleiche Format kann später werden
+                    die Brücke zu einem größeren Dateikontrollprodukt, ohne das Kernversprechen zu ändern: lokal verschlüsseln,
+                    Senden Sie es überall hin und halten Sie den Kern überprüfbar.
+                </p>
+<p>
+                    Eine .veil-Kapsel ist ein geschütztes Paket, das Text, Sprache, Fotos, Videos oder Dateien enthalten kann.
+                    Es ist darauf ausgelegt, durch die Apps zu navigieren, die Menschen bereits verwenden.
+                </p>
+<p>
+                    Für besonders sensible Inhalte kann VeilType eine Nachricht oder Kapsel als einmalig gelesen markieren, sodass sie nur einmal geöffnet wird
+                    und sperrt sich dann selbst für den normalen wiederholten Zugriff.
+                </p>
+</div>
+<div class="capsule-stack reveal delay-1">
+<article class="capsule-card"><span>Text</span><strong>message.veil</strong></article>
+<article class="capsule-card"><span>Stimme</span><strong>voice_capsule.veil</strong></article>
+<article class="capsule-card"><span>Medien</span><strong>photo_video_file.veil</strong></article>
+</div>
+</section>
+<section class="trust section-shell" id="trust">
+<div class="section-heading reveal">
+<div class="section-kicker">Sicherheit und Vertrauen</div>
+<h2>Open-Core-Vertrauen. AES-256-GCM-Verschlüsselung. Ehrliche Grenzen.</h2>
+</div>
+<div class="trust-grid">
+<article class="trust-card reveal">
+<h3>Open-Core-Vertrauensmodell</h3>
+<p>Der Verschlüsselungskern wird zur öffentlichen Überprüfung veröffentlicht. Die Android-App, die Premium-Benutzeroberfläche und die kommerziellen Funktionen bleiben proprietär. <a href="https://github.com/KatsuraCo/VeilType/tree/main/veiltype-core" rel="noopener" target="_blank">Überprüfen Sie den Kern auf GitHub.</a></p>
+</article>
+<article class="trust-card reveal">
+<h3>AES-256-GCM-Verschlüsselung</h3>
+<p>Nachrichten und .veil-Kapseln werden lokal mit AES-256-GCM verschlüsselt, bevor sie an Telegram, WhatsApp, SMS, E-Mail oder eine andere App übergeben werden.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Offline-zuerst</h3>
+<p>Der Nachrichteninhalt wird lokal verschlüsselt und entschlüsselt. VeilType benötigt kein Cloud-Konto, um eine Nachricht zu schützen.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Lokale Schlüsselverwaltung</h3>
+<p>Schlüssel werden auf dem Gerät gespeichert. Wenn ein Schlüssel verloren geht, kann VeilType ihn nicht wiederherstellen. Das ist Absicht.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Einmalige Leserichtlinie</h3>
+<p>Durch schlüsselspezifische Einstellungen können ausgewählte Nachrichten und Kapseln einmal lesbar gemacht werden, wodurch sensible Inhalte einer strengeren lokalen Zugriffsrichtlinie unterliegen.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Kein Content-Server</h3>
+<p>VeilType betreibt keinen Server, der Ihren Nachrichteninhalt empfängt. Messengers transportieren die verschlüsselte Ausgabe.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Durchsetzung auf App-Ebene</h3>
+<p>Selbstzerstörung, einmaliges Lesen und biometrische Tore sind Schutzmaßnahmen auf App-Ebene. Sie helfen, ersetzen aber nicht die Gerätesicherheit.</p>
+</article>
+</div>
+</section>
+<section class="comparison section-shell">
+<div class="section-heading reveal">
+<div class="section-kicker">Vergleich</div>
+<h2>Von Grund auf anders als sichere messengers.</h2>
+</div>
+<div class="comparison-table reveal">
+<div class="row header"><span>Fähigkeit</span><span>Sichern Sie Messenger</span><span>VeilType</span></div>
+<div class="row"><span>Erfordert eine neue Chat-App</span><span>Normalerweise ja</span><span>NEIN</span></div>
+<div class="row"><span>Funktioniert in vorhandenen messengers</span><span>Beschränkt</span><span>Ja</span></div>
+<div class="row"><span>Verschlüsselt vor dem Senden</span><span>Darin Messenger</span><span>Innerhalb der Tastatur</span></div>
+<div class="row"><span>Sprach-/Foto-/Video-/Dateikapseln</span><span>Messenger-spezifisch</span><span>.veil Kapselschicht</span></div>
+<div class="row"><span>Einmaliges Lesen von der Tastatur</span><span>Messenger-abhängig</span><span>Schlüsselspezifische VeilType-Richtlinie</span></div>
+</div>
+</section>
+<section class="permissions section-shell">
+<div class="section-heading"><div class="section-kicker">Android-Berechtigungen</div><h2>Was die Produktionstastatur von Android verlangen kann.</h2></div>
+<div class="permissions-table">
+<div><strong>Eingabemethodendienst</strong><span>Erforderlich</span><p>Lässt Android VeilType als Tastatur anzeigen.</p></div>
+<div><strong>Internet-Erlaubnis</strong><span class="permission-good">Nicht angefordert</span><p>Das Produktionsmanifest deklariert keine Android INTERNET-Berechtigung.</p></div>
+<div><strong>Kontakte, Standort, Mikrofon</strong><span class="permission-good">Nicht angefordert</span><p>Nicht im aktuellen Produktionstastaturmanifest deklariert.</p></div>
+<div><strong>Textabfrage verarbeiten</strong><span>Erklärt</span><p>Ermöglicht Android, Apps zu erkennen, die die Standardtextverarbeitung unterstützen.</p></div>
+</div>
+</section>
+<section class="challenge-strip section-shell" id="break-test">
+<div class="section-heading reveal">
+<div class="section-kicker">Öffentliche Testherausforderung</div>
+<h2>Pause VeilType: 5 Tests, 10 Minuten.</h2>
+<p>Vertrauen Sie der Überschrift nicht. Überprüfen Sie die APK-Berechtigungen, tauschen Sie eine Kapsel offline aus, ändern Sie ein Zeichen und melden Sie den ersten Schritt, der fehlschlägt oder unklar erscheint.</p>
+</div>
+<div class="challenge-grid">
+<article class="trust-card"><h3>1. Überprüfen Sie die Berechtigungen</h3><p>Bestätigen Sie, dass die Produktion APK nicht Android anfordert <code>INTERNET</code> Erlaubnis.</p></article>
+<article class="trust-card"><h3>2. Senden Sie über Ihren Chat</h3><p>Verschlüsseln Sie Text oder Medien und leiten Sie die Ausgabe über Telegram, WhatsApp, SMS, E-Mail oder eine andere App weiter.</p></article>
+<article class="trust-card"><h3>3. Gehen Sie offline</h3><p>Öffnen Sie die verschlüsselte Ausgabe auf einem anderen Gerät im Flugzeugmodus.</p></article>
+<article class="trust-card"><h3>4. Manipulieren Sie es</h3><p>Ändern Sie ein Zeichen in der Nutzlast und bestätigen Sie, dass das Öffnen nicht möglich ist.</p></article>
+<article class="trust-card"><h3>5. Reibung melden</h3><p>Senden Sie Telefonmodell, Messenger, Android-Version und den ersten verwirrenden oder fehlerhaften Schritt.</p></article>
+</div>
+<div class="hero-actions">
+<a class="btn btn-primary" href="./break-veiltype.html">Öffnen Sie den 10-Minuten-Test</a>
+<a class="btn btn-secondary" href="./install.html">Installations- und Einrichtungsanleitung</a>
+</div>
+</section>
+<section class="pricing section-shell" id="pricing">
+<article class="pricing-card reveal">
+<div>
+<div class="section-kicker">Preise</div>
+<h2>Die komplette Tastatur. Für immer kostenlos.</h2>
+<p>
+                        Keine Testversion, kein Abonnement, kein Konto, keine Aktivierung, keine Werbung oder kein Funktionsablauf. Installieren Sie das signierte
+                        Android erstellen und nutzen Sie alle persönlichen Funktionen.
+                    </p>
+</div>
+<div class="price-box">
+<span>Android 8.0+</span>
+<strong>$0</strong>
+<a class="btn btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">Laden Sie den signierten APK herunter</a>
+<a class="btn btn-secondary" href="./install.html">Download- und Einrichtungsanleitung</a>
+<small><span data-count="veiltype-android">0</span> Der Download beginnt öffentlich aufgezeichnet. Zähleraktualisierungen können sich verzögern.</small>
+</div>
+</article>
+</section>
+<section class="invite-program section-shell reveal" id="feedback">
+<div class="section-heading">
+<div class="section-kicker">Direktes Feedback</div>
+<h2>Helfen Sie uns, die genaue Stelle zu reparieren, an der es kaputt ist.</h2>
+<p>Messenger-Kompatibilitätsänderungen. Senden Sie einen strukturierten Bericht mit Ihrem Telefon, der Android-Version, Messenger, den Schritten, dem erwarteten Ergebnis und dem tatsächlichen Ergebnis. Geben Sie niemals Passwörter, private Schlüssel oder sensiblen Klartext an.</p>
+</div>
+<div class="hero-actions">
+<a class="btn btn-primary" href="https://github.com/KatsuraCo/VeilType/issues/new/choose" rel="noopener" target="_blank">Öffentlichen Fehlerbericht öffnen</a>
+<a class="btn btn-secondary" href="mailto:support@truelock.pro?subject=VeilType%20feedback">Senden Sie privates Feedback</a>
+</div>
+</section>
+<section class="faq section-shell" id="faq">
+<div class="section-heading reveal">
+<div class="section-kicker">FAQ</div>
+<h2>Fragen vor der Installation.</h2>
+</div>
+<div class="faq-list">
+<details class="reveal" open="">
+<summary>Ist VeilType ein Messenger?</summary>
+<p>Nein. VeilType ist eine Android-Tastatur- und Datenschutzschicht für die messengers, die Sie bereits verwenden.</p>
+</details>
+<details class="reveal">
+<summary>Speichert VeilType meine Nachrichten?</summary>
+<p>Kein VeilType-Server speichert Ihren Nachrichteninhalt. Die Verschlüsselung und Entschlüsselung erfolgt lokal auf dem Gerät.</p>
+</details>
+<details class="reveal">
+<summary>Benötigt der Empfänger VeilType?</summary>
+<p>Ja. Der Empfänger benötigt VeilType und den richtigen gemeinsamen Schlüssel, um Nachrichten oder Kapseln zu entschlüsseln.</p>
+</details>
+<details class="reveal">
+<summary>Kann ich einer Android-Tastatur vertrauen?</summary>
+<p>Eine Datenschutztastatur muss Vertrauen gewinnen, da Tastaturen getippten Text verarbeiten. VeilType basiert auf lokaler Verschlüsselung, keinem VeilType-Inhaltsserver, klaren Berechtigungen und einem Open-Core-Vertrauensmodell für den datenschutzkritischen Kern.</p>
+</details>
+<details class="reveal">
+<summary>Ist die Offline-Spracheingabe jetzt verfügbar?</summary>
+<p>Nein. Die Offline-Spracheingabe ist als zukünftiges Upgrade geplant. Das beabsichtigte Design ist eine lokale Erkennung, nachdem das ausgewählte Sprachpaket heruntergeladen wurde.</p>
+</details>
+<details class="reveal">
+<summary>Warum werden Sprachpakete getrennt sein?</summary>
+<p>Sprachmodelle können groß sein. Das geplante Sprachpaketmodell hält die App leichter und ermöglicht es Ihnen, nur die Sprachen zu speichern, die Sie tatsächlich verwenden.</p>
+</details>
+<details class="reveal">
+<summary>Ist VeilType Open Source?</summary>
+<p>VeilType verwendet ein Open-Core-Vertrauensmodell: Der datenschutzkritische Verschlüsselungskern wird zur öffentlichen Prüfung veröffentlicht, während das vollständige Android-Produkt kommerzielle Funktionen beibehalten kann. <a href="https://github.com/KatsuraCo/VeilType/tree/main/veiltype-core" rel="noopener" target="_blank">Öffnen Sie den veröffentlichten Kern.</a></p>
+</details>
+<details class="reveal">
+<summary>Welche Verschlüsselung verwendet VeilType?</summary>
+<p>VeilType verwendet die AES-256-GCM-Verschlüsselung zum Schutz von Nachrichten und Kapseln, bevor Inhalte über messengers von Drittanbietern gesendet werden.</p>
+</details>
+<details class="reveal">
+<summary>Was kann ich verschlüsseln?</summary>
+<p>Text, Sprachnachrichten, Fotos, Videos und Dateien können in verschlüsselte Ausgabe oder .veil-Kapseln umgewandelt werden.</p>
+</details>
+<details class="reveal">
+<summary>Kann eine Nachricht oder Kapsel nur einmal geöffnet werden?</summary>
+<p>Ja. VeilType unterstützt einmalige Leseeinstellungen für vertrauliche Nachrichten und Kapseln, sodass das normale wiederholte Öffnen nach dem ersten erfolgreichen Lesen blockiert wird.</p>
+</details>
+<details class="reveal">
+<summary>Ist das DRM?</summary>
+<p>Nein. VeilType ist kein DRM. Es handelt sich um eine lokale Verschlüsselungsschicht. Sobald Inhalte auf einem Gerät entschlüsselt werden, bestehen weiterhin die normalen Geräterisiken.</p>
+</details>
+<details class="reveal">
+<summary>Kann VeilType Screenshots verhindern?</summary>
+<p>Nein. Die Kryptografie kann niemanden davon abhalten, einen Screenshot zu machen oder den Bildschirm zu fotografieren, nachdem der Inhalt sichtbar ist.</p>
+</details>
+</div>
+</section>
+<section class="final-cta section-shell reveal">
+<div>
+<div class="section-kicker">Letzter Anruf</div>
+<h2>Behalten Sie Ihre Chats. Fügen Sie Privatsphäre hinzu.</h2>
+<p>Installieren Sie VeilType, erstellen Sie einen gemeinsamen Schlüssel und senden Sie private Textnachrichten oder Kapseln, ohne alle aufzufordern, zu einem neuen Messenger zu wechseln.</p>
+</div>
+<div class="hero-actions">
+<a class="btn btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">Laden Sie VeilType kostenlos herunter</a>
+<a class="btn btn-secondary" href="#feedback">Melden Sie ein Problem</a>
+<a class="btn btn-secondary" href="https://truelock.pro/enterprise.html">Unternehmensbewertung</a>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<span>VeilType. Typ. Lokal verschlüsseln. Überall hinschicken.</span>
+<span id="footerYear"></span>
+</footer>
+<script src="./attribution.js"></script>
+<script src="./commerce-config.js?v=ph-launch-20260716"></script>
+<script src="./commerce.js?v=ph-launch-20260716"></script>
+<script src="./landing-demo.js?v=mobile-demo-3"></script>
+<script src="./app.js"></script>
+<script async="" data-goatcounter="https://yasha381.goatcounter.com/count" src="https://gc.zgo.at/count.js"></script>
+<script>
+        document.querySelectorAll("[data-count]").forEach(async function (node) {
+            try {
+                var response = await fetch("https://yasha381.goatcounter.com/counter/" + encodeURIComponent(node.dataset.count) + ".json");
+                if (!response.ok) return;
+                var data = await response.json();
+                node.textContent = Number(data.count || 0).toLocaleString();
+            } catch (error) { /* Keep zero until the public counter is available. */ }
+        });
+    </script>
+<script id="localeRuntime">
+(function () {
+    var files = {"en": "index.html", "ru": "ru.html", "es": "es.html", "pt": "pt.html", "de": "de.html", "fr": "fr.html", "it": "it.html", "tr": "tr.html"};
+    var current = "de";
+    var select = document.getElementById("localeSelect");
+    var query = new URLSearchParams(window.location.search).get("lang");
+    var stored = "";
+    try { stored = localStorage.getItem("veiltype-site-language") || ""; } catch (error) { stored = ""; }
+
+    if (query && files[query] && query !== current) {
+        window.location.replace("./" + files[query] + window.location.hash);
+        return;
+    }
+    if (current === "en" && !query && stored && files[stored] && stored !== "en") {
+        window.location.replace("./" + files[stored] + window.location.hash);
+        return;
+    }
+    if (current === "en" && !query && !stored) {
+        var detected = String(navigator.language || "en").slice(0, 2).toLowerCase();
+        if (files[detected] && detected !== "en") {
+            window.location.replace("./" + files[detected] + window.location.hash);
+            return;
+        }
+    }
+    if (select) {
+        select.value = current;
+        select.addEventListener("change", function () {
+            var next = select.value;
+            try { localStorage.setItem("veiltype-site-language", next); } catch (error) {}
+            window.location.href = "./" + files[next] + window.location.search.replace(/([?&])lang=[^&]*&?/, "$1").replace(/[?&]$/, "") + window.location.hash;
+        });
+    }
+}());
+</script></body>
+</html>

@@ -228,6 +228,28 @@ button.btn-primary::after {
     background: rgba(255, 250, 240, 0.76);
 }
 
+.locale-select {
+    flex: 0 0 auto;
+    width: 132px;
+    min-height: 40px;
+    padding: 0 34px 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--midnight);
+    background: var(--paper);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.locale-select:hover,
+.locale-select:focus-visible {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201, 163, 90, 0.18);
+}
+
 .btn-support {
     color: #071a31;
     border-color: rgba(168, 124, 42, 0.72);
@@ -1524,6 +1546,12 @@ p {
     }
 }
 
+@media (max-width: 1500px) {
+    .header-nav {
+        display: none;
+    }
+}
+
 @media (max-width: 1040px) {
     .real-demo { grid-template-columns: 1fr; }
     .release-truth, .permissions-table { grid-template-columns: 1fr; }
@@ -1631,6 +1659,12 @@ p {
 
     .locale-switch {
         flex: 0 0 auto;
+    }
+
+    .locale-select {
+        width: 118px;
+        min-height: 40px;
+        padding-right: 28px;
     }
 
     h1 {

@@ -1,0 +1,629 @@
+HTML
+<html lang="tr">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-M65XFRZR');</script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>VeilType - Messenger'den Önce Doğrulanabilir Android Klavye Şifrelemesi</title>
+<meta content="VeilType, metin veya medya Telegram, WhatsApp, SMS, e-postaya veya metin alanına sahip herhangi bir uygulamaya ulaşmadan önce yerel olarak şifreleyen, INTERNET izni olmayan doğrulanabilir bir Android klavyedir." id="metaDescription" name="description"/>
+<meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<meta content="#0D2340" name="theme-color"/>
+<link href="https://veiltype.tech/tr.html" rel="canonical"/><link href="https://veiltype.tech/" hreflang="en" rel="alternate"/><link href="https://veiltype.tech/ru.html" hreflang="ru" rel="alternate"/><link href="https://veiltype.tech/es.html" hreflang="es" rel="alternate"/><link href="https://veiltype.tech/pt.html" hreflang="pt" rel="alternate"/><link href="https://veiltype.tech/de.html" hreflang="de" rel="alternate"/><link href="https://veiltype.tech/fr.html" hreflang="fr" rel="alternate"/><link href="https://veiltype.tech/it.html" hreflang="it" rel="alternate"/><link href="https://veiltype.tech/tr.html" hreflang="tr" rel="alternate"/><link href="https://veiltype.tech/" hreflang="x-default" rel="alternate"/>
+<meta content="website" property="og:type"/>
+<meta content="VeilType - Doğrulanabilir Android Klavye Şifrelemesi" property="og:title"/>
+<meta content="Test edilebilir bir Android klavye gizlilik katmanı: INTERNET izni yok, Messenger düz metin almadan önce yerel şifreleme, hesap yok, özel bulut yok." property="og:description"/>
+<meta content="https://veiltype.tech/" property="og:url"/>
+<meta content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="VeilType - Doğrulanabilir Android Klavye Şifrelemesi" name="twitter:title"/>
+<meta content="INTERNET izni yok. Messenger düz metni almadan önce şifreleyin." name="twitter:description"/>
+<meta content="https://veiltype.tech/media/product-hunt/01-hero-encrypt-before-send.png" name="twitter:image"/>
+<link href="./favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="./site.webmanifest" rel="manifest"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&amp;family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="./styles.css?v=product-hunt-final-1" rel="stylesheet"/>
+<script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "VeilType",
+            "applicationCategory": "SecurityApplication",
+            "operatingSystem": "Android",
+            "url": "https://veiltype.tech/",
+            "downloadUrl": "https://veiltype.tech/downloads/VeilType.apk",
+            "description": "VeilType is a verifiable Android keyboard without INTERNET permission. It works inside existing messengers and encrypts locally before plaintext reaches another app.",
+            "featureList": [
+                "Open-core privacy architecture",
+                "AES-256-GCM encryption for private capsules",
+                "Text encryption from keyboard",
+                "Planned offline voice typing with optional language packs",
+                "Planned download-only-needed voice languages",
+                "Encrypted voice, photo, video, and file capsules",
+                "One-time read mode for messages and capsules",
+                "8-emoji shared keys",
+                "Biometric unlock",
+                "Panic wipe",
+                "Offline-first, no VeilType server for message content"
+            ],
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "VeilType"
+            }
+        }
+    </script>
+<script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Is VeilType a Messenger?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. VeilType is an Android keyboard and privacy layer for the messengers people already use."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does the recipient need VeilType?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The recipient needs VeilType and the correct shared key to decrypt messages or capsules."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is offline voice typing available now?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Offline voice typing is planned as a future upgrade. The intended design is local recognition after the selected language pack is downloaded."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Why will language packs be separate?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Speech models can be large. The planned language pack model keeps the app lighter and lets users store only the languages they actually use."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can VeilType prevent screenshots?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Cryptography cannot stop someone from taking a screenshot or photographing the screen after content is visible."
+                    }
+                }
+            ]
+        }
+    </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-M65XFRZR" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<header class="site-header">
+<a aria-label="VeilType ana sayfa" class="brand" href="#top">
+<span aria-hidden="true" class="typewriter-logo">V</span>
+<span class="brand-text">VeilType</span>
+</a>
+<nav aria-label="Birincil gezinme" class="header-nav">
+<a href="#how">Nasıl çalışır?</a>
+<a href="#features">Özellikler</a>
+<a href="#trust">Güven</a>
+<a href="#pricing">Sonsuza kadar özgür</a>
+<a href="#faq">SSS</a>
+<a href="./break-veiltype.html">Mola testi</a>
+<a href="https://truelock.pro/technology-package.html">B2B paketi</a>
+</nav>
+<div class="header-actions">
+<a aria-label="Boosty'de VeilType'yi destekleyin" class="btn btn-small btn-support" href="https://boosty.to/daniil_katsura/donate" rel="noopener noreferrer" target="_blank">Destek</a>
+<a class="btn btn-small btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">Ücretsiz indir</a>
+<select aria-label="Dil" class="locale-select" id="localeSelect"><option value="en">English</option><option value="ru">Русский</option><option value="es">Español</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="it">Italiano</option><option selected="selected" value="tr">Türkçe</option></select>
+</div>
+</header>
+<main id="top">
+<section class="hero section-shell">
+<div class="hero-copy reveal">
+<p class="pill">Sonsuza kadar ücretsiz · Android klavye · INTERNET izni yok</p>
+<h1>Mesajlaşma uygulaması düz metni almadan önce şifreleyin.</h1>
+<p class="hero-subtitle">
+                    VeilType test edilebilir bir Android gizlilik katmanıdır: APK üretimi INTERNET izni istemez,
+                    ve seçilen metin, ses, fotoğraf, video ve dosyalar Telegram'ye girmeden önce yerel olarak şifrelenir,
+                    WhatsApp, SMS, e-posta veya başka herhangi bir uygulama.
+                </p>
+<p class="hero-mobile-subtitle">Mesajları doğrudan Telegram, WhatsApp ve diğer Android uygulamalarının içinde şifreleyin.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">VeilType'yi ücretsiz indirin</a>
+<a class="btn btn-secondary" href="./break-veiltype.html">VeilType'yi kırın: 5 test</a>
+<a class="btn btn-secondary" href="https://truelock.pro/technology-package.html">Alıcılar ve ortaklar için</a>
+</div>
+<p class="hero-position">
+                    Başka bir Messenger değil. Messenger'den önceki doğrulanabilir bir katman. VeilType içerik bulutu yok. Şifreli mesaj iş akışı için hesap gerekmez.
+                </p>
+<div aria-label="VeilType güvenin öne çıkanları" class="trust-metrics">
+<span>Yeni Messenger yok</span>
+<span>Hesap yok</span>
+<span>İçerik sunucusu yok</span>
+<span>Sonsuza kadar özgür</span>
+<span>Çevrimdışı ses: planlandı</span>
+<span>AES-256-GCM</span>
+</div>
+</div>
+<div aria-label="Etkileşimli VeilType klavye gösterimi" class="hero-visual reveal delay-1">
+<div class="keyboard-demo" data-keyboard-demo="" data-language="en">
+<div class="demo-phone">
+<div class="demo-chat-head">
+<span class="demo-avatar">A</span>
+<span><strong>Alex</strong><small>Telegram</small></span>
+<span class="demo-private">ÖZEL KATMAN</span>
+</div>
+<div aria-live="polite" class="demo-chat-stream">
+<p class="demo-message incoming">Bu gece boş musun?</p>
+<p class="demo-message outgoing" data-demo-output="">Benimle akşam 7'de buluş</p>
+</div>
+<div class="demo-keyboard">
+<div class="demo-compose" data-demo-compose="">Benimle akşam 7'de buluş</div>
+<div class="demo-hint" data-demo-hint=""><span data-demo-hint-text="">Şifrelemek için kilide dokunun</span></div>
+<div aria-label="VeilType klavye araçları" class="demo-toolbar">
+<button aria-label="Mesajı şifrele" class="demo-tool active" data-demo-encrypt="" title="Şifrele" type="button"><img alt="" src="./assets/keyboard/ic_lock_lock_alpha.png"/></button>
+<button aria-label="Şifrelenmiş mesajı oku" class="demo-tool" data-demo-decrypt="" title="Okumak" type="button"><img alt="" src="./assets/keyboard/ic_menu_view.png"/></button>
+<button aria-label="Girişi temizle" class="demo-tool" title="Temizlemek" type="button"><img alt="" src="./assets/keyboard/ic_menu_close_clear_cancel.png"/></button>
+<button aria-label="Ekleri aç" class="demo-tool" title="Ekler" type="button"><img alt="" src="./assets/keyboard/ic_keyboard_paperclip.svg"/></button>
+</div>
+<div aria-hidden="true" class="demo-number-row"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div>
+<div aria-hidden="true" class="demo-keys">
+<div class="demo-key-row"><span>Q</span><span>W</span><span>E</span><span>R</span><span>T</span><span>Y</span><span>U</span><span>I</span><span>O</span><span>P</span></div>
+<div class="demo-key-row middle"><span>A</span><span>S</span><span>D</span><span>F</span><span>G</span><span>H</span><span>J</span><span>K</span><span>L</span></div>
+<div class="demo-key-row"><span class="utility">↑</span><span>Z</span><span>X</span><span>C</span><span>V</span><span>B</span><span>N</span><span>M</span><span class="utility">⌫</span></div>
+</div>
+<div aria-hidden="true" class="demo-bottom-row">
+<span>123</span><span>EN</span><span>,</span><span class="space">Uzay</span><span>.</span><span>Girmek</span>
+</div>
+</div>
+</div>
+<p class="demo-hint">Messenger'den neyin ayrıldığını görmek için Şifrele'ye dokunun.</p>
+</div>
+</div>
+</section>
+<section aria-label="Gerçek VeilType Android gösterimi" class="real-demo section-shell">
+<div class="real-demo-copy"><div class="section-kicker">Son demo · Gerçek Android</div><h2>Tip. Kilit. Şifreli metin gönder.</h2><p>VeilType akışının tamamını saniyeler içinde görün: normal sohbet, yerel şifreleme ve güvenli teslimat.</p></div>
+<video controls="" playsinline="" poster="./media/product-hunt/01-hero-encrypt-before-send.png" preload="metadata" src="./media/video/veiltype-final-sales-v9.mp4">Tarayıcınız videoyu desteklemiyor.</video>
+</section>
+<section class="release-truth section-shell">
+<div><span class="status-chip available">Şu anda mevcut</span><strong>Şifrelenmiş metin · yerel tuşlar · Android klavye · .veil kapsülleri</strong></div>
+<div><span class="status-chip planned">Planlanan</span><strong>Çevrimdışı sesle yazma · isteğe bağlı konuşma dili paketleri</strong></div>
+</section>
+<section class="problem section-shell reveal">
+<div class="section-kicker">Sorun</div>
+<h2>Özel mesajlaşma herkesin uygulama değiştirmesini gerektirmemelidir.</h2>
+<p>
+                Güvenli Messenger'ler faydalıdır ancak gerçek hayat parçalıdır: WhatsApp'de aile, Telegram'de gruplar,
+                E-postadaki belgeler, SMS'deki kodlar. VeilType, insanların zaten konuştuğu yerde gizlilik sağlar.
+            </p>
+</section>
+<section class="how section-shell" id="how">
+<div class="section-heading reveal">
+<div class="section-kicker">Nasıl çalışır?</div>
+<h2>Dört adım. Yeni sohbet uygulaması yok.</h2>
+</div>
+<div class="steps-grid">
+<article class="step-card reveal">
+<span>01</span>
+<h3>Zaten nerede sohbet ettiğinizi yazın</h3>
+<p>Telegram, WhatsApp, SMS, e-postayı veya metin alanı olan herhangi bir uygulamayı açın. VeilType klavyeniz olarak görünür.</p>
+</article>
+<article class="step-card reveal delay-1">
+<span>02</span>
+<h3>Kapsül içine şifrele</h3>
+<p>Messenger almadan önce metni, sesi, fotoğrafları, videoları veya dosyaları AES-256-GCM şifreli içeriğe dönüştürün.</p>
+</article>
+<article class="step-card reveal delay-2">
+<span>03</span>
+<h3>Herhangi bir Messenger aracılığıyla gönderin</h3>
+<p>Messenger yalnızca şifreli metni veya .veil kapsülünü görür. Özel içeriğiniz şifrelenmiş verinin içinde kalır.</p>
+</article>
+<article class="step-card reveal delay-3">
+<span>04</span>
+<h3>Alıcı VeilType ile açılır</h3>
+<p>Alıcı, Android cihazında yerel olarak şifreyi çözmek için paylaşılan anahtarı ve VeilType'yi kullanır.</p>
+</article>
+</div>
+<p class="section-note reveal">
+                Şifrelenmiş kapsülleri açmak için hem gönderenin hem de alıcının VeilType'ye ve paylaşılan anahtara ihtiyacı vardır.
+            </p>
+</section>
+<section class="product-tour section-shell" data-tour="" id="demo">
+<div class="section-heading reveal">
+<div class="section-kicker">Ürün turu</div>
+<h2>VeilType'yi dört dokunuşla anlayın.</h2>
+<p>Android uygulamasında kullanılan aynı katılım akışını keşfedin. Özel olan her şey cihazda kalır.</p>
+</div>
+<div class="tour-layout reveal">
+<div aria-label="VeilType ürün turu" class="tour-controls" role="tablist">
+<button aria-selected="true" class="tour-tab is-active" data-tour-step="0" role="tab" type="button">
+<strong>01</strong><span>Normal olarak yazın<small>Herhangi bir Messenger'de</small></span>
+</button>
+<button aria-selected="false" class="tour-tab" data-tour-step="1" role="tab" type="button">
+<strong>02</strong><span>Yerel olarak şifrele<small>Göndermeden önce</small></span>
+</button>
+<button aria-selected="false" class="tour-tab" data-tour-step="2" role="tab" type="button">
+<strong>03</strong><span>Anahtar paylaşma<small>Emoji dizisi</small></span>
+</button>
+<button aria-selected="false" class="tour-tab" data-tour-step="3" role="tab" type="button">
+<strong>04</strong><span>Özel olarak kilidini aç<small>Alıcı cihazında</small></span>
+</button>
+</div>
+<div aria-live="polite" class="tour-stage">
+<div aria-hidden="true" class="tour-lock">🔒</div>
+<div class="tour-panel is-active" data-tour-panel="0">
+<p class="tour-label">MESAJ</p>
+<strong>Benimle akşam 7'de buluş</strong>
+<p>VeilType, halihazırda kullanmakta olduğunuz sohbetin içinde Android klavyeniz olarak görünür.</p>
+</div>
+<div class="tour-panel" data-tour-panel="1">
+<p class="tour-label">ŞİFRELENMİŞ ÇIKIŞ</p>
+<strong class="cipher">TL1:Q8bz...kP2</strong>
+<p>Messenger, okunabilir mesajınızı değil şifreli metni alır.</p>
+</div>
+<div class="tour-panel" data-tour-panel="2">
+<p class="tour-label">PAYLAŞILAN ANAHTAR</p>
+<strong class="emoji-key">🔒 🌙 🦊 ⚡ 🧠 🔥 🧩 🌊</strong>
+<p>Anahtarlar yerel olarak VeilType içinde oluşturulur ve saklanır.</p>
+</div>
+<div class="tour-panel" data-tour-panel="3">
+<p class="tour-label">YEREL OLARAK AÇILDI</p>
+<strong>Benimle akşam 7'de buluş</strong>
+<p>Alıcı, mesajı VeilType ve paylaşılan anahtarla açar.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="features section-shell" id="features">
+<div class="section-heading reveal">
+<div class="section-kicker">Özellikler</div>
+<h2>Klavyeden şifrelenmiş kapsüller.</h2>
+</div>
+<div class="features-grid">
+<article class="feature-card reveal">
+<span>⌨</span>
+<h3>Metin şifreleme</h3>
+<p>Normal şekilde yazın, klavyeden şifreleyin ve düz metin yerine şifreli metin gönderin.</p>
+</article>
+<article class="feature-card reveal">
+<span>AES</span>
+<h3>AES-256-GCM şifreleme</h3>
+<p>Özel metin ve kapsüller, klavye iş akışından çıkmadan önce AES-256-GCM ile yerel olarak şifrelenir.</p>
+</article>
+<article class="feature-card reveal">
+<span>OK</span>
+<h3>Açık çekirdekli model</h3>
+<p>Gizliliğin kritik olduğu çekirdek, kamuya açık inceleme için konumlandırılırken, premium ürün özellikleri ticari olarak kalabilir.</p>
+</article>
+<article class="feature-card reveal">
+<span>◉</span>
+<h3>Ses kapsülleri</h3>
+<p>Gerektiğinde biyometri ile şifrelenmiş sesli mesajları kaydedin ve korumalı sesin kilidini açın.</p>
+</article>
+<article class="feature-card reveal">
+<span>▣</span>
+<h3>Fotoğraf, video, dosya kapsülleri</h3>
+<p>Uygulamadan uygulamaya paylaşım için özel medyayı ve dosyaları .veil kapsülleri halinde paketleyin.</p>
+</article>
+<article class="feature-card reveal">
+<span>1x</span>
+<h3>Tek seferlik okuma modu</h3>
+<p>Seçili mesajları veya .veil kapsüllerini alıcı cihazda bir kez açılacak, ardından tekrar okuma için kullanılamaz hale gelecek şekilde ayarlayın.</p>
+</article>
+<article class="feature-card reveal">
+<span>ANAHTAR</span>
+<h3>Emoji tuşları</h3>
+<p>Hesap tabanlı kimlikler yerine akılda kalıcı 8 emojili paylaşılan anahtarlar kullanın.</p>
+</article>
+<article class="feature-card reveal">
+<span>◆</span>
+<h3>Biyometrik kilit açma</h3>
+<p>Seçilen anahtarların ve kapsüllerin şifresini çözmeden önce cihazın biyometrik onayını zorunlu kılın.</p>
+</article>
+<article class="feature-card reveal">
+<span>!</span>
+<h3>Panik butonu</h3>
+<p>Cihazın temizlenmesine ihtiyaç duyduğunuzda yerel anahtarları ve geçici kapsül verilerini hızla silin.</p>
+</article>
+</div>
+</section>
+<section class="trust section-shell" id="offline-voice">
+<div class="section-heading reveal">
+<div class="section-kicker">Yol Haritası</div>
+<h2>Çevrimdışı sesle yazmanın bundan sonra planlanması planlanıyor.</h2>
+<p>
+                    Mevcut lansman şifreli metin ve kapsüllere odaklanıyor. Bir sonraki planlanan yükseltme çevrimdışı
+                    İsteğe bağlı dil paketleriyle sesle yazma, böylece kullanıcıların yalnızca ihtiyaç duydukları konuşma dillerini indirmeleri sağlanır.
+                </p>
+</div>
+<div class="trust-grid">
+<article class="trust-card reveal">
+<h3>Küçük uygulama çekirdeği</h3>
+<p>Amaç, gelecekteki her ses modelini bir araya getirmek yerine ana uygulamanın klavyeye ve şifreleme iş akışına odaklanmasını sağlamaktır.</p>
+</article>
+<article class="trust-card reveal">
+<h3>İsteğe bağlı dil paketleri</h3>
+<p>Planlanan ses yükseltmesi, kullanıcıların hangi çevrimdışı ses dillerini indireceklerini, güncelleyeceklerini veya sileceklerini seçmelerine olanak tanıyacak.</p>
+</article>
+<article class="trust-card reveal">
+<h3>İndirdikten sonra çevrimdışı</h3>
+<p>Amaçlanan tasarım basittir: dil indirme veya güncelleme için internet, kurulumdan sonra yerel tanınma.</p>
+</article>
+</div>
+</section>
+<section class="capsules section-shell">
+<div class="capsule-copy reveal">
+<div class="section-kicker">Kapsül formatı</div>
+<h2>Markalanabilir tek konteyner: .veil</h2>
+<p>
+                    VeilType, özel içerik için AES-256-GCM şifreli .veil kapsülleri oluşturur. Aynı format daha sonra olabilir
+                    temel vaadi değiştirmeden daha büyük bir dosya kontrol ürününe köprü oluşturma: yerel olarak şifreleme,
+                    herhangi bir yere gönderin, çekirdeği denetlenebilir tutun.
+                </p>
+<p>
+                    .veil kapsülü, metin, ses, fotoğraf, video veya dosya içerebilen korumalı bir pakettir.
+                    İnsanların halihazırda kullandığı uygulamalar arasında gezinmek için tasarlanmıştır.
+                </p>
+<p>
+                    Ekstra hassas içerik için VeilType, bir mesajı veya kapsülü tek seferlik okundu olarak işaretleyebilir, böylece bir kez açılır
+                    ve ardından kendisini normal tekrar erişimden kilitler.
+                </p>
+</div>
+<div class="capsule-stack reveal delay-1">
+<article class="capsule-card"><span>Metin</span><strong>mesaj.veil</strong></article>
+<article class="capsule-card"><span>Ses</span><strong>Voice_capsule.veil</strong></article>
+<article class="capsule-card"><span>Medya</span><strong>photo_video_file.veil</strong></article>
+</div>
+</section>
+<section class="trust section-shell" id="trust">
+<div class="section-heading reveal">
+<div class="section-kicker">Güvenlik ve güven</div>
+<h2>Açık çekirdekli güven. AES-256-GCM şifreleme. Dürüst sınırlar.</h2>
+</div>
+<div class="trust-grid">
+<article class="trust-card reveal">
+<h3>Açık çekirdekli güven modeli</h3>
+<p>Şifreleme çekirdeği herkesin incelemesi için yayınlanır. Android uygulaması, birinci sınıf kullanıcı arayüzü ve ticari özellikler tescilli olmaya devam etmektedir. <a href="https://github.com/KatsuraCo/VeilType/tree/main/veiltype-core" rel="noopener" target="_blank">GitHub'deki çekirdeği inceleyin.</a></p>
+</article>
+<article class="trust-card reveal">
+<h3>AES-256-GCM şifreleme</h3>
+<p>Mesajlar ve .veil kapsülleri, Telegram, WhatsApp, SMS, e-posta veya başka bir uygulamaya iletilmeden önce yerel olarak AES-256-GCM ile şifrelenir.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Önce çevrimdışı</h3>
+<p>Mesaj içeriği yerel olarak şifrelenir ve şifresi çözülür. VeilType'nin bir mesajı korumak için bulut hesabına ihtiyacı yoktur.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Yerel anahtar yönetimi</h3>
+<p>Anahtarlar cihazda saklanır. Bir anahtar kaybolursa VeilType onu kurtaramaz. Bu kasıtlıdır.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Tek seferlik okuma politikası</h3>
+<p>Anahtar başına ayarlar, seçilen mesajların ve kapsüllerin bir kez okunabilir olmasını sağlayarak hassas içeriğe daha katı bir yerel erişim politikası sağlar.</p>
+</article>
+<article class="trust-card reveal">
+<h3>İçerik sunucusu yok</h3>
+<p>VeilType, mesaj içeriğinizi alan bir sunucuyu çalıştırmaz. Messenger'ler şifrelenmiş çıktıyı taşır.</p>
+</article>
+<article class="trust-card reveal">
+<h3>Uygulama katmanı yaptırımı</h3>
+<p>Kendi kendini imha eden, tek seferlik okuma ve biyometrik geçitler, uygulama katmanı korumalarıdır. Yardımcı olurlar ancak cihaz güvenliğinin yerini almazlar.</p>
+</article>
+</div>
+</section>
+<section class="comparison section-shell">
+<div class="section-heading reveal">
+<div class="section-kicker">Karşılaştırmak</div>
+<h2>Tasarım gereği güvenli Messenger'lerden farklıdır.</h2>
+</div>
+<div class="comparison-table reveal">
+<div class="row header"><span>Yetenek</span><span>Güvenli Messenger</span><span>VeilType</span></div>
+<div class="row"><span>Yeni bir sohbet uygulaması gerektirir</span><span>Genellikle evet</span><span>HAYIR</span></div>
+<div class="row"><span>Mevcut Messenger'lerde çalışır</span><span>Sınırlı</span><span>Evet</span></div>
+<div class="row"><span>Göndermeden önce şifreler</span><span>Bunun içinde Messenger</span><span>Klavyenin içinde</span></div>
+<div class="row"><span>Ses/fotoğraf/video/dosya kapsülleri</span><span>Messenger'ye özgü</span><span>.veil kapsül katmanı</span></div>
+<div class="row"><span>Klavyeden tek seferlik okuma</span><span>Messenger'ye bağımlı</span><span>Anahtar başına VeilType politikası</span></div>
+</div>
+</section>
+<section class="permissions section-shell">
+<div class="section-heading"><div class="section-kicker">Android izinleri</div><h2>Üretim klavyesinin Android'den yapmasını isteyebileceği şeyler.</h2></div>
+<div class="permissions-table">
+<div><strong>Giriş yöntemi hizmeti</strong><span>Gerekli</span><p>Android'nin VeilType'yi klavye olarak görüntülemesine izin verir.</p></div>
+<div><strong>İnternet izni</strong><span class="permission-good">Talep edilmedi</span><p>Üretim bildirimi Android INTERNET iznini beyan etmiyor.</p></div>
+<div><strong>Kişiler, konum, mikrofon</strong><span class="permission-good">Talep edilmedi</span><p>Mevcut üretim klavye bildiriminde bildirilmedi.</p></div>
+<div><strong>Metin sorgusunu işle</strong><span>Beyan edildi</span><p>Android'nin standart metin işlemeyi destekleyen uygulamaları keşfetmesine olanak tanır.</p></div>
+</div>
+</section>
+<section class="challenge-strip section-shell" id="break-test">
+<div class="section-heading reveal">
+<div class="section-kicker">Herkese açık test mücadelesi</div>
+<h2>VeilType molası: 5 test, 10 dakika.</h2>
+<p>Başlığa güvenmeyin. APK izinlerini doğrulayın, bir kapsülü çevrimdışı olarak değiştirin, bir karakteri değiştirin ve başarısız olan veya belirsiz görünen ilk adımı bildirin.</p>
+</div>
+<div class="challenge-grid">
+<article class="trust-card"><h3>1. İzinleri inceleyin</h3><p>APK üretiminin Android talep etmediğini doğrulayın <code>INTERNET</code> izin.</p></article>
+<article class="trust-card"><h3>2. Sohbetiniz aracılığıyla gönderin</h3><p>Metni veya medyayı şifreleyin ve çıktıyı Telegram, WhatsApp, SMS, e-posta veya başka bir uygulama aracılığıyla iletin.</p></article>
+<article class="trust-card"><h3>3. Çevrimdışı olun</h3><p>Şifrelenmiş çıkışı başka bir cihazda uçak modunda açın.</p></article>
+<article class="trust-card"><h3>4. Onu kurcalayın</h3><p>Yükteki bir karakteri değiştirin ve açma işleminin başarısız olduğunu doğrulayın.</p></article>
+<article class="trust-card"><h3>5. Sürtüşmeyi bildirin</h3><p>Telefon modelini, Messenger, Android sürümünü ve ilk kafa karıştırıcı veya bozuk adımı gönderin.</p></article>
+</div>
+<div class="hero-actions">
+<a class="btn btn-primary" href="./break-veiltype.html">10 dakikalık testi açın</a>
+<a class="btn btn-secondary" href="./install.html">Kurulum ve kurulum kılavuzu</a>
+</div>
+</section>
+<section class="pricing section-shell" id="pricing">
+<article class="pricing-card reveal">
+<div>
+<div class="section-kicker">Fiyatlandırma</div>
+<h2>Eksiksiz klavye. Sonsuza kadar özgür.</h2>
+<p>
+                        Deneme süresi, abonelik, hesap, aktivasyon, reklam veya özelliğin sona ermesi yoktur. İmzalı olanı yükle
+                        Android her kişisel özelliği oluşturur ve kullanır.
+                    </p>
+</div>
+<div class="price-box">
+<span>Android 8.0+</span>
+<strong>$0</strong>
+<a class="btn btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">İmzalı APK'yi indirin</a>
+<a class="btn btn-secondary" href="./install.html">İndirme ve kurulum kılavuzu</a>
+<small><span data-count="veiltype-android">0</span> indirme herkese açık olarak kaydedilmeye başlar. Sayaç güncellemeleri gecikebilir.</small>
+</div>
+</article>
+</section>
+<section class="invite-program section-shell reveal" id="feedback">
+<div class="section-heading">
+<div class="section-kicker">Doğrudan geri bildirim</div>
+<h2>Kırıldığı yeri tam olarak düzeltmemize yardım edin.</h2>
+<p>Messenger uyumluluk değişiklikleri. Telefonunuz, Android sürümü, Messenger, adımlar, beklenen sonuç ve gerçek sonuçla birlikte yapılandırılmış bir rapor gönderin. Hiçbir zaman şifreleri, özel anahtarları veya hassas düz metinleri dahil etmeyin.</p>
+</div>
+<div class="hero-actions">
+<a class="btn btn-primary" href="https://github.com/KatsuraCo/VeilType/issues/new/choose" rel="noopener" target="_blank">Genel hata raporunu aç</a>
+<a class="btn btn-secondary" href="mailto:support@truelock.pro?subject=VeilType%20feedback">Özel geri bildirim gönder</a>
+</div>
+</section>
+<section class="faq section-shell" id="faq">
+<div class="section-heading reveal">
+<div class="section-kicker">SSS</div>
+<h2>Kurulumdan önce sorular.</h2>
+</div>
+<div class="faq-list">
+<details class="reveal" open="">
+<summary>VeilType bir mesajlaşma uygulaması mı?</summary>
+<p>Hayır. VeilType, halihazırda kullanmakta olduğunuz Messenger'ler için bir Android klavyesi ve gizlilik katmanıdır.</p>
+</details>
+<details class="reveal">
+<summary>VeilType mesajlarımı saklıyor mu?</summary>
+<p>Hiçbir VeilType sunucusu mesaj içeriğinizi saklamaz. Şifreleme ve şifre çözme, cihazda yerel olarak gerçekleşir.</p>
+</details>
+<details class="reveal">
+<summary>Alıcının VeilType'ye ihtiyacı var mı?</summary>
+<p>Evet. Alıcının, mesajların veya kapsüllerin şifresini çözmek için VeilType'ye ve doğru paylaşılan anahtara ihtiyacı vardır.</p>
+</details>
+<details class="reveal">
+<summary>Android klavyeye güvenebilir miyim?</summary>
+<p>Klavyeler yazılan metni işlediğinden, gizlilik klavyesinin güven kazanması gerekir. VeilType, yerel şifreleme, VeilType içerik sunucusu olmaması, açık izinler ve gizlilik açısından kritik çekirdek için açık çekirdekli güven modeli etrafında tasarlanmıştır.</p>
+</details>
+<details class="reveal">
+<summary>Çevrimdışı sesle yazma artık kullanılabilir mi?</summary>
+<p>Hayır. Çevrimdışı sesle yazma özelliğinin gelecekteki bir yükseltme olarak planlanması planlanmaktadır. Amaçlanan tasarım, seçilen dil paketi indirildikten sonra yerel olarak tanınmasıdır.</p>
+</details>
+<details class="reveal">
+<summary>Dil paketleri neden ayrı olacak?</summary>
+<p>Konuşma modelleri büyük olabilir. Planlanan dil paketi modeli, uygulamayı daha hafif tutar ve yalnızca gerçekten kullandığınız dilleri saklamanıza olanak tanır.</p>
+</details>
+<details class="reveal">
+<summary>VeilType açık kaynak mı?</summary>
+<p>VeilType açık çekirdekli bir güven modeli kullanır: gizlilik açısından kritik şifreleme çekirdeği kamu denetimi için yayınlanırken Android ürününün tamamı ticari özellikleri koruyabilir. <a href="https://github.com/KatsuraCo/VeilType/tree/main/veiltype-core" rel="noopener" target="_blank">Yayınlanan çekirdeği açın.</a></p>
+</details>
+<details class="reveal">
+<summary>VeilType hangi şifrelemeyi kullanıyor?</summary>
+<p>VeilType, içerik üçüncü taraf Messenger'ler aracılığıyla gönderilmeden önce mesaj ve kapsül koruması için AES-256-GCM şifrelemesini kullanır.</p>
+</details>
+<details class="reveal">
+<summary>Neyi şifreleyebilirim?</summary>
+<p>Metin, sesli mesajlar, fotoğraflar, videolar ve dosyalar şifrelenmiş çıktıya veya .veil kapsüllerine dönüştürülebilir.</p>
+</details>
+<details class="reveal">
+<summary>Bir mesaj veya kapsül yalnızca bir kez açılabilir mi?</summary>
+<p>Evet. VeilType, hassas mesajlar ve kapsüller için tek seferlik okuma ayarlarını destekler, böylece ilk başarılı okumanın ardından normal tekrarlı açılma engellenir.</p>
+</details>
+<details class="reveal">
+<summary>Bu DRM mi?</summary>
+<p>Hayır. VeilType DRM değildir. Yerel bir şifreleme katmanıdır. Bir cihazdaki içeriğin şifresi çözüldükten sonra normal cihaz riskleri hâlâ geçerlidir.</p>
+</details>
+<details class="reveal">
+<summary>VeilType ekran görüntülerini önleyebilir mi?</summary>
+<p>Hayır. Kriptografi, içerik göründükten sonra birisinin ekran görüntüsü almasını veya ekranın fotoğrafını çekmesini engelleyemez.</p>
+</details>
+</div>
+</section>
+<section class="final-cta section-shell reveal">
+<div>
+<div class="section-kicker">Son çağrı</div>
+<h2>Sohbetlerinize devam edin. Gizlilik ekleyin.</h2>
+<p>VeilType'yi yükleyin, paylaşılan bir anahtar oluşturun ve herkesin yeni bir Messenger'ye geçmesini istemeden özel metin veya kapsüller gönderin.</p>
+</div>
+<div class="hero-actions">
+<a class="btn btn-primary" data-goatcounter-click="veiltype-android" href="./downloads/VeilType.apk">VeilType'yi ücretsiz indirin</a>
+<a class="btn btn-secondary" href="#feedback">Sorun bildir</a>
+<a class="btn btn-secondary" href="https://truelock.pro/enterprise.html">İş değerlendirmesi</a>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<span>VeilType. Tip. Yerel olarak şifreleyin. Her yere gönderin.</span>
+<span id="footerYear"></span>
+</footer>
+<script src="./attribution.js"></script>
+<script src="./commerce-config.js?v=ph-launch-20260716"></script>
+<script src="./commerce.js?v=ph-launch-20260716"></script>
+<script src="./landing-demo.js?v=mobile-demo-3"></script>
+<script src="./app.js"></script>
+<script async="" data-goatcounter="https://yasha381.goatcounter.com/count" src="https://gc.zgo.at/count.js"></script>
+<script>
+        document.querySelectorAll("[data-count]").forEach(async function (node) {
+            try {
+                var response = await fetch("https://yasha381.goatcounter.com/counter/" + encodeURIComponent(node.dataset.count) + ".json");
+                if (!response.ok) return;
+                var data = await response.json();
+                node.textContent = Number(data.count || 0).toLocaleString();
+            } catch (error) { /* Keep zero until the public counter is available. */ }
+        });
+    </script>
+<script id="localeRuntime">
+(function () {
+    var files = {"en": "index.html", "ru": "ru.html", "es": "es.html", "pt": "pt.html", "de": "de.html", "fr": "fr.html", "it": "it.html", "tr": "tr.html"};
+    var current = "tr";
+    var select = document.getElementById("localeSelect");
+    var query = new URLSearchParams(window.location.search).get("lang");
+    var stored = "";
+    try { stored = localStorage.getItem("veiltype-site-language") || ""; } catch (error) { stored = ""; }
+
+    if (query && files[query] && query !== current) {
+        window.location.replace("./" + files[query] + window.location.hash);
+        return;
+    }
+    if (current === "en" && !query && stored && files[stored] && stored !== "en") {
+        window.location.replace("./" + files[stored] + window.location.hash);
+        return;
+    }
+    if (current === "en" && !query && !stored) {
+        var detected = String(navigator.language || "en").slice(0, 2).toLowerCase();
+        if (files[detected] && detected !== "en") {
+            window.location.replace("./" + files[detected] + window.location.hash);
+            return;
+        }
+    }
+    if (select) {
+        select.value = current;
+        select.addEventListener("change", function () {
+            var next = select.value;
+            try { localStorage.setItem("veiltype-site-language", next); } catch (error) {}
+            window.location.href = "./" + files[next] + window.location.search.replace(/([?&])lang=[^&]*&?/, "$1").replace(/[?&]$/, "") + window.location.hash;
+        });
+    }
+}());
+</script></body>
+</html>
