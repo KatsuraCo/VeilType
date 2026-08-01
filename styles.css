@@ -228,6 +228,24 @@ button.btn-primary::after {
     background: rgba(255, 250, 240, 0.76);
 }
 
+.btn-support {
+    color: #071a31;
+    border-color: rgba(168, 124, 42, 0.72);
+    background: linear-gradient(135deg, #f2d98f, var(--brass));
+    box-shadow: 0 10px 24px rgba(168, 124, 42, 0.24);
+}
+
+.btn-support::before {
+    content: "\2665";
+    color: #8b2034;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.btn-support:hover {
+    box-shadow: 0 14px 30px rgba(168, 124, 42, 0.32);
+}
+
 .hero {
     display: grid;
     grid-template-columns: minmax(0, 1.02fr) minmax(390px, 0.98fr);
@@ -1593,8 +1611,22 @@ p {
         width: 100%;
     }
 
-    .header-actions .btn {
+    .header-actions .btn:not(.btn-support) {
         display: none;
+    }
+
+    .header-actions .btn-support {
+        width: 42px;
+        min-height: 40px;
+        padding: 0;
+        overflow: hidden;
+        color: transparent;
+        font-size: 0;
+    }
+
+    .header-actions .btn-support::before {
+        color: #8b2034;
+        font-size: 1.1rem;
     }
 
     .locale-switch {
