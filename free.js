@@ -51,16 +51,39 @@
 
   async function loadCounter() {
     const targets = document.querySelectorAll('[data-counter="veiltype-android"]');
+    const showUnavailable = () => targets.forEach((target) => {
+      target.textContent = "—";
+      target.title = "Public counter unavailable";
+    });
     try {
       const response = await fetch("https://yasha381.goatcounter.com/counter/veiltype-android.json");
-      if (!response.ok) return;
+      if (!response.ok) {
+        showUnavailable();
+        return;
+      }
       const data = await response.json();
-      targets.forEach((target) => { target.textContent = data.count || "0"; });
+      targets.forEach((target) => {
+        target.textContent = data.count ?? "—";
+        target.removeAttribute("title");
+      });
     } catch (_) {
-      targets.forEach((target) => { target.textContent = "0"; });
+      showUnavailable();
     }
   }
   loadCounter();
+
+  document.querySelectorAll('[data-goatcounter-click="veiltype-android"]').forEach((link) => {
+    link.addEventListener("click", () => {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+      window.gtag("event", "file_download", {
+        product: "VeilType",
+        platform: "Android",
+        file_name: "VeilType.apk",
+        link_url: link.href
+      });
+    });
+  });
 
   const form = document.querySelector("[data-feedback-form]");
   function reportFromForm() {
