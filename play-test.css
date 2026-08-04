@@ -1,0 +1,46 @@
+:root { --navy:#0d2340; --navy-2:#173a61; --paper:#f4f7f8; --white:#fff; --ink:#111b26; --muted:#566574; --line:#cbd5db; --mint:#63dfc6; --yellow:#f2cb61; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; color:var(--ink); background:var(--paper); font-family:Inter,"Segoe UI",Arial,sans-serif; line-height:1.55; letter-spacing:0; }
+a { color:inherit; }
+button,input,select { font:inherit; letter-spacing:0; }
+.test-shell { width:min(1120px,calc(100% - 40px)); margin:0 auto; }
+.test-header { min-height:68px; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:10px max(20px,calc((100vw - 1120px)/2)); color:var(--white); background:var(--navy); border-bottom:1px solid rgba(255,255,255,.15); }
+.test-brand { display:flex; align-items:center; gap:10px; text-decoration:none; font-size:20px; font-weight:800; }
+.test-brand span { width:34px; height:34px; display:grid; place-items:center; color:var(--navy); background:var(--mint); border-radius:4px; }
+.test-header-actions { display:flex; align-items:center; gap:16px; }
+.text-link { font-size:14px; font-weight:700; }
+#testLanguage { min-height:40px; padding:0 10px; color:var(--white); background:var(--navy-2); border:1px solid #71849a; border-radius:4px; }
+.test-hero { padding:88px 0 58px; color:var(--white); background:var(--navy); }
+.test-eyebrow { margin:0 0 15px; color:var(--mint); font-size:13px; font-weight:800; }
+.test-eyebrow.dark { color:#087b6c; }
+h1 { max-width:850px; margin:0; font-size:clamp(44px,7vw,78px); line-height:1.02; }
+h2 { margin:0 0 18px; font-size:clamp(32px,4vw,48px); line-height:1.1; }
+.test-lead { max-width:760px; margin:24px 0 0; color:#d4dee8; font-size:19px; }
+.test-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; }
+.test-button { min-height:50px; display:inline-flex; align-items:center; justify-content:center; padding:0 20px; border:1px solid transparent; border-radius:5px; text-decoration:none; font-weight:800; cursor:pointer; }
+.test-button.primary { color:var(--navy); background:var(--mint); }
+.test-button.secondary { color:var(--white); background:transparent; border-color:#9fb0c2; }
+.test-facts { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:58px 0 0; padding:0; list-style:none; border-top:1px solid #536a82; border-bottom:1px solid #536a82; }
+.test-facts li { min-height:105px; display:flex; flex-direction:column; justify-content:center; padding:18px 24px; border-right:1px solid #536a82; }
+.test-facts li:last-child { border-right:0; }
+.test-facts strong { color:var(--yellow); font-size:30px; }
+.test-facts span { color:#c8d4df; font-size:14px; }
+.test-band,.join-band { padding:88px 0; }
+.two-column { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:8vw; }
+.two-column > div > p:not(.test-eyebrow) { color:var(--muted); font-size:18px; }
+.test-steps { margin:0; padding:0; list-style:none; border-top:1px solid var(--line); }
+.test-steps li { display:grid; grid-template-columns:54px 1fr; gap:18px; padding:22px 0; border-bottom:1px solid var(--line); }
+.test-steps li > span { color:#087b6c; font-weight:800; }
+.test-steps strong { font-size:18px; }
+.test-steps p { margin:4px 0 0; color:var(--muted); }
+.join-band { color:var(--white); background:var(--navy-2); }
+.join-band .privacy-note { color:#b9c8d6; font-size:14px; }
+.tester-form { padding:28px; color:var(--ink); background:var(--white); border-top:5px solid var(--mint); }
+.tester-form label { display:grid; gap:7px; margin-bottom:18px; font-weight:700; }
+.tester-form input { width:100%; min-height:48px; padding:0 13px; border:1px solid #8998a5; border-radius:4px; }
+.tester-form .consent { grid-template-columns:22px 1fr; align-items:start; font-weight:500; }
+.tester-form .consent input { width:18px; min-height:18px; margin:3px 0 0; }
+.form-status { min-height:24px; margin:14px 0 0; color:#344b60; font-size:14px; }
+.test-footer { min-height:110px; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:30px max(20px,calc((100vw - 1120px)/2)); background:#081729; color:#cad6e1; }
+@media(max-width:760px){ .text-link{display:none}.test-hero{padding-top:64px}.two-column{grid-template-columns:1fr;gap:38px}.test-facts{grid-template-columns:1fr}.test-facts li{min-height:82px;border-right:0;border-bottom:1px solid #536a82}.test-facts li:last-child{border-bottom:0}.test-footer{align-items:flex-start;flex-direction:column} }
