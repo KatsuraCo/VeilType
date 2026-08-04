@@ -1,56 +1,16 @@
 # VeilType
 
-VeilType is an Android keyboard that encrypts text and media capsules locally before they leave your usual chat app.
+VeilType is an Android keyboard that encrypts text locally before the user sends it through another app.
 
-## Core product story
+## Google Play support path
 
-- Android-first privacy keyboard
-- encrypt before you send
-- private messages in any chat
-- one 8-emoji shared key
-- local-only encryption
-- no server
-- no account
-- no cloud
-- no recovery
-- text, voice, photo, and video capsules
+- English support: https://veiltype.tech/play-support.html
+- Russian support: https://veiltype.tech/play-support-ru.html
+- Privacy policy: https://veiltype.tech/privacy-policy.html
+- Russian privacy policy: https://veiltype.tech/privacy-policy-ru.html
 
-## How it works
+## Policy notes
 
-1. Create one 8-emoji shared key on Android and store it locally.
-2. Share that key once over a separate channel you trust.
-3. Open any chat, type normally, tap encrypt, and send ciphertext instead of plaintext.
-
-## What the product is
-
-- A keyboard and privacy layer for normal chat apps
-- A local decryption flow for copied ciphertext
-- A local capsule flow for voice, photo, and video messages
-- An Android-first launch build distributed as an APK
-
-## What the product is not
-
-- Not a new messenger
-- Not a cloud service
-- Not a recovery-based key system
-- Not a protection layer for already compromised phones
-
-## Distribution
-
-- Free forever for personal use
-- Complete feature set with no activation, account, ads, or subscription
-- Main call to action: direct Android APK download
-- Google Play release preparation is in progress
-
-## FAQ summary
-
-- Both people need VeilType and the same 8-emoji shared key.
-- VeilType does not use a server for encryption or key storage.
-- Lost keys cannot be recovered.
-- Installing outside Google Play currently requires enabling APK installation from the browser or files app when Android asks.
-
-## Key links
-
-- Landing page: /
-- APK: /downloads/VeilType.apk
-- llms.txt: /llms.txt
+- The public Google Play support path does not contain external checkout, donation, or referral-reward calls to action.
+- If paid digital features are offered in the Google Play build, they must use Google Play's billing flow.
+- The app may request camera or microphone only for optional input features. Core keyboard text encryption does not upload message content to a VeilType server.

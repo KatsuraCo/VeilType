@@ -1,20 +1,15 @@
 User-agent: *
 Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
+Disallow: /activate.html
+Disallow: /activate-ru.html
+Disallow: /founder-access.html
+Disallow: /founder-access-ru.html
+Disallow: /invite.html
+Disallow: /invite-ru.html
+Disallow: /partners.html
+Disallow: /partners-ru.html
+Disallow: /partner-login.html
+Disallow: /partner-dashboard.html
+Disallow: /admin.html
+Disallow: /backend/
 Sitemap: https://veiltype.tech/sitemap.xml
-Host: veiltype.tech

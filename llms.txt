@@ -1,17 +1,17 @@
 # VeilType
 
-VeilType is a free-forever Android keyboard and local encryption layer. It encrypts text and media before the user deliberately shares the result through an existing messenger. The production APK does not request Android INTERNET permission, does not require an account or activation, and does not use advertising or analytics SDKs.
+VeilType is an Android keyboard that encrypts text locally before the user sends it through another app.
 
-Important limitations:
-- VeilType is not a messenger and does not transport messages itself.
-- Both participants need a compatible Veil application and the required password or recipient key.
-- Messenger compatibility depends on each app's text and file-sharing behavior.
-- VeilType has not received an independent security audit.
-- Forgotten passwords and lost private keys cannot be recovered.
+## Google Play support path
 
-Canonical resources:
-- Product and free APK: https://veiltype.tech/
+- English support: https://veiltype.tech/play-support.html
+- Russian support: https://veiltype.tech/play-support-ru.html
 - Privacy policy: https://veiltype.tech/privacy-policy.html
-- Security model: https://veiltype.tech/security-model.html
-- Public core: https://github.com/KatsuraCo/VeilType/tree/main/veiltype-core
-- Bug reports and feature requests: https://github.com/KatsuraCo/VeilType/issues
+- Russian privacy policy: https://veiltype.tech/privacy-policy-ru.html
+
+## Policy notes
+
+- The public Google Play support path is limited to installation, support, privacy, and feedback information.
+- If paid digital features are offered in the Google Play build, they must use Google Play's billing flow.
+- The app may request camera or microphone only for optional input features. Core keyboard text encryption does not upload message content to a VeilType server.
+
