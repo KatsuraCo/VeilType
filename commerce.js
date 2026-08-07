@@ -3,18 +3,18 @@
     const attribution = window.VEILTYPE_ATTRIBUTION;
     const attributionValues = attribution ? attribution.current : null;
     const refCode = attributionValues && (attributionValues.ref || attributionValues.promo);
-    const regularPrice = Number(config.regularPriceUsd || 4.49);
+    const regularPrice = Number(config.regularPriceUsd || 0);
     const launchCode = String(config.launchCode || "").trim();
     const launchEndsAt = Date.parse(config.launchEndsAt || "");
     const hasLaunchOffer = Boolean(launchCode) && Number.isFinite(launchEndsAt) && Date.now() < launchEndsAt;
     const hasCreatorDiscount = Boolean(refCode) && !hasLaunchOffer;
-    const launchPrice = Number(config.launchPriceUsd || 2.99);
+    const launchPrice = Number(config.launchPriceUsd || 0);
     const discount = hasLaunchOffer
         ? Math.max(0, regularPrice - launchPrice)
-        : (hasCreatorDiscount ? Number(config.creatorDiscountUsd || 1) : 0);
+        : (hasCreatorDiscount ? Number(config.creatorDiscountUsd || 0) : 0);
     const finalPrice = Math.max(0, regularPrice - discount);
     const currency = config.currency || "USD";
-    const productCode = config.productCode || "veiltype_early_access";
+    const productCode = config.productCode || "veiltype_free_forever";
 
     function money(value) {
         return "$" + value.toFixed(2);
