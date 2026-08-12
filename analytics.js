@@ -69,11 +69,47 @@
   }
 
   function sendEvent(name, params) {
-    window.gtag("event", name, Object.assign({
+    var payload = Object.assign({
       product: PRODUCT,
       page_location: window.location.href,
       page_path: window.location.pathname
-    }, attribution(), params || {}));
+    }, attribution(), params || {});
+
+    sendCollectBeacon(name, payload);
+  }
+
+  function clientId() {
+    var key = "veil_ga4_client_id";
+    var existing = localStorage.getItem(key);
+    if (existing) return existing;
+    var created = Date.now() + "." + Math.random().toString(36).slice(2, 12);
+    localStorage.setItem(key, created);
+    return created;
+  }
+
+  function sendCollectBeacon(name, params) {
+    var query = new URLSearchParams({
+      v: "2",
+      tid: MEASUREMENT_ID,
+      cid: clientId(),
+      en: name,
+      dl: window.location.href,
+      dr: document.referrer || "",
+      dt: document.title || ""
+    });
+
+    Object.keys(params || {}).forEach(function (key) {
+      var value = params[key];
+      if (value === undefined || value === null || value === "") return;
+      query.set("ep." + key, String(value).slice(0, 500));
+    });
+
+    var url = "https://www.google-analytics.com/g/collect?" + query.toString();
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url);
+      return;
+    }
+    fetch(url, { method: "POST", mode: "no-cors", keepalive: true }).catch(function () {});
   }
 
   function reportLanding() {
